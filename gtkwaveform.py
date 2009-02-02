@@ -29,7 +29,7 @@ class Waveform(CairoWidget):
         self.connect("button_press_event", self.button_press)
         self.connect("scroll_event", self.scroll_event)
         self._graphdata = graphdata
-        self._graphdata.changed.connect(self.draw)
+        self._graphdata.changed.connect(self.redraw)
         
     def draw(self, context, width, height):
         # black background
@@ -54,6 +54,11 @@ class Waveform(CairoWidget):
             context.move_to(x + 0.5, 0.5 * height + 0.5)
             context.line_to(x + 0.5, y + 0.5)
             context.stroke()
+
+    def redraw(self):
+        context = self.window.cairo_create()
+        width, height = self.window.get_size()
+        self.draw(context, width, height)
 
     def button_press(self, widget, event):
         print event.button
