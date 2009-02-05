@@ -65,9 +65,9 @@ class MainWindow(gtk.Window):
               <toolitem action="Open"/>
               <toolitem action="Save"/>
               <separator/>
+              <toolitem action="ZoomFit"/>
               <toolitem action="ZoomOut"/>
               <toolitem action="ZoomIn"/>
-              <toolitem action="ZoomFit"/>
               <separator/>
               <toolitem action="Start"/>
               <toolitem action="Rewind"/>
@@ -122,12 +122,12 @@ class MainWindow(gtk.Window):
                    ('SelectAll', gtk.STOCK_SELECT_ALL, None, None, '',
                                                          self.ctrl.select_all),
                    ('Unselect', None, 'Unselect', None, '',self.ctrl.unselect),
+                   ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, None, '',
+                                                           self.ctrl.zoom_fit),
                    ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, None, '',
                                                            self.ctrl.zoom_out),
                    ('ZoomIn', gtk.STOCK_ZOOM_IN, None, None, '',
                                                             self.ctrl.zoom_in),
-                   ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, None, '',
-                                                           self.ctrl.zoom_fit),
                    ('About', gtk.STOCK_ABOUT, None, None, '', self.about)
                    ]
         actiongroup = gtk.ActionGroup('')

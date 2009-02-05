@@ -67,14 +67,14 @@ class UIController(object):
     def unselect(self):
         pass
 
-    def zoom_out(self):
-        pass
+    def zoom_out(self, *args):
+        self._graphdata.zoom_out()
 
-    def zoom_in(self):
-        pass
+    def zoom_in(self, *args):
+        self._graphdata.zoom_in()
 
-    def zoom_fit(self):
-        pass
+    def zoom_fit(self, *args):
+        self._graphdata.zoom_fit()
 
     def scroll_right(self):
         pass
