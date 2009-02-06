@@ -18,12 +18,10 @@ class Mock(object):
 class Fake(object):
 
     def _method(self, *args, **kwargs):
-        print "hello"
         return []
 
     def __getattr__(self, a):
-        if a not in self.__dict__:
-            return self._method
+        return self._method
 
 
 if __name__ == "__main__":
@@ -31,7 +29,20 @@ if __name__ == "__main__":
     assert m.one() == 1
     assert m.one("bla") == 1
     assert m.zero() == 0
-
+    try:
+        m.foo()
+        assert False
+    except AttributeError:
+        assert True
+        
     f = Fake()
     f.foo()
     f.bar()
+
+    class NotSoFake(Fake):
+        def hello(self):
+            return "hello"
+
+    n = NotSoFake()
+    assert n.hello() == "hello"
+    assert n.what() == []
