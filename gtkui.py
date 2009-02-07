@@ -95,39 +95,33 @@ class MainWindow(gtk.Window):
                    ('Edit', None, '_Edit'),
                    ('View', None, '_View'),
                    ('Help', None, '_Help'),
-                   ('New', gtk.STOCK_NEW, None, None, '', self.ctrl.new),
+                   ('New', gtk.STOCK_NEW, None, None, '', self.new),
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
-                   ('Save', gtk.STOCK_SAVE, None, None, '', self.ctrl.save),
-                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',
-                                                            self.ctrl.save_as),
+                   ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
+                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',self.save_as),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', gtk.main_quit),
-                   ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '',
-                                                               self.ctrl.play),
-                   ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',
-                                                              self.ctrl.pause),
+                   ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '', self.play),
+                   ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',self.pause),
                    ('Start', gtk.STOCK_MEDIA_PREVIOUS, None, None, '',
-                                                         self.ctrl.goto_start),
-                   ('End', gtk.STOCK_MEDIA_NEXT, None, None, '',
-                                                         self.ctrl.goto_end),
+                                                              self.goto_start),
+                   ('End', gtk.STOCK_MEDIA_NEXT, None, None, '',self.goto_end),
                    ('Rewind', gtk.STOCK_MEDIA_REWIND, None, None, '',
-                                                         self.ctrl.rewind),
+                                                                  self.rewind),
                    ('Forward', gtk.STOCK_MEDIA_FORWARD, None, None, '',
-                                                         self.ctrl.forward),
-
-                   ('Cut', gtk.STOCK_CUT, None, None, '', self.ctrl.cut),
-                   ('Copy', gtk.STOCK_COPY, None, None, '', self.ctrl.copy),
-                   ('Paste', gtk.STOCK_PASTE, None, None, '', self.ctrl.paste),
-                   ('Undo', gtk.STOCK_UNDO, None, None, '', self.ctrl.undo),
-                   ('Redo', gtk.STOCK_REDO, None, None, '', self.ctrl.redo),
+                                                                 self.forward),
+                   ('Cut', gtk.STOCK_CUT, None, None, '', self.cut),
+                   ('Copy', gtk.STOCK_COPY, None, None, '', self.copy),
+                   ('Paste', gtk.STOCK_PASTE, None, None, '', self.paste),
+                   ('Undo', gtk.STOCK_UNDO, None, None, '', self.undo),
+                   ('Redo', gtk.STOCK_REDO, None, None, '', self.redo),
                    ('SelectAll', gtk.STOCK_SELECT_ALL, None, None, '',
-                                                         self.ctrl.select_all),
-                   ('Unselect', None, 'Unselect', None, '',self.ctrl.unselect),
+                                                         self.select_all),
+                   ('Unselect', None, 'Unselect', None, '', self.unselect),
                    ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, None, '',
-                                                           self.ctrl.zoom_fit),
+                                                                self.zoom_fit),
                    ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, None, '',
-                                                           self.ctrl.zoom_out),
-                   ('ZoomIn', gtk.STOCK_ZOOM_IN, None, None, '',
-                                                            self.ctrl.zoom_in),
+                                                                self.zoom_out),
+                   ('ZoomIn', gtk.STOCK_ZOOM_IN, None, None, '', self.zoom_in),
                    ('About', gtk.STOCK_ABOUT, None, None, '', self.about)
                    ]
         actiongroup = gtk.ActionGroup('')
@@ -135,6 +129,27 @@ class MainWindow(gtk.Window):
         uimanager.insert_action_group(actiongroup, 0)
 
         return uimanager
+
+    # -- Callbacks
+
+    def __getattr__(self, name):
+        """Redirect callbacks to the controller.
+
+        The gtk widget passed to the callback (first argument) will
+        not be passed to the controller method.
+        
+        """
+        if name in ["new", "save", "play", "pause", "rewind", "forward",
+                    "goto_start", "goto_end", "select_all", "unselect",
+                    "cut", "copy", "paste", "undo", "redo",
+                    "zoom_in", "zoom_out", "zoom_fit"]:
+            method = getattr(self.ctrl, name)
+            def forward(self, *args):
+                method(*args[1:])
+            return forward
+        else:
+            raise AttributeError(name)
+
 
     def about(self, *args):
         d = gtk.Dialog(title="About",
@@ -147,7 +162,7 @@ class MainWindow(gtk.Window):
         d.run()
         d.destroy()
         
-    def open(self, sndfile):
+    def open(self, *args):
         chooser = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                 buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                          gtk.STOCK_OPEN, gtk.RESPONSE_OK))
@@ -156,6 +171,9 @@ class MainWindow(gtk.Window):
         chooser.destroy()
         if response == gtk.RESPONSE_OK:
             self.ctrl.open(filename)
+
+    def save_as(self, *args):
+        pass
 
 # -- Tests
            

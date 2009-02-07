@@ -24,10 +24,10 @@ class UIController(object):
     def quit(self):
         pass
 
-    def play(self, *args):
+    def play(self):
         self._player.thread_play(self._snd._data)
 
-    def pause(self, *args):
+    def pause(self):
         self._player.pause()
         pass
 
@@ -67,13 +67,13 @@ class UIController(object):
     def unselect(self):
         pass
 
-    def zoom_out(self, *args):
+    def zoom_out(self):
         self._graphdata.zoom_out()
 
-    def zoom_in(self, *args):
+    def zoom_in(self):
         self._graphdata.zoom_in()
 
-    def zoom_fit(self, *args):
+    def zoom_fit(self):
         self._graphdata.zoom_fit()
 
     def scroll_right(self):
