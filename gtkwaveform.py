@@ -56,9 +56,9 @@ class Waveform(CairoWidget):
             context.stroke()
 
     def redraw(self):
-        context = self.window.cairo_create()
-        width, height = self.window.get_size()
-        self.draw(context, width, height)
+        # queue_draw() emits an expose event. Double buffering is used
+        # automatically in the expose event handler.
+        self.queue_draw()
 
     def button_press(self, widget, event):
         print event.button
