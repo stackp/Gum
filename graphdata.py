@@ -27,12 +27,6 @@ class GraphData(object):
         self._view_end = len(self._data)
         self.changed()
 
-    def scroll_left(self):
-        pass
-
-    def scroll_right(self):
-        pass
-
     def _zoom(self, point, factor):
         """Expand or shrink view according to factor.
 
@@ -72,6 +66,27 @@ class GraphData(object):
         self._view_start = 0
         self._view_end = len(self._data)
         self.changed()
+
+    def _scroll(self, factor):
+        """Shift the view.
+
+        A negative factor shift the view to the left, a positive one
+        to the right. The absolute value of the factor determines the
+        length of the shift, relative to the view length. For example:
+        0.1 is 10%, O.5 is one half, 1.0 is 100%.
+        
+        """
+        l = self._view_end - self._view_start
+        l = l * factor
+        self._view_start += l
+        self._view_end += l
+        self.changed()
+
+    def scroll_left(self):
+        self._scroll(-0.20)
+            
+    def scroll_right(self):
+        self._scroll(0.20)
 
     def get_info(self, width):
         width = int(width)

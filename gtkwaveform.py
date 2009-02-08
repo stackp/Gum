@@ -65,9 +65,9 @@ class Waveform(CairoWidget):
 
     def scroll_event(self, widget, event):
         if event.direction == gtk.gdk.SCROLL_UP:
-            pass
+            self._graphdata.scroll_left()
         elif event.direction == gtk.gdk.SCROLL_DOWN:
-            pass
+            self._graphdata.scroll_right()
 
 if __name__ == '__main__':
     from mock import Mock, Fake
