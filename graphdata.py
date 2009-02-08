@@ -20,6 +20,7 @@ class GraphData(object):
         self._data = None
         self._view_start = 0
         self._view_end = 0
+        self._width = 0
 
     def set_data(self, data):
         self._data = data
@@ -48,6 +49,7 @@ class GraphData(object):
         l = l * factor
         self._view_start = point - l * 0.5
         self._view_end = point + l * 0.5
+        self._adjust_view()
         self.changed()
 
         
@@ -80,6 +82,7 @@ class GraphData(object):
         l = l * factor
         self._view_start += l
         self._view_end += l
+        self._adjust_view()
         self.changed()
 
     def scroll_left(self):
@@ -88,8 +91,28 @@ class GraphData(object):
     def scroll_right(self):
         self._scroll(0.20)
 
-    def get_info(self, width):
-        width = int(width)
+    def set_width(self, width):
+        "Set the number of values the graph must have."
+        self._width = int(width)
+        self._adjust_view()
+        
+    def get_values(self):
+        "Return the graph values."
+        width = self._width
+        start, end = [int(round(v)) for v in self._view_start, self._view_end]
+        visible = self._data[start:end]
+        o = _overview(visible, width)
+        return o
+
+    def _adjust_view(self):
+        """Adjust view boundaries.
+
+        After scrolling or zooming, the view must be adjusted. Indeed,
+        it must not start before 0 or end after the sound. Also, the
+        view must contain enough values to fit in the width.
+
+        """
+        width = self._width
 
         # When the zoom is too strong and the width cannot be filled,
         # zoom out.
@@ -111,11 +134,6 @@ class GraphData(object):
             self._view_start = 0
         if self._view_end > len(self._data):
             self._view_end = len(self._data)
-            
-        start, end = [int(round(v)) for v in self._view_start, self._view_end]
-        visible = self._data[start:end]
-        o = _overview(visible, width)
-        return o
 
 def test_overview():
     b = xrange(1000000000)
@@ -124,7 +142,8 @@ def test_overview():
 def test_GraphData():
     c = GraphData()
     c.set_data(range(1000))
-    o = c.get_info(200)
+    c.set_width(200)
+    o = c.get_values()
 
     c = GraphData()
     class Foo:
@@ -140,44 +159,51 @@ def test_zoom():
     g = GraphData()
     g.set_data(data)
 
+    g.set_width(4)
     g._zoom(point=1.5, factor=1)
-    o = g.get_info(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
     
     g._zoom(point=0, factor=1)
-    o = g.get_info(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
 
     g._zoom(point=6, factor=1)
-    o = g.get_info(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
     
+    g.set_width(2)
     g.set_data(data)
     g._zoom(point=1.5, factor=0.5)
-    o = g.get_info(2)
+    o = g.get_values()
     assert o == [2, 3]
 
     g._zoom(point=1.5, factor=0.5)
-    o = g.get_info(4)
+    g.set_width(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
 
+    g.set_width(2)
     g._zoom(point=0, factor=0.5)
-    o = g.get_info(2)
+    o = g.get_values()
     assert o == [1, 2]
 
+    g.set_width(4)
     g._zoom(point=0, factor=0.25)
-    o = g.get_info(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
     
+    g.set_width(4)
     g._zoom(point=4, factor=4)
-    o = g.get_info(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4]
 
 
+    g.set_width(3)
     data = [1, 2, 3, 4, 5]
     g.set_data(data)
     g._zoom(point=2, factor=0.5)
-    o = g.get_info(3)
+    o = g.get_values()
     assert o == [2, 3, 4]
 
     data = [1, 2, 3, 4, 5]
@@ -197,11 +223,13 @@ def test_zoom_in():
     g.set_data(data)
 
     g.zoom_in()
-    o = g.get_info(2)
+    g.set_width(2)
+    o = g.get_values()
     assert o == [2, 3]
 
     g.zoom_out()
-    o = g.get_info(4)
+    g.set_width(4)
+    o = g.get_values()
     assert o == [1, 2, 3, 4] 
     
 if __name__ == "__main__":

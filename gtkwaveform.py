@@ -28,8 +28,12 @@ class Waveform(CairoWidget):
         self.add_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.SCROLL_MASK)
         self.connect("button_press_event", self.button_press)
         self.connect("scroll_event", self.scroll_event)
+        self.connect("size_allocate", self.resize)
         self._graphdata = graphdata
         self._graphdata.changed.connect(self.redraw)
+
+    def resize(self, widget, rect):
+        self._graphdata.set_width(rect.width)
         
     def draw(self, context, width, height):
         # black background
@@ -45,7 +49,7 @@ class Waveform(CairoWidget):
 
         # waveform
         context.set_source_rgb(0, 0.9, 0)
-        overview = self._graphdata.get_info(width)
+        overview = self._graphdata.get_values()
         for i, value in enumerate(overview):
             x = i
             y = round((-value * 0.5 + 0.5) * height)
@@ -77,7 +81,8 @@ if __name__ == '__main__':
         window = gtk.Window()
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
-        ctrl = Mock({"get_info": [v / 500. for v in xrange(500)]})
+        ctrl = Mock({"get_values": [v / 500. for v in xrange(500)],
+                     "set_width": None})
         ctrl.changed = Fake()
         waveform = Waveform(ctrl)
         window.add(waveform)
@@ -91,7 +96,7 @@ if __name__ == '__main__':
 
         from random import random
         values = [(random() - 0.5) * 2 for i in xrange(500)]        
-        ctrl = Mock({"get_info": values})
+        ctrl = Mock({"get_values": values, "set_width": None})
         ctrl.changed = Fake()
         waveform = Waveform(ctrl)
         window.add(waveform)
@@ -105,7 +110,7 @@ if __name__ == '__main__':
 
         from math import sin
         sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        ctrl = Mock({"get_info": sine})
+        ctrl = Mock({"get_values": sine, "set_width": None})
         ctrl.changed = Fake()
         waveform = Waveform(ctrl)
         window.add(waveform)
