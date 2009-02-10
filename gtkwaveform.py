@@ -73,6 +73,56 @@ class Waveform(CairoWidget):
         elif event.direction == gtk.gdk.SCROLL_DOWN:
             self._graphdata.scroll_right()
 
+class ScrolledWaveform(gtk.VBox):
+    """A waveform with a scrollbar.
+
+    This widget groups a Waveform widget and a horizontal
+    scrollbar. Both act on the same graphdata object. Both are updated
+    when the graphdata object changes.
+
+    """
+    def __init__(self, graphdata):
+        super(gtk.VBox, self).__init__()
+        self._waveform = Waveform(graphdata)
+        self._adjustment = gtk.Adjustment(0, 0, 1, 0.1, 0, 1)
+        self._hscrollbar = gtk.HScrollbar(self._adjustment)
+        self._graphdata = graphdata
+        self.pack_start(self._waveform, expand=True, fill=True)
+        self.pack_start(self._hscrollbar, expand=False, fill=False)
+        self._hscrollbar.connect("value-changed", self.update_model)
+        self._graphdata.changed.connect(self.update_scrollbar)
+
+        # When the scrollbar or the graph model changes, this
+        # attribute must be set to True to avoid infinite feedback
+        # between them. Example of what happens otherwise: scrollbar
+        # changes --> graph changes --> scrollbar changes --> ...
+        self.inhibit = False
+
+    def update_model(self, widget):
+        """Changes the model.
+
+        Called when the scrollbar has been moved by the user.
+
+        """
+        if not self.inhibit:
+            self.inhibit = True
+            self._graphdata.view_starts_at(self._adjustment.value)
+            self.inhibit = False
+        
+    def update_scrollbar(self):
+        """Changes the scrollbar.
+
+        Called when the model has changed.
+
+        """
+        if not self.inhibit:
+            self.inhibit = True
+            length, start, end = self._graphdata.get_info()
+            self._adjustment.upper = length
+            self._adjustment.value = start
+            self._adjustment.page_size = (end - start)
+            self.inhibit = False
+
 if __name__ == '__main__':
     from mock import Mock, Fake
     
@@ -116,8 +166,6 @@ if __name__ == '__main__':
         window.add(waveform)
         window.show_all()
         gtk.main()
-
-    
 
     test_window()
     test_rand()

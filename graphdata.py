@@ -28,6 +28,20 @@ class GraphData(object):
         self._view_end = len(self._data)
         self.changed()
 
+    def view_starts_at(self, value):
+        "Moves the view start and keep the view length"
+        l = self._view_end - self._view_start
+        self._view_start = value
+        self._view_end = value + l
+        self.changed()
+
+    def get_info(self):
+        "Returns information about the graph: length, view start, view end"
+        length = len(self._data)
+        start = self._view_start
+        end = self._view_end
+        return (length, start, end)
+
     def _zoom(self, point, factor):
         """Expand or shrink view according to factor.
 
@@ -79,7 +93,7 @@ class GraphData(object):
         
         """
         l = self._view_end - self._view_start
-        l = l * factor
+        l = int(l * factor)
         self._view_start += l
         self._view_end += l
         self._adjust_view()
@@ -231,9 +245,22 @@ def test_zoom_in():
     g.set_width(4)
     o = g.get_values()
     assert o == [1, 2, 3, 4] 
+
+def test_scroll():
+    data = [1, 2, 3, 4]
+    g = GraphData()
+    g.set_data(data)
+    g.set_width(4)
+
+    g.scroll_right()
+    length, start, end = g.get_info()
+    assert length == 4
+    assert start == 0
+    assert end == 4
     
 if __name__ == "__main__":
     test_overview()
     test_GraphData()
     test_zoom()
     test_zoom_in()
+    test_scroll()
