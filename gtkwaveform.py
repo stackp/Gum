@@ -72,6 +72,7 @@ class WaveformLayer(object):
         self._cache = None
         layered.add_events(gtk.gdk.SCROLL_MASK)
         graphdata.changed.connect(self.update)
+        self._layered.connect("scroll_event", self.scroll_event)
 
     def update(self):
         self._cache = None
@@ -110,6 +111,13 @@ class WaveformLayer(object):
         context.set_source_surface(self._cache, 0, 0)
         context.set_operator(cairo.OPERATOR_SOURCE)
         context.paint()
+
+    def scroll_event(self, widget, event):
+        if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
+            self._graphdata.scroll_left()
+        elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
+            self._graphdata.scroll_right()
+
 
 class SelectionLayer(object):
     """A layer for LayeredGraphView.
@@ -175,25 +183,19 @@ class SelectableWaveform(LayeredGraphView):
         self.layers.append(WaveformLayer(self, graphdata))
         self.layers.append(SelectionLayer(self, graphdata, selection))
 
-class ScrolledWaveform(gtk.VBox):
-    """A waveform with a scrollbar.
+class GraphScrollbar(gtk.HScrollbar):
+    """An horizontal scrollbar that acts on a GraphData.
 
-    This widget groups a Waveform widget and a horizontal
-    scrollbar. Both act on the same graphdata object. Both are updated
-    when the graphdata object changes.
+    Acts on a graphdata object and is updated when the graphdata
+    object changes.
 
     """
-    def __init__(self, graphdata, selection):
-        super(gtk.VBox, self).__init__()
-        self._waveform = SelectableWaveform(graphdata, selection)
+    def __init__(self, graphdata):
         self._adjustment = gtk.Adjustment(0, 0, 1, 0.1, 0, 1)
-        self._hscrollbar = gtk.HScrollbar(self._adjustment)
+        super(GraphScrollbar, self).__init__(self._adjustment)
         self._graphdata = graphdata
-        self.pack_start(self._waveform, expand=True, fill=True)
-        self.pack_start(self._hscrollbar, expand=False, fill=False)
-        self._hscrollbar.connect("value-changed", self.update_model)
         self._graphdata.changed.connect(self.update_scrollbar)
-        self.connect("scroll_event", self.scroll_event)
+        self.connect("value-changed", self.update_model)
         
         # When the scrollbar or the graph model changes, this
         # attribute must be set to True to avoid infinite feedback
@@ -225,13 +227,6 @@ class ScrolledWaveform(gtk.VBox):
             self._adjustment.value = start
             self._adjustment.page_size = (end - start)
             self.inhibit = False
-
-    def scroll_event(self, widget, event):
-        if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
-            self._graphdata.scroll_left()
-        elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
-            self._graphdata.scroll_right()
-
 
 if __name__ == '__main__':
     from mock import Mock, Fake

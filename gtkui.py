@@ -1,5 +1,5 @@
 import gtk
-from gtkwaveform import ScrolledWaveform
+from gtkwaveform import SelectableWaveform, GraphScrollbar
 
 
 class MainWindow(gtk.Window):
@@ -15,13 +15,15 @@ class MainWindow(gtk.Window):
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
         for w in self.toolbar:
             w.set_homogeneous(False)
-        self.scrolledwaveform = ScrolledWaveform(wf_controller, selection)
+        self.waveform = SelectableWaveform(wf_controller, selection)
+        self.scrollbar = GraphScrollbar(wf_controller)
         self.statusbar = gtk.Statusbar()
 
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)
         self.vbox.pack_start(self.toolbar, expand=False, fill=False)
-        self.vbox.pack_start(self.scrolledwaveform, expand=True, fill=True)
+        self.vbox.pack_start(self.waveform, expand=True, fill=True)
+        self.vbox.pack_start(self.scrollbar, expand=False, fill=False)
         self.vbox.pack_end(self.statusbar, expand=False, fill=False)
         self.add(self.vbox)
         
