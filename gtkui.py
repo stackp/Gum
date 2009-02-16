@@ -4,7 +4,7 @@ from gtkwaveform import ScrolledWaveform
 
 class MainWindow(gtk.Window):
 
-    def __init__(self, ui_controller, wf_controller):
+    def __init__(self, ui_controller, wf_controller, selection):
         gtk.Window.__init__(self)
 
         self.ctrl = ui_controller
@@ -15,7 +15,7 @@ class MainWindow(gtk.Window):
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
         for w in self.toolbar:
             w.set_homogeneous(False)
-        self.scrolledwaveform = ScrolledWaveform(wf_controller)
+        self.scrolledwaveform = ScrolledWaveform(wf_controller, selection)
         self.statusbar = gtk.Statusbar()
 
         self.vbox = gtk.VBox()
