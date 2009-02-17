@@ -1,6 +1,10 @@
 import gtk
 import cairo
-import gobject
+
+# -- Base classes for painting sound visualization.
+#
+# Defined step by step only for code clarity. Everything could as well
+# be stuck in one class.
 
 class CairoWidget(gtk.DrawingArea):
 
@@ -59,6 +63,27 @@ class LayeredGraphView(LayeredCairoWidget):
         self._graphdata.set_width(rect.width)
 
 
+# -- Aah, beautiful sound visualization widget.
+
+class GraphView(LayeredGraphView):
+    """Sound visualization widget for the main window.
+
+    * Two graphical layers: the waveform and the selection.
+    * Mouse event listeners act on models (scroll and selection).
+
+    """
+    def __init__(self, graphdata, selection):
+        super(GraphView, self).__init__(graphdata)
+        self._graphdata = graphdata
+        self._selection = selection
+        self.layers.append(WaveformLayer(self, graphdata))
+        self.layers.append(SelectionLayer(self, graphdata, selection))
+        MouseSelection(self, selection)
+        MouseScroll(self, graphdata)
+
+
+# -- The layers that can be added to LayeredGraphview.
+
 class WaveformLayer(object):
     """A layer for LayeredGraphView.
 
@@ -72,7 +97,6 @@ class WaveformLayer(object):
         self._cache = None
         layered.add_events(gtk.gdk.SCROLL_MASK)
         graphdata.changed.connect(self.update)
-        self._layered.connect("scroll_event", self.scroll_event)
 
     def update(self):
         self._cache = None
@@ -112,13 +136,6 @@ class WaveformLayer(object):
         context.set_operator(cairo.OPERATOR_SOURCE)
         context.paint()
 
-    def scroll_event(self, widget, event):
-        if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
-            self._graphdata.scroll_left()
-        elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
-            self._graphdata.scroll_right()
-
-
 class SelectionLayer(object):
     """A layer for LayeredGraphView.
 
@@ -130,7 +147,6 @@ class SelectionLayer(object):
     def __init__(self, layered, graphdata, selection):
         self._layered = layered
         self._graphdata = graphdata
-        self.pressed = False
         self._cache = None
         self._selection = selection
         self._selection.changed.connect(self.update)
@@ -138,9 +154,6 @@ class SelectionLayer(object):
                            gtk.gdk.BUTTON_RELEASE_MASK |
                            gtk.gdk.POINTER_MOTION_MASK |
                            gtk.gdk.POINTER_MOTION_HINT_MASK)
-        self._layered.connect("button_press_event", self.button_press)
-        self._layered.connect("button_release_event", self.button_release)
-        self._layered.connect("motion_notify_event", self.motion_notify)
 
     def update(self):
         self._cache = None
@@ -160,6 +173,39 @@ class SelectionLayer(object):
         context.set_operator(cairo.OPERATOR_OVER)
         context.paint()
 
+
+# -- Mouse event listeners that act on models.
+
+class MouseScroll(object):
+    """Listens for mouse wheel events and scroll a graph
+
+    Must be attached to a gtk.Widget and a GraphData.
+
+    """
+    def __init__(self, widget, graphdata):
+        self._graphdata = graphdata
+        widget.connect("scroll_event", self.scroll_event)
+
+    def scroll_event(self, widget, event):
+        if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
+            self._graphdata.scroll_left()
+        elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
+            self._graphdata.scroll_right()
+
+
+class MouseSelection(object):
+    """Listens for mouse events and select graph area
+
+    Must be attached to a gtk.Widget and a GraphData.
+
+    """
+    def __init__(self, widget, selection):
+        self._selection = selection
+        self.pressed = False
+        widget.connect("button_press_event", self.button_press)
+        widget.connect("button_release_event", self.button_release)
+        widget.connect("motion_notify_event", self.motion_notify)
+        
     def button_press(self, widget, event):
         if event.button == 1:
             self.pressed = True
@@ -174,14 +220,8 @@ class SelectionLayer(object):
         if event.button == 1:
             self.pressed = False
 
-class SelectableWaveform(LayeredGraphView):
 
-    def __init__(self, graphdata, selection):
-        super(SelectableWaveform, self).__init__(graphdata)
-        self._graphdata = graphdata
-        self._selection = selection
-        self.layers.append(WaveformLayer(self, graphdata))
-        self.layers.append(SelectionLayer(self, graphdata, selection))
+# -- An horizontal scrollbar, derived to control a graph model.
 
 class GraphScrollbar(gtk.HScrollbar):
     """An horizontal scrollbar that acts on a GraphData.
@@ -227,6 +267,9 @@ class GraphScrollbar(gtk.HScrollbar):
             self._adjustment.value = start
             self._adjustment.page_size = (end - start)
             self.inhibit = False
+
+
+# -- Testing
 
 if __name__ == '__main__':
     from mock import Mock, Fake
