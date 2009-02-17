@@ -12,8 +12,10 @@ class UIController(object):
         pass
 
     def open(self, filename):
+        self._player.pause()
         self._snd = Sound(filename)
         self._graphdata.set_data(self._snd._data)
+        self._player.set_data(self._snd._data)
 
     def save(self):
         pass
@@ -25,11 +27,10 @@ class UIController(object):
         pass
 
     def play(self):
-        self._player.thread_play(self._snd._data)
+        self._player.thread_play()
 
     def pause(self):
         self._player.pause()
-        pass
 
     def goto_start(self):
         pass
