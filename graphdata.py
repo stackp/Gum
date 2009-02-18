@@ -186,14 +186,14 @@ class Selection(object):
     def start_selection(self, value):
         "The value is an index in the graphdata."
         length, view_start, view_end = self._graphdata.get_info()
-        self.start = view_start + int(round(value * self.density))
+        self.start = view_start + value * self.density
         self.end = self.start
         self.changed()
         
     def end_selection(self, value):
         "The value is an index in the graphdata."
         length, view_start, view_end = self._graphdata.get_info()
-        self.end = view_start + int(round(value * self.density))
+        self.end = view_start + value * self.density
         self.changed()
 
     def get_selection(self):
@@ -314,7 +314,7 @@ def test_scroll():
 
 def test_selection():
     from mock import Fake, Mock
-    graphdata = Mock({"get_density": 9, "get_info": (5000, 100, 200)})
+    graphdata = Mock({"get_density": 9, "get_info": (5000, 100.1, 200.1)})
     graphdata.changed = Fake()
     selection = Selection(graphdata)
     selection.start_selection(10)

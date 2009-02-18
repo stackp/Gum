@@ -11,7 +11,7 @@ if __name__ == "__main__":
     player = Player()
     graphdata = GraphData()
     selection = Selection(graphdata)
-    ui_ctrl = UIController(player, graphdata)
+    ui_ctrl = UIController(player, graphdata, selection)
     win = MainWindow(ui_ctrl, graphdata, selection)
     win.resize(700, 500)
     win.show_all()

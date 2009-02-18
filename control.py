@@ -3,9 +3,10 @@ from player import Player
 
 class UIController(object):
 
-    def __init__(self, player, graphdata):
+    def __init__(self, player, graphdata, selection):
         self._player = player
         self._graphdata = graphdata
+        self._selection = selection
         self._snd = None
 
     def new(self):
@@ -16,6 +17,7 @@ class UIController(object):
         self._snd = Sound(filename)
         self._graphdata.set_data(self._snd._data)
         self._player.set_data(self._snd._data)
+        self._selection.unselect()
 
     def save(self):
         pass
@@ -27,6 +29,15 @@ class UIController(object):
         pass
 
     def play(self):
+        start = int(round(self._selection.start))
+        end = int(round(self._selection.end))
+        if start > end:
+            start, end = end, start
+        if start == end:
+            end = len(self._player._data)
+        self._position = start
+        self._player.start = start
+        self._player.end = end
         self._player.thread_play()
 
     def pause(self):
