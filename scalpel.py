@@ -2,7 +2,8 @@
 
 from gtkui import MainWindow
 from control import UIController
-from graphmodel import Graph, Selection
+from graphmodel import Graph
+from selection import Selection
 from player import Player
 import gtk
 gtk.gdk.threads_init()
