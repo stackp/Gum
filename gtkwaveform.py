@@ -168,10 +168,6 @@ class SelectionLayer(object):
             start, end = self._selection.pixels()
 
             if start != end:
-
-                if start > end:
-                    start, end = end, start
-                    
                 # darken everything ...
                 c.set_source_rgba(0, 0, 0, 0.75)
                 c.paint()
