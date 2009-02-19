@@ -2,17 +2,17 @@
 
 from gtkui import MainWindow
 from control import UIController
-from graphdata import GraphData, Selection
+from graphmodel import Graph, Selection
 from player import Player
 import gtk
 gtk.gdk.threads_init()
 
 if __name__ == "__main__":
     player = Player()
-    graphdata = GraphData()
-    selection = Selection(graphdata)
-    ui_ctrl = UIController(player, graphdata, selection)
-    win = MainWindow(ui_ctrl, graphdata, selection)
+    graph = Graph()
+    selection = Selection(graph)
+    ui_ctrl = UIController(player, graph, selection)
+    win = MainWindow(ui_ctrl, graph, selection)
     win.resize(700, 500)
     win.show_all()
     gtk.main()

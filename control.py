@@ -3,9 +3,9 @@ from player import Player
 
 class UIController(object):
 
-    def __init__(self, player, graphdata, selection):
+    def __init__(self, player, graph, selection):
         self._player = player
-        self._graphdata = graphdata
+        self._graph = graph
         self._selection = selection
         self._snd = None
 
@@ -15,7 +15,7 @@ class UIController(object):
     def open(self, filename):
         self._player.pause()
         self._snd = Sound(filename)
-        self._graphdata.set_data(self._snd._data)
+        self._graph.set_data(self._snd._data)
         self._player.set_data(self._snd._data)
         self._selection.unselect()
 
@@ -80,13 +80,13 @@ class UIController(object):
         pass
 
     def zoom_out(self):
-        self._graphdata.zoom_out()
+        self._graph.zoom_out()
 
     def zoom_in(self):
-        self._graphdata.zoom_in()
+        self._graph.zoom_in()
 
     def zoom_fit(self):
-        self._graphdata.zoom_fit()
+        self._graph.zoom_fit()
 
     def scroll_right(self):
         pass

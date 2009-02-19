@@ -47,20 +47,20 @@ class LayeredCairoWidget(CairoWidget):
             layer.draw(context, width, height)
 
 class LayeredGraphView(LayeredCairoWidget):
-    """A layered widget dedicated to paint data from a GraphData
+    """A layered widget dedicated to paint data from a Graph
     object.
     
-    As soon as it knows its width, it gives it to the GraphData
+    As soon as it knows its width, it gives it to the Graph
     object.
 
     """
-    def __init__(self, graphdata):
+    def __init__(self, graph):
         super(LayeredGraphView, self).__init__()
-        self._graphdata = graphdata
+        self._graph = graph
         self.connect("size_allocate", self.resize)
 
     def resize(self, widget, rect):
-        self._graphdata.set_width(rect.width)
+        self._graph.set_width(rect.width)
 
 
 # -- Aah, beautiful sound visualization widget.
@@ -72,14 +72,14 @@ class GraphView(LayeredGraphView):
     * Mouse event listeners act on models (scroll and selection).
 
     """
-    def __init__(self, graphdata, selection):
-        super(GraphView, self).__init__(graphdata)
-        self._graphdata = graphdata
+    def __init__(self, graph, selection):
+        super(GraphView, self).__init__(graph)
+        self._graph = graph
         self._selection = selection
-        self.layers.append(WaveformLayer(self, graphdata))
-        self.layers.append(SelectionLayer(self, graphdata, selection))
+        self.layers.append(WaveformLayer(self, graph))
+        self.layers.append(SelectionLayer(self, graph, selection))
         MouseSelection(self, selection)
-        MouseScroll(self, graphdata)
+        MouseScroll(self, graph)
 
 
 # -- The layers that can be added to LayeredGraphview.
@@ -88,15 +88,15 @@ class WaveformLayer(object):
     """A layer for LayeredGraphView.
 
     It paints the graph (the waveform). The cairo surface is cached,
-    it is redrawn only when graphdata has changed.
+    it is redrawn only when graph has changed.
 
     """
-    def __init__(self, layered, graphdata):
+    def __init__(self, layered, graph):
         self._layered = layered
-        self._graphdata = graphdata
+        self._graph = graph
         self._cache = None
         layered.add_events(gtk.gdk.SCROLL_MASK)
-        graphdata.changed.connect(self.update)
+        graph.changed.connect(self.update)
 
     def update(self):
         self._cache = None
@@ -122,7 +122,7 @@ class WaveformLayer(object):
 
             # waveform
             c.set_source_rgb(0, 0.9, 0)
-            overview = self._graphdata.get_values()
+            overview = self._graph.get_values()
             for i, value in enumerate(overview):
                 x = i
                 y = round((-value * 0.5 + 0.5) * height)
@@ -144,9 +144,9 @@ class SelectionLayer(object):
     cached, it is redrawn only when selection has changed.
 
     """
-    def __init__(self, layered, graphdata, selection):
+    def __init__(self, layered, graph, selection):
         self._layered = layered
-        self._graphdata = graphdata
+        self._graph = graph
         self._cache = None
         self._selection = selection
         self._selection.changed.connect(self.update)
@@ -202,24 +202,24 @@ class SelectionLayer(object):
 class MouseScroll(object):
     """Listens for mouse wheel events and scroll a graph
 
-    Must be attached to a gtk.Widget and a GraphData.
+    Must be attached to a gtk.Widget and a Graph.
 
     """
-    def __init__(self, widget, graphdata):
-        self._graphdata = graphdata
+    def __init__(self, widget, graph):
+        self._graph = graph
         widget.connect("scroll_event", self.scroll_event)
 
     def scroll_event(self, widget, event):
         if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
-            self._graphdata.scroll_left()
+            self._graph.scroll_left()
         elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
-            self._graphdata.scroll_right()
+            self._graph.scroll_right()
 
 
 class MouseSelection(object):
     """Listens for mouse events and select graph area
 
-    Must be attached to a gtk.Widget and a GraphData.
+    Must be attached to a gtk.Widget and a Graph.
 
     """
     def __init__(self, widget, selection):
@@ -247,17 +247,17 @@ class MouseSelection(object):
 # -- An horizontal scrollbar, derived to control a graph model.
 
 class GraphScrollbar(gtk.HScrollbar):
-    """An horizontal scrollbar that acts on a GraphData.
+    """An horizontal scrollbar that acts on a Graph.
 
-    Acts on a graphdata object and is updated when the graphdata
+    Acts on a graph object and is updated when the graph
     object changes.
 
     """
-    def __init__(self, graphdata):
+    def __init__(self, graph):
         self._adjustment = gtk.Adjustment(0, 0, 1, 0.1, 0, 1)
         super(GraphScrollbar, self).__init__(self._adjustment)
-        self._graphdata = graphdata
-        self._graphdata.changed.connect(self.update_scrollbar)
+        self._graph = graph
+        self._graph.changed.connect(self.update_scrollbar)
         self.connect("value-changed", self.update_model)
         
         # When the scrollbar or the graph model changes, this
@@ -274,7 +274,7 @@ class GraphScrollbar(gtk.HScrollbar):
         """
         if not self.inhibit:
             self.inhibit = True
-            self._graphdata.view_starts_at(self._adjustment.value)
+            self._graph.view_starts_at(self._adjustment.value)
             self.inhibit = False
         
     def update_scrollbar(self):
@@ -285,7 +285,7 @@ class GraphScrollbar(gtk.HScrollbar):
         """
         if not self.inhibit:
             self.inhibit = True
-            length, start, end = self._graphdata.get_info()
+            length, start, end = self._graph.get_info()
             self._adjustment.upper = length
             self._adjustment.value = start
             self._adjustment.page_size = (end - start)
@@ -301,12 +301,12 @@ if __name__ == '__main__':
         window = gtk.Window()
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
-        graphdata = Mock({"get_values": [v / 500. for v in xrange(500)],
+        graph = Mock({"get_values": [v / 500. for v in xrange(500)],
                      "set_width": None,
                      "get_info": (0, 0, 0)})
-        graphdata.changed = Fake()
-        layered = LayeredGraphView(graphdata)
-        layered.layers.append(WaveformLayer(layered, graphdata))
+        graph.changed = Fake()
+        layered = LayeredGraphView(graph)
+        layered.layers.append(WaveformLayer(layered, graph))
         window.add(layered)
         window.show_all()
         gtk.main()
@@ -318,11 +318,11 @@ if __name__ == '__main__':
 
         from random import random
         values = [(random() - 0.5) * 2 for i in xrange(500)]        
-        graphdata = Mock({"get_values": values, "set_width": None,
+        graph = Mock({"get_values": values, "set_width": None,
                           "get_info": (0, 0, 0)})
-        graphdata.changed = Fake()
-        layered = LayeredGraphView(graphdata)
-        layered.layers.append(WaveformLayer(layered, graphdata))
+        graph.changed = Fake()
+        layered = LayeredGraphView(graph)
+        layered.layers.append(WaveformLayer(layered, graph))
         window.add(layered)
         window.show_all()
         gtk.main()
@@ -334,11 +334,11 @@ if __name__ == '__main__':
 
         from math import sin
         sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        graphdata = Mock({"get_values": sine, "set_width": None,
+        graph = Mock({"get_values": sine, "set_width": None,
                           "get_info": (0, 0, 0)})
-        graphdata.changed = Fake()
-        layered = LayeredGraphView(graphdata)
-        layered.layers.append(WaveformLayer(layered, graphdata))
+        graph.changed = Fake()
+        layered = LayeredGraphView(graph)
+        layered.layers.append(WaveformLayer(layered, graph))
         window.add(layered)
         window.show_all()
         gtk.main()
@@ -348,13 +348,13 @@ if __name__ == '__main__':
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
 
-        graphdata = Mock({"get_values": [], "set_width": None,
+        graph = Mock({"get_values": [], "set_width": None,
                           "get_info": (0, 0, 0)})
-        graphdata.changed = Fake()
+        graph.changed = Fake()
         selection = Mock({"get_selection": (20, 100)})
         selection.changed = Fake()
-        layered = LayeredGraphView(graphdata)
-        layered.layers.append(SelectionLayer(layered, graphdata, selection))
+        layered = LayeredGraphView(graph)
+        layered.layers.append(SelectionLayer(layered, graph, selection))
         window.add(layered)
         window.show_all()
         gtk.main()

@@ -13,7 +13,7 @@ def _overview(data, width):
         left = left + density 
     return res
 
-class GraphData(object):
+class Graph(object):
     """Computes how a sound must be displayed on the screen.
     
     When an audio file is displayed on the screen, several frames are
@@ -162,21 +162,21 @@ class GraphData(object):
 
 
 class Selection(object):
-    """Represents a selection on a GraphData object.
+    """Represents a selection on a Graph object.
 
     Translates between frame numbers and pixels.
 
     """
-    def __init__(self, graphdata):
-        self._graphdata = graphdata
+    def __init__(self, graph):
+        self._graph = graph
         self.changed = Signal()
-        self.density = self._graphdata.get_density()
+        self.density = self._graph.get_density()
         self.unselect()
-        self._graphdata.changed.connect(self.update)
+        self._graph.changed.connect(self.update)
     
     def update(self):
-        "Called when self._graphdata changes."
-        self.density = self._graphdata.get_density()
+        "Called when self._graph changes."
+        self.density = self._graph.get_density()
         self.changed()
 
     def unselect(self):
@@ -184,20 +184,20 @@ class Selection(object):
         self.end = 0
 
     def start_selection(self, value):
-        "The value is an index in the graphdata."
-        length, view_start, view_end = self._graphdata.get_info()
+        "The value is an index in the graph."
+        length, view_start, view_end = self._graph.get_info()
         self.start = view_start + value * self.density
         self.end = self.start
         self.changed()
         
     def end_selection(self, value):
-        "The value is an index in the graphdata."
-        length, view_start, view_end = self._graphdata.get_info()
+        "The value is an index in the graph."
+        length, view_start, view_end = self._graph.get_info()
         self.end = view_start + value * self.density
         self.changed()
 
     def get_selection(self):
-        (length, vstart, vend) = self._graphdata.get_info()
+        (length, vstart, vend) = self._graph.get_info()
         sel_start = (self.start - vstart) / self.density
         sel_end = (self.end - vstart) / self.density
         return sel_start, sel_end
@@ -207,24 +207,24 @@ def test_overview():
     b = xrange(1000000000)
     print _overview(b, 30)
     
-def test_GraphData():
-    c = GraphData()
+def test_Graph():
+    c = Graph()
     c.set_data(range(1000))
     c.set_width(200)
     o = c.get_values()
 
-    c = GraphData()
+    c = Graph()
     class Foo:
         def foo(self):
             print "Changed."
     f = Foo()
-    c = GraphData()
+    c = Graph()
     c.changed.connect(f.foo)
     c.set_data(range(1000))
 
 def test_zoom():
     data = [1, 2, 3, 4]
-    g = GraphData()
+    g = Graph()
     g.set_data(data)
 
     g.set_width(4)
@@ -287,7 +287,7 @@ def test_zoom():
 
 def test_zoom_in():
     data = [1, 2, 3, 4]
-    g = GraphData()
+    g = Graph()
     g.set_data(data)
 
     g.set_width(2)
@@ -302,7 +302,7 @@ def test_zoom_in():
 
 def test_scroll():
     data = [1, 2, 3, 4]
-    g = GraphData()
+    g = Graph()
     g.set_data(data)
     g.set_width(4)
 
@@ -314,9 +314,9 @@ def test_scroll():
 
 def test_selection():
     from mock import Fake, Mock
-    graphdata = Mock({"get_density": 9, "get_info": (5000, 100.1, 200.1)})
-    graphdata.changed = Fake()
-    selection = Selection(graphdata)
+    graph = Mock({"get_density": 9, "get_info": (5000, 100.1, 200.1)})
+    graph.changed = Fake()
+    selection = Selection(graph)
     selection.start_selection(10)
     selection.end_selection(100)
     selection.update()
@@ -324,7 +324,7 @@ def test_selection():
     
 if __name__ == "__main__":
     test_overview()
-    test_GraphData()
+    test_Graph()
     test_zoom()
     test_zoom_in()
     test_scroll()
