@@ -165,7 +165,7 @@ class SelectionLayer(object):
             self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
                                                  width, height)
             c = cairo.Context(self._cache)
-            start, end = self._selection.get_selection()
+            start, end = self._selection.pixels()
 
             if start != end:
 
@@ -351,7 +351,7 @@ if __name__ == '__main__':
         graph = Mock({"get_values": [], "set_width": None,
                           "get_info": (0, 0, 0)})
         graph.changed = Fake()
-        selection = Mock({"get_selection": (20, 100)})
+        selection = Mock({"pixels": (20, 100)})
         selection.changed = Fake()
         layered = LayeredGraphView(graph)
         layered.layers.append(SelectionLayer(layered, graph, selection))

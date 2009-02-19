@@ -35,11 +35,12 @@ class Selection(object):
         self.end = view_start + value * self.density
         self.changed()
 
-    def get_selection(self):
+    def pixels(self):
         (length, vstart, vend) = self._graph.get_info()
         sel_start = (self.start - vstart) / self.density
         sel_end = (self.end - vstart) / self.density
         return sel_start, sel_end
+
     
 def test_selection():
     from mock import Fake, Mock
