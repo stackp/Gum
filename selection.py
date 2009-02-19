@@ -42,8 +42,8 @@ class Selection(object):
 
         """
         (length, vstart, vend) = self._graph.get_info()
-        pix_start = (self.start - vstart) / self.density
-        pix_end = (self.end - vstart) / self.density
+        pix_start = int(round((self.start - vstart) / self.density))
+        pix_end = int(round((self.end - vstart) / self.density))
         if pix_start > pix_end:
             pix_start, pix_end = pix_end, pix_start
         return pix_start, pix_end
