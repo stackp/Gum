@@ -36,11 +36,29 @@ class Selection(object):
         self.changed()
 
     def pixels(self):
-        (length, vstart, vend) = self._graph.get_info()
-        sel_start = (self.start - vstart) / self.density
-        sel_end = (self.end - vstart) / self.density
-        return sel_start, sel_end
+        """Returns pixel position for selection: `(start, end)`.
 
+        `start` is always lower than or equals to `end`.
+
+        """
+        (length, vstart, vend) = self._graph.get_info()
+        pix_start = (self.start - vstart) / self.density
+        pix_end = (self.end - vstart) / self.density
+        if pix_start > pix_end:
+            pix_start, pix_end = pix_end, pix_start
+        return pix_start, pix_end
+
+    def frames(self):
+        """Returns frames index for selection: (start, end).
+
+        start is always lower than or equals to end.
+
+        """
+        start = int(round(self.start))
+        end = int(round(self.end))
+        if start > end:
+            start, end = end, start
+        return start, end
     
 def test_selection():
     from mock import Fake, Mock

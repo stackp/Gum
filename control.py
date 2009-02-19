@@ -29,10 +29,7 @@ class UIController(object):
         pass
 
     def play(self):
-        start = int(round(self._selection.start))
-        end = int(round(self._selection.end))
-        if start > end:
-            start, end = end, start
+        start, end = self._selection.frames()
         if start == end:
             end = len(self._player._data)
         self._position = start
@@ -57,7 +54,7 @@ class UIController(object):
 
     def cut(self):
         pass
-
+    
     def copy(self):
         pass
 
