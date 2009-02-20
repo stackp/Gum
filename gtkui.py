@@ -179,7 +179,7 @@ class MainWindow(gtk.Window):
            
 def test():
     from mock import Fake, Mock
-    wf_ctrl = Mock({"get_info": (0, 0, [], [])})
+    wf_ctrl = Mock({"frames_info" :(0, 0, [], [])})
     win = MainWindow(Fake(), wf_ctrl)
     win.resize(700, 500)
     win.show_all()

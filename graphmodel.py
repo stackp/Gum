@@ -45,8 +45,12 @@ class Graph(object):
         self._view_end = value + l
         self.changed()
 
-    def get_info(self):
-        "Returns information about the graph: length, view start, view end"
+    def frames_info(self):
+        """Returns information about the sound, in frames:
+
+               (length, view_start, view_end)
+
+        """
         length = len(self._sound._data)
         start = self._view_start
         end = self._view_end
@@ -275,7 +279,7 @@ def test_scroll():
     g.set_width(4)
 
     g.scroll_right()
-    length, start, end = g.get_info()
+    length, start, end = g.frames_info()
     assert length == 4
     assert start == 0
     assert end == 4

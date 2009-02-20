@@ -280,7 +280,7 @@ class GraphScrollbar(gtk.HScrollbar):
         """
         if not self.inhibit:
             self.inhibit = True
-            length, start, end = self._graph.get_info()
+            length, start, end = self._graph.frames_info()
             if start != end:
                 self._adjustment.upper = length
                 self._adjustment.value = start
@@ -304,7 +304,7 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
         graph = Mock({"get_values": [v / 500. for v in xrange(500)],
                      "set_width": None,
-                     "get_info": (0, 0, 0)})
+                     "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
         layered.layers.append(WaveformLayer(layered, graph))
@@ -320,7 +320,7 @@ if __name__ == '__main__':
         from random import random
         values = [(random() - 0.5) * 2 for i in xrange(500)]        
         graph = Mock({"get_values": values, "set_width": None,
-                          "get_info": (0, 0, 0)})
+                          "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
         layered.layers.append(WaveformLayer(layered, graph))
@@ -336,7 +336,7 @@ if __name__ == '__main__':
         from math import sin
         sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
         graph = Mock({"get_values": sine, "set_width": None,
-                          "get_info": (0, 0, 0)})
+                          "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
         layered.layers.append(WaveformLayer(layered, graph))
@@ -350,7 +350,7 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
 
         graph = Mock({"get_values": [], "set_width": None,
-                          "get_info": (0, 0, 0)})
+                          "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         selection = Mock({"pixels": (20, 100)})
         selection.changed = Fake()

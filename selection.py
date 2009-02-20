@@ -32,7 +32,7 @@ class Selection(object):
     
     def start_selection(self, pixel):
         "The pixel is an index in the graph."
-        length, view_start, view_end = self._graph.get_info()
+        length, view_start, view_end = self._graph.frames_info()
         start = view_start + pixel * self.density
         self.start = self.gauge(start, 0, length)
         self.end = self.start
@@ -40,7 +40,7 @@ class Selection(object):
         
     def end_selection(self, pixel):
         "The pixel is an index in the graph."
-        length, view_start, view_end = self._graph.get_info()
+        length, view_start, view_end = self._graph.frames_info()
         end = view_start + pixel * self.density
         self.end = self.gauge(end, 0, length)
         self.changed()
@@ -51,7 +51,7 @@ class Selection(object):
         `start` is always lower than or equals to `end`.
 
         """
-        (length, vstart, vend) = self._graph.get_info()
+        (length, vstart, vend) = self._graph.frames_info()
         pix_start = int(round((self.start - vstart) / self.density))
         pix_end = int(round((self.end - vstart) / self.density))
         if pix_start > pix_end:
@@ -72,7 +72,7 @@ class Selection(object):
     
 def test_selection():
     from mock import Fake, Mock
-    graph = Mock({"get_density": 9, "get_info": (5000, 100.1, 200.1)})
+    graph = Mock({"get_density": 9, "frames_info": (5000, 100.1, 200.1)})
     graph.changed = Fake()
     selection = Selection(graph)
     selection.start_selection(10)
