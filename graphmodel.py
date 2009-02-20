@@ -54,10 +54,12 @@ class Graph(object):
 
     def get_density(self):
         "Number of frames per pixel."
-        d = (self._view_end - self._view_start) / float(self._width)
-        if d == 0:
-            # empty sound
+        number_frames_view = (self._view_end - self._view_start)
+        if number_frames_view < self._width:
+            # the sound is too small to fill the width
             d = 1
+        else:
+            d = float(number_frames_view) / self._width
         return d
 
     def _zoom(self, point, factor):
