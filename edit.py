@@ -73,12 +73,6 @@ class Sound(object):
     def save_as(self, filename, format):
         pass
 
-    def select(start, end):
-        pass
-
-    def unselect():
-        pass
-
     def cut(self, start, end):
         clip = self._data[start:end]
         do = (self._do_cut, (start, end))
@@ -116,8 +110,6 @@ class Sound(object):
     def monoize(self, start, end):
         pass
     
-    def _emit(self, signal):
-        pass
     def undo(self):
         self.history.undo()
         self.changed()
@@ -126,8 +118,6 @@ class Sound(object):
         self.history.redo()
         self.changed()
 
-    def register(self, obj):
-        pass
 
 # -- Tests
 
