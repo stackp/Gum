@@ -57,7 +57,7 @@ class UIController(object):
         start, end = self._selection.frames()
         self._selection.start = start
         self._selection.end = start
-        self._sound.cut(start, end)
+        self.clip = self._sound.cut(start, end)
         
     def copy(self):
         start, end = self._selection.frames()
@@ -73,10 +73,10 @@ class UIController(object):
         pass
 
     def undo(self):
-        pass
+        self._sound.undo()
 
     def redo(self):
-        pass
+        self._sound.redo()
 
     def select_all(self):
         pass

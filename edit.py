@@ -80,13 +80,15 @@ class Sound(object):
         pass
 
     def cut(self, start, end):
+        clip = self._data[start:end]
         do = (self._do_cut, (start, end))
         undo = (self._do_paste, (start, self._data[start:end]))
         action = Action(do, undo)
         action.do()
         self.history.push(action)
         self.changed()
-        
+        return clip
+    
     def _do_cut(self, start, end):
         del self._data[start:end]
 
@@ -116,6 +118,13 @@ class Sound(object):
     
     def _emit(self, signal):
         pass
+    def undo(self):
+        self.history.undo()
+        self.changed()
+
+    def redo(self):
+        self.history.redo()
+        self.changed()
 
     def register(self, obj):
         pass
