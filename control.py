@@ -54,9 +54,9 @@ class UIController(object):
 
     def cut(self):
         start, end = self._selection.frames()
-        self._sound.cut(start, end)
         self._selection.start = start
         self._selection.end = start
+        self._sound.cut(start, end)
         
     def copy(self):
         pass
