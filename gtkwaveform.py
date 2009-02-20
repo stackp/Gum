@@ -281,9 +281,15 @@ class GraphScrollbar(gtk.HScrollbar):
         if not self.inhibit:
             self.inhibit = True
             length, start, end = self._graph.get_info()
-            self._adjustment.upper = length
-            self._adjustment.value = start
-            self._adjustment.page_size = (end - start)
+            if start != end:
+                self._adjustment.upper = length
+                self._adjustment.value = start
+                self._adjustment.page_size = (end - start)
+            else:
+                # empty sound
+                self._adjustment.upper = 1
+                self._adjustment.value = 0
+                self._adjustment.page_size = 1
             self.inhibit = False
 
 
