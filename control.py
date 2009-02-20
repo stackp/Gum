@@ -7,16 +7,16 @@ class UIController(object):
         self._player = player
         self._graph = graph
         self._selection = selection
-        self._snd = None
+        self._sound = None
 
     def new(self):
         pass
 
     def open(self, filename):
         self._player.pause()
-        self._snd = Sound(filename)
-        self._graph.set_data(self._snd._data)
-        self._player.set_data(self._snd._data)
+        self._sound = Sound(filename)
+        self._graph.set_sound(self._sound)
+        self._player.set_data(self._sound._data)
         self._selection.unselect()
 
     def save(self):
@@ -53,8 +53,11 @@ class UIController(object):
         pass
 
     def cut(self):
-        pass
-    
+        start, end = self._selection.frames()
+        self._sound.cut(start, end)
+        self._selection.start = start
+        self._selection.end = start
+        
     def copy(self):
         pass
 
@@ -98,7 +101,7 @@ def test_UIController():
     # Test opening a file
     ctrl = UIController()
     ctrl.open('sounds/test1.wav')
-    assert ctrl._snd != None
+    assert ctrl._sound != None
 
     # Test playing
     assert ctrl._player != None

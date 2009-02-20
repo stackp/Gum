@@ -23,15 +23,23 @@ class Graph(object):
     """
     def __init__(self):
         self.changed = Signal()
+        self._sound = None
         self._data = None
         self._view_start = 0
         self._view_end = 0
         self._width = 100
 
-    def set_data(self, data):
-        self._data = data
+    def set_sound(self, sound):
+        self._sound = sound
+        self._data = sound._data
         self._view_start = 0
         self._view_end = len(self._data)
+        self._sound.changed.connect(self.update)
+        self.changed()
+
+    def update(self):
+        "called when sound has changed."
+        self._adjust_view()
         self.changed()
 
     def view_starts_at(self, value):
