@@ -77,7 +77,7 @@ class GraphView(LayeredGraphView):
         self._graph = graph
         self._selection = selection
         self.layers.append(WaveformLayer(self, graph))
-        self.layers.append(SelectionLayer(self, graph, selection))
+        self.layers.append(SelectionLayer(self, selection))
         MouseSelection(self, selection)
         MouseScroll(self, graph)
 
@@ -144,9 +144,8 @@ class SelectionLayer(object):
     cached, it is redrawn only when selection has changed.
 
     """
-    def __init__(self, layered, graph, selection):
+    def __init__(self, layered, selection):
         self._layered = layered
-        self._graph = graph
         self._cache = None
         self._selection = selection
         self._selection.changed.connect(self.update)
