@@ -1,3 +1,4 @@
+from event import Signal
 import pysndfile
 
 
@@ -64,7 +65,8 @@ class Sound(object):
             # del on them. Converting to list. Fixme later
             self._data = list(self._data)
         self.history = History()
-     
+        self.changed = Signal()
+
     def save(self, format):
         self.save_as(self.filename, format)
 
@@ -83,8 +85,8 @@ class Sound(object):
         action = Action(do, undo)
         action.do()
         self.history.push(action)
-        self._emit('cut')
-
+        self.changed()
+        
     def _do_cut(self, start, end):
         del self._data[start:end]
 
@@ -98,7 +100,6 @@ class Sound(object):
         action = Action(do, undo)
         action.do()
         self.history.push(action)
-        self._emit('paste')
 
     def _do_paste(self, start, clip):
         self._data = self._data[:start] + clip + self._data[start:]
