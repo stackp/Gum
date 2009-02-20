@@ -21,12 +21,10 @@ class Graph(object):
     the screen, according to zooming and position in the sound.
 
     """
-    def __init__(self):
+    def __init__(self, sound):
         self.changed = Signal()
-        self._sound = None
-        self._view_start = 0
-        self._view_end = 0
         self._width = 100
+        self.set_sound(sound)
 
     def set_sound(self, sound):
         self._sound = sound
@@ -56,7 +54,11 @@ class Graph(object):
 
     def get_density(self):
         "Number of frames per pixel."
-        return (self._view_end - self._view_start) / float(self._width)
+        d = (self._view_end - self._view_start) / float(self._width)
+        if d == 0:
+            # empty sound
+            d = 1
+        return d
 
     def _zoom(self, point, factor):
         """Expand or shrink view according to factor.

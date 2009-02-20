@@ -3,11 +3,11 @@ from player import Player
 
 class UIController(object):
 
-    def __init__(self, player, graph, selection):
+    def __init__(self, sound, player, graph, selection):
         self._player = player
         self._graph = graph
         self._selection = selection
-        self._sound = None
+        self._sound = sound
         self.clipboard = []
 
     def new(self):

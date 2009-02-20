@@ -5,14 +5,16 @@ from control import UIController
 from graphmodel import Graph
 from selection import Selection
 from player import Player
+from edit import Sound
 import gtk
 gtk.gdk.threads_init()
 
 if __name__ == "__main__":
-    player = Player()
-    graph = Graph()
+    sound = Sound()
+    player = Player(sound)
+    graph = Graph(sound)
     selection = Selection(graph)
-    ui_ctrl = UIController(player, graph, selection)
+    ui_ctrl = UIController(sound, player, graph, selection)
     win = MainWindow(ui_ctrl, graph, selection)
     win.resize(700, 500)
     win.show_all()

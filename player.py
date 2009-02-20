@@ -11,7 +11,8 @@ class Player(object):
        * position
 
     """
-    def __init__(self):
+    def __init__(self, sound):
+        self.set_sound(sound)
         self._playing = False
         self._periodsize = 128
         self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
