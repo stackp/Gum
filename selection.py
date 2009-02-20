@@ -22,17 +22,27 @@ class Selection(object):
         self.start = 0
         self.end = 0
 
-    def start_selection(self, value):
-        "The value is an index in the graph."
+    def gauge(self, value, mini, maxi):
+        "Calibrate value between mini and maxi."
+        if value < mini:
+            value = mini
+        if value > maxi:
+            value = maxi
+        return value
+    
+    def start_selection(self, pixel):
+        "The pixel is an index in the graph."
         length, view_start, view_end = self._graph.get_info()
-        self.start = view_start + value * self.density
+        start = view_start + pixel * self.density
+        self.start = self.gauge(start, 0, length)
         self.end = self.start
         self.changed()
         
-    def end_selection(self, value):
-        "The value is an index in the graph."
+    def end_selection(self, pixel):
+        "The pixel is an index in the graph."
         length, view_start, view_end = self._graph.get_info()
-        self.end = view_start + value * self.density
+        end = view_start + pixel * self.density
+        self.end = self.gauge(end, 0, length)
         self.changed()
 
     def pixels(self):
