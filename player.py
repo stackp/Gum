@@ -11,8 +11,7 @@ class Player(object):
        * position
 
     """
-    def __init__(self, data=[]):
-        self.set_data(data)
+    def __init__(self):
         self._playing = False
         self._periodsize = 128
         self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
@@ -24,11 +23,11 @@ class Player(object):
         self._pcm.setperiodsize(self._periodsize)
         self._lock = threading.Lock()
 
-    def set_data(self, data):
-        self._data = data
+    def set_sound(self, sound):
+        self._sound = sound
         self.start = 0
         self.position = 0
-        self.end = len(data)
+        self.end = len(sound._data)
 
 
     def play(self):
@@ -43,7 +42,7 @@ class Player(object):
         self._playing = True
 
         # FIXME: remove or make an if statement
-        data = array('d', self._data)
+        data = array('d', self._sound._data)
 
         position = self.start
         while self._playing:
@@ -78,20 +77,26 @@ class Player(object):
         
 # test
 def testPlayer():
-
+    class FakeSound: pass
+    
     from math import sin
     SR = 44100
     f0 = 440
     time = 1
     sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
+    sound = FakeSound()
+    sound._data = sine
+    
     player = Player()
-    player.set_data(sine)    
+    player.set_sound(sound)
     player.play()
 
     import pysndfile
     f = pysndfile.sndfile('sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
-    player = Player(data)
+    player = Player()
+    sound._data = data
+    player.set_sound(sound)
     player.play()
     player.play()
 

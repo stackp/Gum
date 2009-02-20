@@ -8,6 +8,7 @@ class UIController(object):
         self._graph = graph
         self._selection = selection
         self._sound = None
+        self.clipboard = []
 
     def new(self):
         pass
@@ -16,7 +17,7 @@ class UIController(object):
         self._player.pause()
         self._sound = Sound(filename)
         self._graph.set_sound(self._sound)
-        self._player.set_data(self._sound._data)
+        self._player.set_sound(self._sound)
         self._selection.unselect()
 
     def save(self):
@@ -31,7 +32,7 @@ class UIController(object):
     def play(self):
         start, end = self._selection.frames()
         if start == end:
-            end = len(self._player._data)
+            end = len(self._sound._data)
         self._position = start
         self._player.start = start
         self._player.end = end
@@ -59,11 +60,15 @@ class UIController(object):
         self._sound.cut(start, end)
         
     def copy(self):
-        pass
-
+        start, end = self._selection.frames()
+        self.clip = self._sound.copy(start, end)
+        
     def paste(self):
-        pass
-
+        start, end = self._selection.frames()
+        self._selection.start = start
+        self._selection.end = end + len(self.clip)
+        self._sound.paste(start, self.clip)
+                          
     def trim(self):
         pass
 
@@ -97,20 +102,12 @@ class UIController(object):
 
 def test_UIController():
     from time import sleep
+    from mock import Fake
     
     # Test opening a file
-    ctrl = UIController()
+    ctrl = UIController(Fake(), Fake(), Fake())
     ctrl.open('sounds/test1.wav')
     assert ctrl._sound != None
-
-    # Test playing
-    assert ctrl._player != None
-    ctrl.play()
-
-    # Test pausing
-    sleep(0.5)
-    ctrl.pause()
-
 
 if __name__ == "__main__":
     test_UIController()

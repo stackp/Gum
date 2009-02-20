@@ -24,16 +24,14 @@ class Graph(object):
     def __init__(self):
         self.changed = Signal()
         self._sound = None
-        self._data = None
         self._view_start = 0
         self._view_end = 0
         self._width = 100
 
     def set_sound(self, sound):
         self._sound = sound
-        self._data = sound._data
         self._view_start = 0
-        self._view_end = len(self._data)
+        self._view_end = len(self._sound._data)
         self._sound.changed.connect(self.update)
         self.changed()
 
@@ -51,7 +49,7 @@ class Graph(object):
 
     def get_info(self):
         "Returns information about the graph: length, view start, view end"
-        length = len(self._data)
+        length = len(self._sound._data)
         start = self._view_start
         end = self._view_end
         return (length, start, end)
@@ -98,7 +96,7 @@ class Graph(object):
     def zoom_fit(self):
         "Fit everything in the view."
         self._view_start = 0
-        self._view_end = len(self._data)
+        self._view_end = len(self._sound._data)
         self.changed()
 
     def _scroll(self, factor):
@@ -133,7 +131,7 @@ class Graph(object):
         "Return the graph values."
         width = self._width
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
-        visible = self._data[start:end]
+        visible = self._sound._data[start:end]
         o = _overview(visible, width)
         return o
 
@@ -158,15 +156,15 @@ class Graph(object):
         if self._view_start < 0:
             self._view_end += -self._view_start 
             self._view_start = 0
-        elif self._view_end > len(self._data):
-            self._view_start -= (self._view_end - len(self._data))
-            self._view_end = len(self._data)
+        elif self._view_end > len(self._sound._data):
+            self._view_start -= (self._view_end - len(self._sound._data))
+            self._view_end = len(self._sound._data)
 
         # Ultimate check on bounds.
         if self._view_start < 0:
             self._view_start = 0
-        if self._view_end > len(self._data):
-            self._view_end = len(self._data)
+        if self._view_end > len(self._sound._data):
+            self._view_end = len(self._sound._data)
 
 
 def test_overview():

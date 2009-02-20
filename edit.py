@@ -100,10 +100,11 @@ class Sound(object):
         action = Action(do, undo)
         action.do()
         self.history.push(action)
+        self.changed()
 
     def _do_paste(self, start, clip):
         self._data = self._data[:start] + clip + self._data[start:]
-
+        
     def normalize(self, start, end):
         pass
 
