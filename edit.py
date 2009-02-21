@@ -1,6 +1,6 @@
 from event import Signal
 import pysndfile
-
+import numpy
 
 class Action(object):
     """Describes an action, and a way to revert that action"""
@@ -51,6 +51,12 @@ class History(object):
 
 
 class Sound(object):
+
+    # _data is a numpy.ndarray, as returned by pysndfile
+
+    # For convenience, some operations (ex: cut(), copy(), ...) are
+    # performed on list(_data), and the result is then converted to a
+    # numpy array.
     
     def __init__(self, filename=None):
         self.filename = filename
@@ -61,9 +67,6 @@ class Sound(object):
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self._data = f.read_frames(nframes)
-            # scikit-pysndfile uses numpy.ndarray. Can't manage to use
-            # del on them. Converting to list. Fixme later
-            self._data = list(self._data)
         self.history = History()
         self.changed = Signal()
 
@@ -84,7 +87,11 @@ class Sound(object):
         return clip
     
     def _do_cut(self, start, end):
-        del self._data[start:end]
+        # using del on numpy.ndarray raises a ValueError. Converting
+        # to list.
+        data = list(self._data)
+        del data[start:end]
+        self._data = numpy.array(data)
 
     def copy(self, start, end):
         clip = self._data[start:end]
@@ -99,7 +106,9 @@ class Sound(object):
         self.changed()
 
     def _do_paste(self, start, clip):
-        self._data = self._data[:start] + clip + self._data[start:]
+        data = list(self._data)
+        data = data[:start] + list(clip) + data[start:]
+        self._data = numpy.array(data)
         
     def normalize(self, start, end):
         pass
