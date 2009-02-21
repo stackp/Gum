@@ -89,11 +89,8 @@ class Sound(object):
         return clip
     
     def _do_cut(self, start, end):
-        # using del on numpy.ndarray raises a ValueError. Converting
-        # to list.
-        data = list(self._data)
-        del data[start:end]
-        self._data = numpy.array(data)
+        data = numpy.concatenate((self._data[:start], self._data[end:]))
+        self._data = data
 
     def copy(self, start, end):
         clip = self._data[start:end]
@@ -108,9 +105,8 @@ class Sound(object):
         self.changed()
 
     def _do_paste(self, start, clip):
-        data = list(self._data)
-        data = data[:start] + list(clip) + data[start:]
-        self._data = numpy.array(data)
+        data = numpy.concatenate((self._data[:start], clip,self._data[start:]))
+        self._data = data
         
     def normalize(self, start, end):
         pass
