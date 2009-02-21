@@ -135,12 +135,20 @@ class Graph(object):
         self._adjust_view()
         self.changed()
         
-    def get_values(self):
+    def channels(self):
         "Return the graph values."
         width = self._width
+        numchan = self._sound.numchan
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
         visible = self._sound._data[start:end]
-        o = _overview(visible, width)
+        if numchan == 1:
+            o = [_overview(visible, width)]
+        else:
+            visible = visible.transpose()
+            o = []
+            for chan in range(numchan):
+                values = _overview(visible[chan], width)
+                o.append(values)
         return o
 
     def _adjust_view(self):
@@ -180,102 +188,133 @@ def test_overview():
     print _overview(b, 30)
     
 def test_Graph():
-    c = Graph()
-    c.set_data(range(1000))
-    c.set_width(200)
-    o = c.get_values()
+    from mock import Mock, Fake
 
-    c = Graph()
+    sound = Mock({})
+    sound._data = range(1000)
+    sound.numchan = 1
+    sound.changed = Fake()
+
+    c = Graph(sound)
+    c.set_width(200)
+    o = c.channels()
+
     class Foo:
         def foo(self):
             print "Changed."
     f = Foo()
-    c = Graph()
+    c = Graph(sound)
     c.changed.connect(f.foo)
-    c.set_data(range(1000))
+
+    c.set_width(200)
+    o = c.channels()
+
+    # stereo
+    import numpy
+    data = numpy.array([[1, 1], [2, 2], [3, 3]])
+    sound._data = data
+    sound.numchan = 2
+    o = c.channels()
+    assert(len(o)) == 2
+    
 
 def test_zoom():
+    from mock import Mock, Fake
+
+    sound = Mock({})
     data = [1, 2, 3, 4]
-    g = Graph()
-    g.set_data(data)
+    sound._data = data
+    sound.numchan = 1
+    sound.changed = Fake()
+
+    g = Graph(sound)
 
     g.set_width(4)
     g._zoom(point=1.5, factor=1)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
     
     g._zoom(point=0, factor=1)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
 
     g._zoom(point=6, factor=1)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
     
     g.set_width(2)
-    g.set_data(data)
     g._zoom(point=1.5, factor=0.5)
-    o = g.get_values()
-    assert o == [2, 3]
+    o = g.channels()
+    assert o == [[2, 3]]
 
     g._zoom(point=1.5, factor=0.5)
     g.set_width(4)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
 
     g.set_width(2)
     g._zoom(point=0, factor=0.5)
-    o = g.get_values()
-    assert o == [1, 2]
+    o = g.channels()
+    assert o == [[1, 2]]
 
     g.set_width(4)
     g._zoom(point=0, factor=0.25)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
     
     g.set_width(4)
     g._zoom(point=4, factor=4)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4]
-
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]]
 
     g.set_width(3)
     data = [1, 2, 3, 4, 5]
-    g.set_data(data)
+    sound._data = data
     g._zoom(point=2, factor=0.5)
-    o = g.get_values()
-    assert o == [2, 3, 4]
+    o = g.channels()
+    assert o == [[2, 3, 4]]
 
     data = [1, 2, 3, 4, 5]
-    g.set_data(data)
+    sound._data = data
     g._zoom(point=2, factor=0.5)
     g._zoom(point=2, factor=0.5)
     start, end = g._view_start, g._view_end
     
     data = [1, 2, 3, 4, 5]
-    g.set_data(data)
+    sound._data = data
     g._zoom(point=2, factor=0.5 * 0.5)
     assert (start, end) == (g._view_start, g._view_end)
 
 def test_zoom_in():
+    from mock import Mock, Fake
+    sound = Mock({})
+    sound.numchan = 1
+    sound.changed = Fake()
+
     data = [1, 2, 3, 4]
-    g = Graph()
-    g.set_data(data)
+    sound._data = data
+    g = Graph(sound)
 
     g.set_width(2)
     g.zoom_in()
-    o = g.get_values()
-    assert o == [2, 3]
+    o = g.channels()
+    assert o == [[2, 3]]
 
     g.zoom_out()
     g.set_width(4)
-    o = g.get_values()
-    assert o == [1, 2, 3, 4] 
+    o = g.channels()
+    assert o == [[1, 2, 3, 4]] 
 
 def test_scroll():
+    from mock import Mock, Fake
+
+    sound = Mock({})
     data = [1, 2, 3, 4]
-    g = Graph()
-    g.set_data(data)
+    sound._data = data
+    sound.numchan = 1
+    sound.changed = Fake()
+
+    g = Graph(sound)
     g.set_width(4)
 
     g.scroll_right()

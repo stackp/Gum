@@ -101,37 +101,46 @@ class WaveformLayer(object):
     def update(self):
         self._cache = None
         self._layered.update()
+
+    def draw_channel(self, values, surface, width, height):
+        "Draw one sound channel on a cairo surface."
+        c = cairo.Context(surface)
+
+        # line at zero
+        c.set_line_width(1)
+        c.set_source_rgb(0.2, 0.2, 0.2)
+        c.move_to(0, round(height / 2) + 0.5)
+        c.line_to(width, round(height / 2) + 0.5)
+        c.stroke()
+
+        # waveform
+        c.set_source_rgb(0, 0.9, 0)
+        for i, value in enumerate(values):
+            x = i
+            y = round((-value * 0.5 + 0.5) * height)
+            #c.rectangle(x, y, 1, 1)
+            #c.fill()
+            c.move_to(x + 0.5, 0.5 * height + 0.5)
+            c.line_to(x + 0.5, y + 0.5)
+            c.stroke()
         
     def draw(self, context, width, height):
+        "Draw all sound channels."
         if not self._cache:
             surface = context.get_target()
             self._cache = surface.create_similar(cairo.CONTENT_COLOR,
                                                  width, height)
             c = cairo.Context(self._cache)
-
-            # black background
-            c.set_source_rgb(0, 0, 0)
-            c.paint()
-
-            # line at zero
-            c.set_line_width(1)
-            c.set_source_rgb(0.2, 0.2, 0.2)
-            c.move_to(0, round(height / 2) + 0.5)
-            c.line_to(width, round(height / 2) + 0.5)
-            c.stroke()
-
-            # waveform
-            c.set_source_rgb(0, 0.9, 0)
-            overview = self._graph.get_values()
-            for i, value in enumerate(overview):
-                x = i
-                y = round((-value * 0.5 + 0.5) * height)
-                #c.rectangle(x, y, 1, 1)
-                #c.fill()
-                c.move_to(x + 0.5, 0.5 * height + 0.5)
-                c.line_to(x + 0.5, y + 0.5)
-                c.stroke()
-
+            channels = self._graph.channels()
+            numchan = len(channels)
+            for i in range(numchan):
+                s = surface.create_similar(cairo.CONTENT_COLOR,
+                                                     width, height / numchan)
+                self.draw_channel(channels[i], s, width, height / numchan)
+                c.set_source_surface(s, 0, (height / numchan) * i)
+                c.set_operator(cairo.OPERATOR_ATOP)
+                c.paint()
+                
         context.set_source_surface(self._cache, 0, 0)
         context.set_operator(cairo.OPERATOR_SOURCE)
         context.paint()
@@ -302,7 +311,7 @@ if __name__ == '__main__':
         window = gtk.Window()
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
-        graph = Mock({"get_values": [v / 500. for v in xrange(500)],
+        graph = Mock({"channels": [[v / 500. for v in xrange(500)]],
                      "set_width": None,
                      "frames_info": (0, 0, 0)})
         graph.changed = Fake()
@@ -318,8 +327,8 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
 
         from random import random
-        values = [(random() - 0.5) * 2 for i in xrange(500)]        
-        graph = Mock({"get_values": values, "set_width": None,
+        values = [[(random() - 0.5) * 2 for i in xrange(500)]]        
+        graph = Mock({"channels": values, "set_width": None,
                           "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
@@ -334,8 +343,24 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
 
         from math import sin
+        sine = [[sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]]
+        graph = Mock({"channels": sine, "set_width": None,
+                          "frames_info": (0, 0, 0)})
+        graph.changed = Fake()
+        layered = LayeredGraphView(graph)
+        layered.layers.append(WaveformLayer(layered, graph))
+        window.add(layered)
+        window.show_all()
+        gtk.main()
+
+    def test_sines():
+        window = gtk.Window()
+        window.resize(500, 200)
+        window.connect("delete-event", gtk.main_quit)
+
+        from math import sin
         sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        graph = Mock({"get_values": sine, "set_width": None,
+        graph = Mock({"channels": [sine, sine], "set_width": None,
                           "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
@@ -349,13 +374,13 @@ if __name__ == '__main__':
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
 
-        graph = Mock({"get_values": [], "set_width": None,
+        graph = Mock({"channels": [], "set_width": None,
                           "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         selection = Mock({"pixels": (20, 100)})
         selection.changed = Fake()
         layered = LayeredGraphView(graph)
-        layered.layers.append(SelectionLayer(layered, graph, selection))
+        layered.layers.append(SelectionLayer(layered, selection))
         window.add(layered)
         window.show_all()
         gtk.main()
@@ -363,4 +388,5 @@ if __name__ == '__main__':
     test_window()
     test_rand()
     test_sine()
+    test_sines()
     test_selection()
