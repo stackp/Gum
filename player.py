@@ -1,6 +1,7 @@
 import alsaaudio
 import threading
 from array import array
+import numpy
 
 class Player(object):
     """Play sound using alsa.
@@ -30,7 +31,6 @@ class Player(object):
         self.position = 0
         self.end = len(sound._data)
 
-
     def play(self):
 
         # Reentrancy: only one thread is allowed to play at the same
@@ -51,12 +51,9 @@ class Player(object):
                 start = position
                 end = position + self._periodsize
                 buf = self._sound._data[start:end]
-                # converting mono to stereo
-                a = []
-                for frame in buf:
-                    a.append(frame)
-                    a.append(frame)
-                buf = array('d', a)
+                if self._sound.numchan == 1:
+                    # converting mono to stereo
+                    buf = numpy.reshape([buf, buf], -1, 2)
                 self._pcm.write(buf)
                 position = end
 
@@ -84,15 +81,14 @@ def testPlayer():
     sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
     sound = FakeSound()
     sound._data = sine
+    sound.numchan = 1
     
-    player = Player()
-    player.set_sound(sound)
+    player = Player(sound)
     player.play()
 
     import pysndfile
     f = pysndfile.sndfile('sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
-    player = Player()
     sound._data = data
     player.set_sound(sound)
     player.play()
@@ -121,11 +117,13 @@ def testPlayer():
     sleep(0.3)
     player.pause()
 
-#    f = pysndfile.sndfile('sounds/test2.wav')
-#    data = f.read_frames(f.get_nframes())
-#    player = Player(data)
-#    player.play()
-
+    # Testing stereo
+    f = pysndfile.sndfile('sounds/test2.wav')
+    data = f.read_frames(f.get_nframes())
+    sound._data = data
+    sound.numchan = 2
+    player = Player(sound)
+    player.play()
 
 if __name__ == '__main__':
     testPlayer()
