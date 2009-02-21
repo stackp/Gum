@@ -42,9 +42,6 @@ class Player(object):
         # FIXME: self.stop() might have been called before!
         self._playing = True
 
-        # FIXME: remove or make an if statement
-        data = array('d', self._sound._data)
-
         position = self.start
         while self._playing:
             if position > self.end:
@@ -53,7 +50,7 @@ class Player(object):
             else:
                 start = position
                 end = position + self._periodsize
-                buf = data[start:end]
+                buf = self._sound._data[start:end]
                 # converting mono to stereo
                 a = []
                 for frame in buf:
