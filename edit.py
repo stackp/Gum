@@ -62,11 +62,13 @@ class Sound(object):
         self.filename = filename
         if filename == None:
             # empty sound
-            self._data = []
+            self._data = numpy.array([])
+            self.numchan = 1
         else:
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self._data = f.read_frames(nframes)
+            self.numchan = f.get_channels()
         self.history = History()
         self.changed = Signal()
 
@@ -170,7 +172,6 @@ def testHistory():
 def testSound():
     from copy import copy
     snd = Sound()
-    assert snd._data == []
 
     # synthesize a sine wave
     from math import sin
@@ -183,70 +184,70 @@ def testSound():
     snd._data = copy(sine)
     del sine2[start:end]
     snd.cut(start, end)
-    assert snd._data == sine2
+    assert snd._data.tolist() == sine2
 
     snd.history.undo()
-    assert snd._data == sine
+    assert snd._data.tolist() == sine
     snd.history.undo()
-    assert snd._data == sine
+    assert snd._data.tolist() == sine
     snd.history.redo()
-    assert snd._data == sine2
+    assert snd._data.tolist() == sine2
 
     clip = snd.copy(start, end)
     snd.paste(0, clip)
-    assert snd._data == sine2[start:end] + sine2
+    assert snd._data.tolist() == sine2[start:end] + sine2
     snd.history.undo()
-    assert snd._data == sine2
+    assert snd._data.tolist() == sine2
     snd.history.redo()
-    assert snd._data == sine2[start:end] + sine2
+    assert snd._data.tolist() == sine2[start:end] + sine2
     
     # test with a mono file
     snd = Sound("sounds/test1.wav")
     assert snd._data != []
     start = 4444
     end = 55555
-    data = copy(snd._data)
-    data2 = copy(snd._data)
+    data = snd._data.tolist()
+    data2 = snd._data.tolist()
     del data2[start:end]
     snd.cut(start, end)
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     snd.history.undo()
-    assert snd._data == data
+    assert snd._data.tolist() == data
     snd.history.undo()
-    assert snd._data == data
+    assert snd._data.tolist() == data
     snd.history.redo()
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     clip = snd.copy(start, end)
     snd.paste(0, clip)
-    assert snd._data == data2[start:end] + data2
+    assert snd._data.tolist() == data2[start:end] + data2
     snd.history.undo()
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     snd.paste(0, clip)
-    assert snd._data == data2[start:end] + data2
+    assert snd._data.tolist() == data2[start:end] + data2
 
     # test with a stereo file
     snd = Sound("sounds/test2.wav")
-    assert snd._data != []
+    assert snd._data.tolist() != []
     start = 4444
     end = 55555
-    data = copy(snd._data)
-    data2 = copy(snd._data)
+    data = copy(snd._data.tolist())
+    data2 = copy(snd._data.tolist())
     del data2[start:end]
     snd.cut(start, end)
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     snd.history.undo()
-    assert snd._data == data
+    assert snd._data.tolist() == data
     snd.history.undo()
-    assert snd._data == data
+    assert snd._data.tolist() == data
     snd.history.redo()
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     clip = snd.copy(start, end)
     snd.paste(0, clip)
-    assert snd._data == data2[start:end] + data2
+    assert snd._data.tolist() == data2[start:end] + data2
     snd.history.undo()
-    assert snd._data == data2
+    assert snd._data.tolist() == data2
     snd.paste(0, clip)
-    assert snd._data == data2[start:end] + data2
+    assert snd._data.tolist() == data2[start:end] + data2
 
 if __name__ == '__main__':
     testAction()
