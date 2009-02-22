@@ -115,14 +115,20 @@ class WaveformLayer(object):
 
         # waveform
         c.set_source_rgb(0, 0.9, 0)
-        for i, value in enumerate(values):
+        for i, (mini, maxi) in enumerate(values):
+            # -1 <= mini <= maxi <= 1
             x = i
-            y = round((-value * 0.5 + 0.5) * height)
-            #c.rectangle(x, y, 1, 1)
-            #c.fill()
-            c.move_to(x + 0.5, 0.5 * height + 0.5)
-            c.line_to(x + 0.5, y + 0.5)
-            c.stroke()
+            y1 = round((-mini * 0.5 + 0.5) * height)
+            y2 = round((-maxi * 0.5 + 0.5) * height)
+            if y1 == y2:
+                # Fill one pixel 
+                c.rectangle(x, y1, 1, 1)
+                c.fill()
+            else:
+                # Draw a line from min to max
+                c.move_to(x + 0.5, y1 + 0.5)
+                c.line_to(x + 0.5, y2 + 0.5)
+                c.stroke()
         
     def draw(self, context, width, height):
         "Draw all sound channels."
