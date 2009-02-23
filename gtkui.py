@@ -57,6 +57,10 @@ class MainWindow(gtk.Window):
                 <menuitem action="ZoomOut"/>
                 <menuitem action="ZoomFit"/>
               </menu>
+              <menu action="Effects">
+                <menuitem action="Reverse"/>
+                <menuitem action="Normalize"/>
+              </menu>                
               <menu action="Help">
                 <menuitem action="About"/>
               </menu>
@@ -94,6 +98,7 @@ class MainWindow(gtk.Window):
         actions = [('File', None, '_File'),
                    ('Edit', None, '_Edit'),
                    ('View', None, '_View'),
+                   ('Effects', None, '_Effects'),
                    ('Help', None, '_Help'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
@@ -122,6 +127,8 @@ class MainWindow(gtk.Window):
                    ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, None, '',
                                                                 self.zoom_out),
                    ('ZoomIn', gtk.STOCK_ZOOM_IN, None, None, '', self.zoom_in),
+                   ('Reverse', None, 'Reverse', None, '', self.reverse),
+                   ('Normalize', None, 'Normalize', None, '', self.normalize),
                    ('About', gtk.STOCK_ABOUT, None, None, '', self.about)
                    ]
         actiongroup = gtk.ActionGroup('')
@@ -142,7 +149,8 @@ class MainWindow(gtk.Window):
         if name in ["new", "save", "play", "pause", "rewind", "forward",
                     "goto_start", "goto_end", "select_all", "unselect",
                     "cut", "copy", "paste", "undo", "redo",
-                    "zoom_in", "zoom_out", "zoom_fit"]:
+                    "zoom_in", "zoom_out", "zoom_fit",
+                    "reverse", "normalize"]:
             method = getattr(self.ctrl, name)
             def forward(self, *args):
                 method(*args[1:])

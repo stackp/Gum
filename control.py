@@ -93,6 +93,13 @@ class UIController(object):
     def zoom_fit(self):
         self._graph.zoom_fit()
 
+    def reverse(self):
+        start, end = self._selection.frames()
+        self._sound.reverse(start, end)
+
+    def normalize(self):
+        pass
+
     def scroll_right(self):
         pass
 
