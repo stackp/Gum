@@ -1,4 +1,5 @@
 from event import Signal
+from copy import copy
 import pysndfile
 import numpy
 
@@ -112,7 +113,17 @@ class Sound(object):
         pass
 
     def reverse(self, start, end):
-        pass
+        do = (self._do_reverse, (start, end))
+        undo = (self._do_reverse, (start, end))
+        action = Action(do, undo)
+        action.do()
+        self.history.push(action)
+        self.changed()
+
+    def _do_reverse(self, start, end):
+        rev = numpy.flipud(copy(self._data[start:end]))
+        self._data[start:end] = rev
+        self.changed()
 
     def monoize(self, start, end):
         pass
@@ -245,6 +256,18 @@ def testSound():
     snd.paste(0, clip)
     assert snd._data.tolist() == data2[start:end] + data2
 
+    # test reverse
+    snd = Sound()
+    snd._data = numpy.array(range(10))
+    snd.reverse(3, 6)
+    assert snd._data.tolist() == [0, 1, 2, 5, 4, 3, 6, 7, 8, 9]
+
+    snd._data = numpy.array(zip(range(8), range(8)))
+    snd.reverse(3, 6)
+    assert snd._data.tolist() == [[0, 0], [1, 1], [2, 2], [5, 5],
+                                  [4, 4], [3, 3], [6, 6], [7, 7]]
+
+        
 if __name__ == '__main__':
     testAction()
     testSound()
