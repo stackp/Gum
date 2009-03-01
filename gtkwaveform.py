@@ -316,7 +316,7 @@ if __name__ == '__main__':
         window = gtk.Window()
         window.resize(500, 200)
         window.connect("delete-event", gtk.main_quit)
-        graph = Mock({"channels": [[v / 500. for v in xrange(500)]],
+        graph = Mock({"channels": [[(v / 500., v / 500.)for v in xrange(500)]],
                      "set_width": None,
                      "frames_info": (0, 0, 0)})
         graph.changed = Fake()
@@ -332,9 +332,12 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
 
         from random import random
-        values = [[(random() - 0.5) * 2 for i in xrange(500)]]        
-        graph = Mock({"channels": values, "set_width": None,
-                          "frames_info": (0, 0, 0)})
+        
+        channels = [[((random() - 0.5) * 2, (random() - 0.5) * 2)
+                   for i in xrange(500)]]
+        graph = Mock({"channels": channels,
+                      "set_width": None,
+                      "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
         layered.layers.append(WaveformLayer(layered, graph))
@@ -348,8 +351,9 @@ if __name__ == '__main__':
         window.connect("delete-event", gtk.main_quit)
 
         from math import sin
-        sine = [[sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]]
-        graph = Mock({"channels": sine, "set_width": None,
+        sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
+        channels = [[(i, i) for i in sine]]
+        graph = Mock({"channels": channels, "set_width": None,
                           "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
@@ -365,7 +369,9 @@ if __name__ == '__main__':
 
         from math import sin
         sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        graph = Mock({"channels": [sine, sine], "set_width": None,
+        channels = [[(i, i) for i in sine], [(i, i) for i in sine]]
+
+        graph = Mock({"channels": channels, "set_width": None,
                           "frames_info": (0, 0, 0)})
         graph.changed = Fake()
         layered = LayeredGraphView(graph)
