@@ -14,9 +14,8 @@ if __name__ == "__main__":
     player = Player(sound)
     graph = Graph(sound)
     selection = Selection(graph)
-    ui_ctrl = UIController(sound, player, graph, selection)
-    win = MainWindow(ui_ctrl, graph, selection)
+    controller = UIController(sound, player, graph, selection)
+    win = MainWindow(controller, graph, selection)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
-
