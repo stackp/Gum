@@ -1,11 +1,12 @@
 import gtk
 import cairo
 
-# -- Base classes for painting sound visualization.
+# -- Base classes for drawing sound visualization.
 #
-# Defined step by step only for code clarity. Everything could as well
-# be stuck in one class.
-
+# CairoWidget, LayeredCairoWidget, and LayeredGraphView are defined as
+# successive subclasses only for code clarity. Everything could as
+# well be stuck in LayeredGraphView.
+#
 class CairoWidget(gtk.DrawingArea):
 
     __gsignals__ = {"expose-event": "override"}
@@ -30,6 +31,7 @@ class CairoWidget(gtk.DrawingArea):
         """Must be overriden to draw to the cairo context."""
         pass
 
+
 class LayeredCairoWidget(CairoWidget):
     """A widget with several layers.
 
@@ -46,12 +48,12 @@ class LayeredCairoWidget(CairoWidget):
         for layer in self.layers:
             layer.draw(context, width, height)
 
+
 class LayeredGraphView(LayeredCairoWidget):
-    """A layered widget dedicated to paint data from a Graph
-    object.
+    """A layered widget dedicated to a Graph object.
     
-    As soon as it knows its width, it gives it to the Graph
-    object.
+    Every time the widget is resized, the new width is passed to the
+    Graph object.
 
     """
     def __init__(self, graph):
@@ -63,8 +65,11 @@ class LayeredGraphView(LayeredCairoWidget):
         self._graph.set_width(rect.width)
 
 
-# -- Aah, beautiful sound visualization widget.
-
+# -- The sound visualization widget, composed of several layers:
+#
+#    * waveform
+#    * selection
+#
 class GraphView(LayeredGraphView):
     """Sound visualization widget for the main window.
 
@@ -82,8 +87,8 @@ class GraphView(LayeredGraphView):
         MouseScroll(self, graph)
 
 
-# -- The layers that can be added to LayeredGraphview.
-
+# -- Layers that can be added to LayeredGraphview.
+#
 class WaveformLayer(object):
     """A layer for LayeredGraphView.
 
@@ -106,28 +111,28 @@ class WaveformLayer(object):
         "Draw one sound channel on a cairo surface."
         c = cairo.Context(surface)
 
-        # line at zero
+        # Line at zero
         c.set_line_width(1)
         c.set_source_rgb(0.2, 0.2, 0.2)
         c.move_to(0, round(height / 2) + 0.5)
         c.line_to(width, round(height / 2) + 0.5)
         c.stroke()
 
-        # waveform
+        # Waveform
         c.set_source_rgb(0, 0.9, 0)
         for i, (mini, maxi) in enumerate(values):
             # -1 <= mini <= maxi <= 1
             x = i
-            y1 = round((-mini * 0.5 + 0.5) * height)
-            y2 = round((-maxi * 0.5 + 0.5) * height)
-            if y1 == y2:
+            ymin = round((-mini * 0.5 + 0.5) * height)
+            ymax = round((-maxi * 0.5 + 0.5) * height)
+            if ymin == ymax:
                 # Fill one pixel 
-                c.rectangle(x, y1, 1, 1)
+                c.rectangle(x, ymin, 1, 1)
                 c.fill()
             else:
                 # Draw a line from min to max
-                c.move_to(x + 0.5, y1 + 0.5)
-                c.line_to(x + 0.5, y2 + 0.5)
+                c.move_to(x + 0.5, ymin + 0.5)
+                c.line_to(x + 0.5, ymax + 0.5)
                 c.stroke()
         
     def draw(self, context, width, height):
@@ -150,6 +155,7 @@ class WaveformLayer(object):
         context.set_source_surface(self._cache, 0, 0)
         context.set_operator(cairo.OPERATOR_SOURCE)
         context.paint()
+
 
 class SelectionLayer(object):
     """A layer for LayeredGraphView.
@@ -207,9 +213,9 @@ class SelectionLayer(object):
 
 
 # -- Mouse event listeners that act on models.
-
+#
 class MouseScroll(object):
-    """Listens for mouse wheel events and scroll a graph
+    """Listens for mouse wheel events and scroll a graph.
 
     Must be attached to a gtk.Widget and a Graph.
 
@@ -226,9 +232,9 @@ class MouseScroll(object):
 
 
 class MouseSelection(object):
-    """Listens for mouse events and select graph area
+    """Listens for mouse events and select graph area.
 
-    Must be attached to a gtk.Widget and a Graph.
+    Must be attached to a gtk.Widget and a Selection.
 
     """
     def __init__(self, widget, selection):
@@ -253,10 +259,10 @@ class MouseSelection(object):
             self.pressed = False
 
 
-# -- An horizontal scrollbar, derived to control a graph model.
-
+# -- Horizontal scrollbar, subclassed to control a Graph object.
+#
 class GraphScrollbar(gtk.HScrollbar):
-    """An horizontal scrollbar that acts on a Graph.
+    """An horizontal scrollbar tied to a Graph.
 
     Acts on a graph object and is updated when the graph
     object changes.
@@ -307,7 +313,7 @@ class GraphScrollbar(gtk.HScrollbar):
             self.inhibit = False
 
 
-# -- Testing
+# -- Tests
 
 if __name__ == '__main__':
     from mock import Mock, Fake
