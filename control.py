@@ -112,7 +112,7 @@ def test_UIController():
     from mock import Fake
     
     # Test opening a file
-    ctrl = UIController(Fake(), Fake(), Fake())
+    ctrl = UIController(Fake(), Fake(), Fake(), Fake())
     ctrl.open('sounds/test1.wav')
     assert ctrl._sound != None
 
