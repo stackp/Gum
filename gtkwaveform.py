@@ -311,93 +311,62 @@ class GraphScrollbar(gtk.HScrollbar):
 
 if __name__ == '__main__':
     from mock import Mock, Fake
-    
-    def test_window():
-        window = gtk.Window()
-        window.resize(500, 200)
-        window.connect("delete-event", gtk.main_quit)
-        graph = Mock({"channels": [[(v / 500., v / 500.)for v in xrange(500)]],
-                     "set_width": None,
-                     "frames_info": (0, 0, 0)})
-        graph.changed = Fake()
-        layered = LayeredGraphView(graph)
-        layered.layers.append(WaveformLayer(layered, graph))
-        window.add(layered)
-        window.show_all()
-        gtk.main()
 
-    def test_rand():
-        window = gtk.Window()
-        window.resize(500, 200)
-        window.connect("delete-event", gtk.main_quit)
+    def test_layered():
 
-        from random import random
-        
-        channels = [[((random() - 0.5) * 2, (random() - 0.5) * 2)
-                   for i in xrange(500)]]
-        graph = Mock({"channels": channels,
-                      "set_width": None,
-                      "frames_info": (0, 0, 0)})
-        graph.changed = Fake()
-        layered = LayeredGraphView(graph)
-        layered.layers.append(WaveformLayer(layered, graph))
-        window.add(layered)
-        window.show_all()
-        gtk.main()
-
-    def test_sine():
-        window = gtk.Window()
-        window.resize(500, 200)
-        window.connect("delete-event", gtk.main_quit)
-
-        from math import sin
-        sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        channels = [[(i, i) for i in sine]]
-        graph = Mock({"channels": channels, "set_width": None,
+        def randomized():
+            from random import random        
+            channels = [[((random() - 0.5) * 2, (random() - 0.5) * 2)
+                       for i in xrange(500)]]
+            graph = Mock({"channels": channels,
+                          "set_width": None,
                           "frames_info": (0, 0, 0)})
-        graph.changed = Fake()
-        layered = LayeredGraphView(graph)
-        layered.layers.append(WaveformLayer(layered, graph))
-        window.add(layered)
-        window.show_all()
-        gtk.main()
+            graph.changed = Fake()
+            layered = LayeredGraphView(graph)
+            layered.layers.append(WaveformLayer(layered, graph))
+            return layered
 
-    def test_sines():
-        window = gtk.Window()
-        window.resize(500, 200)
-        window.connect("delete-event", gtk.main_quit)
-
-        from math import sin
-        sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
-        channels = [[(i, i) for i in sine], [(i, i) for i in sine]]
-
-        graph = Mock({"channels": channels, "set_width": None,
+        def sine():
+            from math import sin
+            sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
+            channels = [[(i, i) for i in sine]]
+            graph = Mock({"channels": channels, "set_width": None,
                           "frames_info": (0, 0, 0)})
-        graph.changed = Fake()
-        layered = LayeredGraphView(graph)
-        layered.layers.append(WaveformLayer(layered, graph))
-        window.add(layered)
-        window.show_all()
-        gtk.main()
+            graph.changed = Fake()
+            layered = LayeredGraphView(graph)
+            layered.layers.append(WaveformLayer(layered, graph))
+            return layered
 
-    def test_selection():
-        window = gtk.Window()
-        window.resize(500, 200)
-        window.connect("delete-event", gtk.main_quit)
+        def sines():
+            from math import sin
+            sine = [sin(2 * 3.14 * 0.01 * x) for x in xrange(500)]
+            channels = [[(i, i) for i in sine], [(i, i) for i in sine]]
 
-        graph = Mock({"channels": [], "set_width": None,
+            graph = Mock({"channels": channels, "set_width": None,
                           "frames_info": (0, 0, 0)})
-        graph.changed = Fake()
-        selection = Mock({"pixels": (20, 100)})
-        selection.changed = Fake()
-        layered = LayeredGraphView(graph)
-        layered.layers.append(SelectionLayer(layered, selection))
-        window.add(layered)
-        window.show_all()
-        gtk.main()
+            graph.changed = Fake()
+            layered = LayeredGraphView(graph)
+            layered.layers.append(WaveformLayer(layered, graph))
+            return layered
 
-    test_window()
-    test_rand()
-    test_sine()
-    test_sines()
-    test_selection()
+        def selection():
+            graph = Mock({"channels": [], "set_width": None,
+                          "frames_info": (0, 0, 0)})
+            graph.changed = Fake()
+            selection = Mock({"pixels": (20, 100)})
+            selection.changed = Fake()
+            layered = LayeredGraphView(graph)
+            layered.layers.append(SelectionLayer(layered, selection))
+            return layered
+
+        layereds = [randomized(), sine(), sines(), selection()]
+
+        for layered in layereds:
+            window = gtk.Window()
+            window.resize(500, 200)
+            window.connect("delete-event", gtk.main_quit)
+            window.add(layered)
+            window.show_all()
+            gtk.main()
+
+    test_layered()
