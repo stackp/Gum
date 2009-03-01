@@ -21,7 +21,7 @@ class CairoWidget(gtk.DrawingArea):
         width, height = self.window.get_size()
         self.draw(context, width, height)
 
-    def update(self):
+    def redraw(self):
         # queue_draw() emits an expose event. Double buffering is used
         # automatically in the expose event handler.
         self.queue_draw()
@@ -57,9 +57,9 @@ class LayeredGraphView(LayeredCairoWidget):
     def __init__(self, graph):
         super(LayeredGraphView, self).__init__()
         self._graph = graph
-        self.connect("size_allocate", self.resize)
+        self.connect("size_allocate", self.resized)
 
-    def resize(self, widget, rect):
+    def resized(self, widget, rect):
         self._graph.set_width(rect.width)
 
 
@@ -100,7 +100,7 @@ class WaveformLayer(object):
 
     def update(self):
         self._cache = None
-        self._layered.update()
+        self._layered.redraw()
 
     def draw_channel(self, values, surface, width, height):
         "Draw one sound channel on a cairo surface."
@@ -171,7 +171,7 @@ class SelectionLayer(object):
 
     def update(self):
         self._cache = None
-        self._layered.update()
+        self._layered.redraw()
 
     def draw(self, context, width, height):
         if not self._cache:
@@ -190,7 +190,6 @@ class SelectionLayer(object):
                 c.set_operator(cairo.OPERATOR_CLEAR)
                 c.rectangle(start + 0.5, 0, end - start + 0.5, height)
                 c.fill()
-
 
             # cursors
             c.set_operator(cairo.OPERATOR_ADD)
