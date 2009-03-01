@@ -28,8 +28,9 @@ class History(object):
         self._actions = []
         self._last = -1
 
-    def push(self, action):
+    def _push(self, action):
         if self._last < len(self._actions) - 1:
+            # erase previously undone actions
             del self._actions[self._last + 1:]
         self._actions.append(action)
         self._last = self._last + 1
@@ -50,14 +51,15 @@ class History(object):
             action = self._actions[self._last]
             return action.do()
 
+    def add(self, do, undo):
+        "Does an action and adds it to history."
+        action = Action(do, undo)
+        self._push(action)
+        return action.do()
 
 class Sound(object):
 
     # _data is a numpy.ndarray, as returned by pysndfile
-
-    # For convenience, some operations (ex: cut(), copy(), ...) are
-    # performed on list(_data), and the result is then converted to a
-    # numpy array.
     
     def __init__(self, filename=None):
         self.filename = filename
@@ -83,15 +85,13 @@ class Sound(object):
         clip = self._data[start:end]
         do = (self._do_cut, (start, end))
         undo = (self._do_paste, (start, self._data[start:end]))
-        action = Action(do, undo)
-        action.do()
-        self.history.push(action)
-        self.changed()
+        self.history.add(do, undo)
         return clip
     
     def _do_cut(self, start, end):
         data = numpy.concatenate((self._data[:start], self._data[end:]))
         self._data = data
+        self.changed()
 
     def copy(self, start, end):
         clip = self._data[start:end]
@@ -100,14 +100,12 @@ class Sound(object):
     def paste(self, start, clip):
         do = (self._do_paste, (start, clip))
         undo = (self._do_cut, (start, start + len(clip)))
-        action = Action(do, undo)
-        action.do()
-        self.history.push(action)
-        self.changed()
+        self.history.add(do, undo)
 
     def _do_paste(self, start, clip):
         data = numpy.concatenate((self._data[:start], clip,self._data[start:]))
         self._data = data
+        self.changed()
         
     def normalize(self, start, end):
         pass
@@ -115,10 +113,7 @@ class Sound(object):
     def reverse(self, start, end):
         do = (self._do_reverse, (start, end))
         undo = (self._do_reverse, (start, end))
-        action = Action(do, undo)
-        action.do()
-        self.history.push(action)
-        self.changed()
+        self.history.add(do, undo)
 
     def _do_reverse(self, start, end):
         rev = numpy.flipud(copy(self._data[start:end]))
@@ -130,11 +125,9 @@ class Sound(object):
     
     def undo(self):
         self.history.undo()
-        self.changed()
 
     def redo(self):
         self.history.redo()
-        self.changed()
 
 
 # -- Tests
@@ -154,27 +147,24 @@ def testAction():
     assert a.do() == 1
     assert a.undo() == 1
 
-
-def testHistory():
+def testHistory():    
     history = History()
     f = lambda x: x
     do = (f, (1,))
-    undo = (f, (2,))    
-    action = Action(do, undo)
-    history.push(action)
+    undo = (f, (2,))
+    assert history.add(do, undo) == 1
     assert history.undo() == 2
     assert history.undo() == None
     assert history.redo() == 1
     assert history.redo() == None
     assert history.undo() == 2
-    history.push(action)
-    history.push(action)
+    assert history.add(do, undo) ==  1
+    assert history.add(do, undo) == 1
     assert history.undo() == 2
     assert history.undo() == 2
     assert history.redo() == 1
     assert history.redo() == 1
     assert history.redo() == None
-    
     
 def testSound():
     from copy import copy
