@@ -4,10 +4,10 @@ from gtkwaveform import GraphView, GraphScrollbar
 
 class MainWindow(gtk.Window):
 
-    def __init__(self, ui_controller, wf_controller, selection):
+    def __init__(self, controller, graph, selection):
         gtk.Window.__init__(self)
 
-        self.ctrl = ui_controller
+        self.ctrl = controller
         
         self.uimanager = self._make_ui_manager()
         self.menubar = self.uimanager.get_widget('/menubar')
@@ -15,8 +15,8 @@ class MainWindow(gtk.Window):
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
         for w in self.toolbar:
             w.set_homogeneous(False)
-        self.waveform = GraphView(wf_controller, selection)
-        self.scrollbar = GraphScrollbar(wf_controller)
+        self.waveform = GraphView(graph, selection)
+        self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
 
         self.vbox = gtk.VBox()
