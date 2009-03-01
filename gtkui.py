@@ -187,8 +187,17 @@ class MainWindow(gtk.Window):
            
 def test():
     from mock import Fake, Mock
-    wf_ctrl = Mock({"frames_info" :(0, 0, [], [])})
-    win = MainWindow(Fake(), wf_ctrl)
+    graph = Mock({"frames_info":(0, 0, [], []),
+                  "channels": [[(0, 0.5)]],
+                  "set_width": None,
+                  "scroll_left": None,
+                  "scroll_right": None})
+    graph.changed = Fake()
+    selection = Mock({"pixels": [50, 100],
+                      "start_selection": None,
+                      "end_selection": None})
+    selection.changed = Fake()
+    win = MainWindow(Fake(), graph, selection)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
