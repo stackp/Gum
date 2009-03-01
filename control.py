@@ -8,7 +8,7 @@ class UIController(object):
         self._graph = graph
         self._selection = selection
         self._sound = sound
-        self.clipboard = []
+        self.clip = []
 
     def new(self):
         pass
