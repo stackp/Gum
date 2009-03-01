@@ -1,18 +1,5 @@
 from event import Signal
 
-#def _overview(data, width):
-#    density = len(data) / float(width)
-#    if density < 1:
-#        density = 1
-#    left = 0
-#    end = len(data)
-#    res = []
-#    while int(round(left)) < end:
-#        i = int(round(left))
-#        res.append(data[i])
-#        left = left + density 
-#    return res
-
 def _overview(data, width):
     "Returns a list of (min, max) tuples."
     density = len(data) / float(width)
@@ -35,11 +22,11 @@ def _overview(data, width):
     return res
 
 class Graph(object):
-    """Computes how a sound must be displayed on the screen.
+    """Scale the sound visualization.
     
-    When an audio file is displayed on the screen, several frames are
-    condensed in one column of pixels. This object computes what to display on
-    the screen, according to zooming and position in the sound.
+    When audio is drawn on the screen, several frames are condensed in
+    one column of pixels. This object computes what to display,
+    according to zooming and position in the sound.
 
     """
     def __init__(self, sound):
