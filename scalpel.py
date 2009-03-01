@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from gtkui import MainWindow
-from control import UIController
+from control import Controller
 from graphmodel import Graph
 from selection import Selection
 from player import Player
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     player = Player(sound)
     graph = Graph(sound)
     selection = Selection(graph)
-    controller = UIController(sound, player, graph, selection)
+    controller = Controller(sound, player, graph, selection)
     win = MainWindow(controller, graph, selection)
     win.resize(700, 500)
     win.show_all()

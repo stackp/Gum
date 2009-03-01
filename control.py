@@ -1,7 +1,7 @@
 from edit import Sound
 from player import Player
 
-class UIController(object):
+class Controller(object):
 
     def __init__(self, sound, player, graph, selection):
         self._player = player
@@ -107,15 +107,15 @@ class UIController(object):
         pass
 
 
-def test_UIController():
+def test_Controller():
     from time import sleep
     from mock import Fake
     
     # Test opening a file
-    ctrl = UIController(Fake(), Fake(), Fake(), Fake())
+    ctrl = Controller(Fake(), Fake(), Fake(), Fake())
     ctrl.open('sounds/test1.wav')
     assert ctrl._sound != None
 
 if __name__ == "__main__":
-    test_UIController()
+    test_Controller()
 
