@@ -42,7 +42,7 @@ class Graph(object):
         self.changed()
 
     def update(self):
-        "called when sound has changed."
+        "Called when sound has changed."
         self._adjust_view()
         self.changed()
 
@@ -68,7 +68,7 @@ class Graph(object):
         "Number of frames per pixel."
         number_frames_view = (self._view_end - self._view_start)
         if number_frames_view < self._width:
-            # the sound is too small to fill the width
+            # sound is too small to fill the width
             d = 1
         else:
             d = float(number_frames_view) / self._width
@@ -189,6 +189,8 @@ class Graph(object):
             self._view_start = 0
         if self._view_end > len(self._sound._data):
             self._view_end = len(self._sound._data)
+
+       
 
 
 def test_overview():
