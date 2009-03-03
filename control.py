@@ -65,9 +65,8 @@ class Controller(object):
         
     def paste(self):
         start, end = self._selection.frames()
-        self._selection.start = start
-        self._selection.end = start + len(self.clip)
         self._sound.paste(start, self.clip)
+        self._selection.set(start, start + len(self.clip))
 
     def trim(self):
         pass

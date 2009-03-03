@@ -18,6 +18,12 @@ class Selection(object):
         self.density = self._graph.get_density()
         self.changed()
 
+    def set(self, start, end):
+        "Set selection bounds (in frames)"
+        self.start = start
+        self.end = end
+        self.changed()
+
     def unselect(self):
         self.start = 0
         self.end = 0
