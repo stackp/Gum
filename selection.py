@@ -46,7 +46,7 @@ class Selection(object):
         self.changed()
 
     def _pxltofrm(self, p):
-        """Converts a pixel value to a frame value.
+        """Converts a pixel index to a frame index.
 
         Check that sound limits are not exceeded.
         
@@ -71,7 +71,7 @@ class Selection(object):
     def get(self):
         """Returns frames index for selection: (start, end).
 
-        start is always lower than or equals to end.
+        start is always lower than or equal to end.
 
         """
         start = int(round(self.start))

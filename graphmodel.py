@@ -72,11 +72,11 @@ class Graph(object):
         return d
 
     def frmtopxl(self, f):
-        "Converts a frame value to a pixel value."
+        "Converts a frame index to a pixel index."
         return int(round(f - self._view_start) / self.density())
 
     def pxltofrm(self, p):
-        "Converts a pixel value to a frame value."
+        "Converts a pixel index to a frame index."
         return int(round(self._view_start + p * self.density()))
 
     def _zoom(self, point, factor):
