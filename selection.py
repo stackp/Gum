@@ -11,9 +11,9 @@ class Selection(object):
         self.changed = Signal()
         self.density = self._graph.get_density()
         self.unselect()
-        self._graph.changed.connect(self.update)
+        self._graph.changed.connect(self._update)
     
-    def update(self):
+    def _update(self):
         "Called when self._graph changes."
         self.density = self._graph.get_density()
         self.changed()
