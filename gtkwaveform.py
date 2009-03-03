@@ -300,7 +300,8 @@ class GraphScrollbar(gtk.HScrollbar):
         """
         if not self.inhibit:
             self.inhibit = True
-            length, start, end = self._graph.frames_info()
+            length = self._graph.numframes()
+            start, end = self._graph.view()
             if start != end:
                 self._adjustment.upper = length
                 self._adjustment.value = start

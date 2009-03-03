@@ -53,18 +53,15 @@ class Graph(object):
         self._view_end = value + l
         self.changed()
 
-    def frames_info(self):
-        """Returns information about the sound, in frames:
-
-               (length, view_start, view_end)
-
-        """
-        length = len(self._sound._data)
+    def numframes(self):
+        return len(self._sound._data)
+    
+    def view(self):
         start = self._view_start
         end = self._view_end
-        return (length, start, end)
+        return (start, end)
 
-    def get_density(self):
+    def density(self):
         "Number of frames per pixel."
         number_frames_view = (self._view_end - self._view_start)
         if number_frames_view < self._width:
@@ -73,6 +70,14 @@ class Graph(object):
         else:
             d = float(number_frames_view) / self._width
         return d
+
+    def frmtopxl(self, f):
+        "Converts a frame value to a pixel value."
+        return int(round(f - self._view_start) / self.density())
+
+    def pxltofrm(self, p):
+        "Converts a pixel value to a frame value."
+        return int(round(self._view_start + p * self.density()))
 
     def _zoom(self, point, factor):
         """Expand or shrink view according to factor.
@@ -191,8 +196,6 @@ class Graph(object):
             self._view_end = len(self._sound._data)
 
        
-
-
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))

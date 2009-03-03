@@ -9,13 +9,11 @@ class Selection(object):
     def __init__(self, graph):
         self._graph = graph
         self.changed = Signal()
-        self.density = self._graph.get_density()
         self.unselect()
         self._graph.changed.connect(self._update)
     
     def _update(self):
         "Called when self._graph changes."
-        self.density = self._graph.get_density()
         self.changed()
 
     def set(self, start, end):
@@ -38,18 +36,25 @@ class Selection(object):
     
     def start_selection(self, pixel):
         "The pixel is an index in the graph."
-        length, view_start, view_end = self._graph.frames_info()
-        start = view_start + pixel * self.density
-        self.start = self.gauge(start, 0, length)
+        self.start = self._pxltofrm(pixel)
         self.end = self.start
         self.changed()
         
     def end_selection(self, pixel):
         "The pixel is an index in the graph."
-        length, view_start, view_end = self._graph.frames_info()
-        end = view_start + pixel * self.density
-        self.end = self.gauge(end, 0, length)
+        self.end = self._pxltofrm(pixel)
         self.changed()
+
+    def _pxltofrm(self, p):
+        """Converts a pixel value to a frame value.
+
+        Check that sound limits are not exceeded.
+        
+        """
+        length = self._graph.numframes()
+        f = self._graph.pxltofrm(p)
+        f = self.gauge(f, 0, length)
+        return f
 
     def pixels(self):
         """Returns pixel position for selection: `(start, end)`.
@@ -57,9 +62,8 @@ class Selection(object):
         `start` is always lower than or equals to `end`.
 
         """
-        (length, vstart, vend) = self._graph.frames_info()
-        pix_start = int(round((self.start - vstart) / self.density))
-        pix_end = int(round((self.end - vstart) / self.density))
+        pix_start = self._graph.frmtopxl(self.start)
+        pix_end = self._graph.frmtopxl(self.end)
         if pix_start > pix_end:
             pix_start, pix_end = pix_end, pix_start
         return pix_start, pix_end
@@ -78,10 +82,24 @@ class Selection(object):
 
     
 def test_selection():
-    from mock import Fake, Mock
-    graph = Mock({"get_density": 10, "frames_info": (5000, 100.1, 200.1)})
-    graph.changed = Fake()
-    selection = Selection(graph)
+    from graphmodel import Graph
+    from mock import Fake
+
+    class FakeGraph():
+        density = 10
+        numframes = (lambda(self): 5000)
+        _view_start = 100.1
+        _view_end = 200.1
+        changed = Fake()
+
+        def frmtopxl(self, f):
+            return int(round(f - self._view_start) / self.density)
+
+        def pxltofrm(self, p):
+            return int(round(self._view_start + p * self.density))
+
+        
+    selection = Selection(FakeGraph())
     selection.start_selection(10)
     selection.end_selection(100)
     selection._update()
