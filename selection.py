@@ -78,14 +78,14 @@ class Selection(object):
     
 def test_selection():
     from mock import Fake, Mock
-    graph = Mock({"get_density": 9, "frames_info": (5000, 100.1, 200.1)})
+    graph = Mock({"get_density": 10, "frames_info": (5000, 100.1, 200.1)})
     graph.changed = Fake()
     selection = Selection(graph)
     selection.start_selection(10)
     selection.end_selection(100)
-    selection.update()
-    assert selection.get_selection() == (10, 100)
-
+    selection._update()
+    assert selection.pixels() == (10, 100)
+    assert selection.frames() == (100 + 10 *  10, 100 + 10 * 100)
 
 if __name__ == "__main__":
     test_selection()
