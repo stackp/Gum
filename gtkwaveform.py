@@ -170,10 +170,6 @@ class SelectionLayer(object):
         self._cache = None
         self._selection = selection
         self._selection.changed.connect(self.update)
-        layered.add_events(gtk.gdk.BUTTON_PRESS_MASK |
-                           gtk.gdk.BUTTON_RELEASE_MASK |
-                           gtk.gdk.POINTER_MOTION_MASK |
-                           gtk.gdk.POINTER_MOTION_HINT_MASK)
 
     def update(self):
         self._cache = None
@@ -240,6 +236,10 @@ class MouseSelection(object):
     def __init__(self, widget, selection):
         self._selection = selection
         self.pressed = False
+        widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
+                          gtk.gdk.BUTTON_RELEASE_MASK |
+                          gtk.gdk.POINTER_MOTION_MASK |
+                          gtk.gdk.POINTER_MOTION_HINT_MASK)
         widget.connect("button_press_event", self.button_press)
         widget.connect("button_release_event", self.button_release)
         widget.connect("motion_notify_event", self.motion_notify)
