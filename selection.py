@@ -64,7 +64,7 @@ class Selection(object):
             pix_start, pix_end = pix_end, pix_start
         return pix_start, pix_end
 
-    def frames(self):
+    def get(self):
         """Returns frames index for selection: (start, end).
 
         start is always lower than or equals to end.
@@ -75,6 +75,7 @@ class Selection(object):
         if start > end:
             start, end = end, start
         return start, end
+
     
 def test_selection():
     from mock import Fake, Mock
@@ -85,7 +86,7 @@ def test_selection():
     selection.end_selection(100)
     selection._update()
     assert selection.pixels() == (10, 100)
-    assert selection.frames() == (100 + 10 *  10, 100 + 10 * 100)
+    assert selection.get() == (100 + 10 *  10, 100 + 10 * 100)
 
 if __name__ == "__main__":
     test_selection()

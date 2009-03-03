@@ -30,7 +30,7 @@ class Controller(object):
         pass
 
     def play(self):
-        start, end = self._selection.frames()
+        start, end = self._selection.get()
         if start == end:
             end = len(self._sound._data)
         self._position = start
@@ -54,17 +54,17 @@ class Controller(object):
         pass
 
     def cut(self):
-        start, end = self._selection.frames()
+        start, end = self._selection.get()
         self._selection.start = start
         self._selection.end = start
         self.clip = self._sound.cut(start, end)
         
     def copy(self):
-        start, end = self._selection.frames()
+        start, end = self._selection.get()
         self.clip = self._sound.copy(start, end)
         
     def paste(self):
-        start, end = self._selection.frames()
+        start, end = self._selection.get()
         self._sound.paste(start, self.clip)
         self._selection.set(start, start + len(self.clip))
 
@@ -93,7 +93,7 @@ class Controller(object):
         self._graph.zoom_fit()
 
     def reverse(self):
-        start, end = self._selection.frames()
+        start, end = self._selection.get()
         self._sound.reverse(start, end)
 
     def normalize(self):
