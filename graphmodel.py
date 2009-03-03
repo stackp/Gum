@@ -46,7 +46,7 @@ class Graph(object):
         self._adjust_view()
         self.changed()
 
-    def view_starts_at(self, value):
+    def move_to(self, value):
         "Moves the view start and keep the view length"
         l = self._view_end - self._view_start
         self._view_start = value

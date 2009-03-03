@@ -289,7 +289,7 @@ class GraphScrollbar(gtk.HScrollbar):
         """
         if not self.inhibit:
             self.inhibit = True
-            self._graph.view_starts_at(self._adjustment.value)
+            self._graph.move_to(self._adjustment.value)
             self.inhibit = False
         
     def update_scrollbar(self):
