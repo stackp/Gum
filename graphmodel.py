@@ -73,11 +73,21 @@ class Graph(object):
 
     def frmtopxl(self, f):
         "Converts a frame index to a pixel index."
-        return int(round(f - self._view_start) / self.density())
+        p = int(round(f - self._view_start) / self.density())
+        return p
 
     def pxltofrm(self, p):
         "Converts a pixel index to a frame index."
-        return int(round(self._view_start + p * self.density()))
+        f = int(round(self._view_start + p * self.density()))
+        return self._gauge(f, 0, self.numframes())
+    
+    def _gauge(self, value, mini, maxi):
+        "Calibrate value between mini and maxi."
+        if value < mini:
+            value = mini
+        if value > maxi:
+            value = maxi
+        return value
 
     def _zoom(self, point, factor):
         """Expand or shrink view according to factor.

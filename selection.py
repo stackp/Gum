@@ -25,36 +25,17 @@ class Selection(object):
     def unselect(self):
         self.start = 0
         self.end = 0
-
-    def gauge(self, value, mini, maxi):
-        "Calibrate value between mini and maxi."
-        if value < mini:
-            value = mini
-        if value > maxi:
-            value = maxi
-        return value
     
     def start_selection(self, pixel):
         "The pixel is an index in the graph."
-        self.start = self._pxltofrm(pixel)
+        self.start = self._graph.pxltofrm(pixel)
         self.end = self.start
         self.changed()
         
     def end_selection(self, pixel):
         "The pixel is an index in the graph."
-        self.end = self._pxltofrm(pixel)
+        self.end = self._graph.pxltofrm(pixel)
         self.changed()
-
-    def _pxltofrm(self, p):
-        """Converts a pixel index to a frame index.
-
-        Check that sound limits are not exceeded.
-        
-        """
-        length = self._graph.numframes()
-        f = self._graph.pxltofrm(p)
-        f = self.gauge(f, 0, length)
-        return f
 
     def pixels(self):
         """Returns pixel position for selection: `(start, end)`.
