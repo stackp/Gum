@@ -9,7 +9,7 @@ from edit import Sound
 import gtk
 gtk.gdk.threads_init()
 
-if __name__ == "__main__":
+def run():
     sound = Sound()
     player = Player(sound)
     graph = Graph(sound)
@@ -19,3 +19,6 @@ if __name__ == "__main__":
     win.resize(700, 500)
     win.show_all()
     gtk.main()
+
+if __name__ == "__main__":
+    run()
