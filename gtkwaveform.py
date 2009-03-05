@@ -192,16 +192,6 @@ class SelectionLayer(object):
                 c.set_operator(cairo.OPERATOR_CLEAR)
                 c.rectangle(start + 0.5, 0, end - start + 0.5, height)
                 c.fill()
-
-            # cursors
-            c.set_operator(cairo.OPERATOR_ADD)
-            c.set_line_width(1)
-            c.set_source_rgba(1, 1, 1, 0.7)
-            c.move_to(start + 0.5, 0)
-            c.line_to(start + 0.5, height)
-            c.move_to(end + 0.5, 0)
-            c.line_to(end + 0.5, height)
-            c.stroke()
             
         context.set_source_surface(self._cache, 0, 0)
         context.set_operator(cairo.OPERATOR_OVER)
