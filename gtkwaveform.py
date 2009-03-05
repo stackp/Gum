@@ -190,7 +190,7 @@ class SelectionLayer(object):
 
                 # ... then clear selection
                 c.set_operator(cairo.OPERATOR_CLEAR)
-                c.rectangle(start + 0.5, 0, end - start + 0.5, height)
+                c.rectangle(start, 0, end - start, height)
                 c.fill()
             
         context.set_source_surface(self._cache, 0, 0)
