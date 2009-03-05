@@ -343,7 +343,8 @@ def test_scroll():
     g.set_width(4)
 
     g.scroll_right()
-    length, start, end = g.frames_info()
+    length = g.numframes()
+    start, end = g.view()
     assert length == 4
     assert start == 0
     assert end == 4
