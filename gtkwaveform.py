@@ -146,7 +146,7 @@ class WaveformLayer(object):
             numchan = len(channels)
             for i in range(numchan):
                 s = surface.create_similar(cairo.CONTENT_COLOR,
-                                                     width, height / numchan)
+                                           width, height / numchan)
                 self.draw_channel(channels[i], s, width, height / numchan)
                 c.set_source_surface(s, 0, (height / numchan) * i)
                 c.set_operator(cairo.OPERATOR_ATOP)
