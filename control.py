@@ -21,10 +21,10 @@ class Controller(object):
         self._selection.unselect()
 
     def save(self):
-        pass
+        self._sound.save()
 
     def save_as(self, filename):
-        pass
+        self._sound.save_as(filename)
 
     def quit(self):
         pass

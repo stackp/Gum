@@ -181,7 +181,14 @@ class MainWindow(gtk.Window):
             self.ctrl.open(filename)
 
     def save_as(self, *args):
-        pass
+        chooser = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+        response = chooser.run()
+        filename = chooser.get_filename()
+        chooser.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.ctrl.save_as(filename)
 
 # -- Tests
            
