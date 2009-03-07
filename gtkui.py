@@ -160,13 +160,13 @@ class MainWindow(gtk.Window):
 
 
     def about(self, *args):
-        d = gtk.Dialog(title="About",
-                       flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                       buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_OK))
+        d = gtk.AboutDialog()
         d.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         d.set_transient_for(self)
-        d.vbox.add(gtk.Label("Scalpel"))
-        d.show_all()
+        d.set_program_name("Scalpel")
+        d.set_version("0.1")
+        d.set_copyright("(c) Pierre Duquesne <stackp@online.fr>")
+        d.set_comments("A sound editor")
         d.run()
         d.destroy()
         
