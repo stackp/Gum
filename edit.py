@@ -72,6 +72,7 @@ class Sound(object):
             nframes = f.get_nframes()
             self._data = f.read_frames(nframes)
             self.numchan = f.get_channels()
+            f.close()
         self.history = History()
         self.changed = Signal()
 
