@@ -61,7 +61,7 @@ class MainWindow(gtk.Window):
                 <menuitem action="Reverse"/>
                 <menuitem action="Normalize"/>
               </menu>                
-              <menu action="Help">
+              <menu action="Scalpel">
                 <menuitem action="About"/>
               </menu>
             </menubar>
@@ -99,7 +99,7 @@ class MainWindow(gtk.Window):
                    ('Edit', None, '_Edit'),
                    ('View', None, '_View'),
                    ('Effects', None, '_Effects'),
-                   ('Help', None, '_Help'),
+                   ('Scalpel', None, '_Scalpel'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
                    ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
