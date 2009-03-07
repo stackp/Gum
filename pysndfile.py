@@ -889,7 +889,7 @@ out of luck, because its implementation of POSIX open is broken)"""
             nc = input.shape[1]
 
         if nframes == -1:
-            nframes = N.size(input)
+            nframes = N.size(input) / nc
         # Number of channels should be the one expected
         if not(nc == self._sfinfo.channels):
             raise Exception("Expected %d channels, got %d" % \
