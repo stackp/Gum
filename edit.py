@@ -76,11 +76,17 @@ class Sound(object):
         self.history = History()
         self.changed = Signal()
 
-    def save(self, format):
+    def save(self, format=pysndfile.formatinfo()):
         self.save_as(self.filename, format)
 
-    def save_as(self, filename, format):
-        pass
+    def save_as(self, filename, format=pysndfile.formatinfo()):
+        f = pysndfile.sndfile(filename, mode='write',
+                              format=format,
+                              channels=self.numchan,
+                              samplerate=44100)
+        f.write_frames(self._data)
+        f.close()
+        self.filename = filename
 
     def cut(self, start, end):
         clip = self._data[start:end]
@@ -247,7 +253,7 @@ def testSound():
     snd.paste(0, clip)
     assert snd._data.tolist() == data2[start:end] + data2
 
-    # test reverse
+    # test reverse()
     snd = Sound()
     snd._data = numpy.array(range(10))
     snd.reverse(3, 6)
@@ -257,6 +263,27 @@ def testSound():
     snd.reverse(3, 6)
     assert snd._data.tolist() == [[0, 0], [1, 1], [2, 2], [5, 5],
                                   [4, 4], [3, 3], [6, 6], [7, 7]]
+
+    # test save_as()
+    import os
+    snd = Sound("sounds/test1.wav")
+    outfile = "/tmp/test.wav"
+    snd.save_as(outfile)
+    assert os.path.exists(outfile)
+    assert snd.filename == outfile
+    snd2 = Sound(outfile)
+    assert abs((snd._data - snd2._data).max()) < 0.0001 # quantization errors!
+    os.remove(outfile)
+
+    snd = Sound("sounds/test2.wav")
+    outfile = "/tmp/test2.wav"
+    snd.save_as(outfile)
+    assert os.path.exists(outfile)
+    assert snd.filename == outfile
+    snd2 = Sound(outfile)
+    assert snd._data.size == snd2._data.size
+    assert abs((snd._data - snd2._data).flatten().max()) == 0
+    os.remove(outfile)
 
         
 if __name__ == '__main__':
