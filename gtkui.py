@@ -33,7 +33,7 @@ class MainWindow(gtk.Window):
         self.vbox.pack_end(self.statusbar, expand=False, fill=False)
         self.add(self.vbox)
         
-        self.connect("delete-event", gtk.main_quit)
+        self.connect("delete-event", self.quit)
         self.set_title("scalpel")
 
     def _make_ui_manager(self):
@@ -110,7 +110,7 @@ class MainWindow(gtk.Window):
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
                    ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
                    ('Save as', gtk.STOCK_SAVE_AS, None, None, '',self.save_as),
-                   ('Quit', gtk.STOCK_QUIT, None, None, '', gtk.main_quit),
+                   ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '', self.play),
                    ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',self.pause),
                    ('Start', gtk.STOCK_MEDIA_PREVIOUS, None, None, '',
@@ -185,6 +185,11 @@ class MainWindow(gtk.Window):
         filename = self.filedialog.get_filename(action='save')
         if filename != None:
             self.ctrl.save_as(filename)
+
+    def quit(self, *args):
+        self.ctrl.quit()
+        gtk.main_quit()
+
 
 # -- Tests
            

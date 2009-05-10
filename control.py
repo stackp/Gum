@@ -32,7 +32,7 @@ class Controller(object):
         self._sound.save_as(filename)
 
     def quit(self):
-        pass
+        self._player.pause()
 
     def play(self):
         start, end = self._selection.get()
