@@ -39,6 +39,14 @@ class FileDialog(object):
         filename = chooser.get_filename()
         chooser.hide()
 
+        # By default, the GTK loop would wait until the process is
+        # idle to process events. Now, it is very probable that file
+        # I/O will be performed right after this method call and that
+        # would delay hiding the dialog until I/O are done. So,
+        # process pending events to hide the dialog right now.
+        while gtk.events_pending():
+            gtk.main_iteration(False)
+
         if response == gtk.RESPONSE_OK:
             self.curdir = os.path.dirname(filename)
             return filename
