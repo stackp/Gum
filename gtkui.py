@@ -5,7 +5,7 @@
 
 import gtk
 from gtkwaveform import GraphView, GraphScrollbar
-
+from gtkfiledialog import FileDialog
 
 class MainWindow(gtk.Window):
 
@@ -23,6 +23,7 @@ class MainWindow(gtk.Window):
         self.waveform = GraphView(graph, selection)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
+        self.filedialog = FileDialog()
 
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)
@@ -176,23 +177,13 @@ class MainWindow(gtk.Window):
         d.destroy()
         
     def open(self, *args):
-        chooser = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                         gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-        response = chooser.run()
-        filename = chooser.get_filename()
-        chooser.destroy()
-        if response == gtk.RESPONSE_OK:
+        filename = self.filedialog.get_filename(action='open')
+        if filename != None:
             self.ctrl.open(filename)
 
     def save_as(self, *args):
-        chooser = gtk.FileChooserDialog(action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
-        response = chooser.run()
-        filename = chooser.get_filename()
-        chooser.destroy()
-        if response == gtk.RESPONSE_OK:
+        filename = self.filedialog.get_filename(action='save')
+        if filename != None:
             self.ctrl.save_as(filename)
 
 # -- Tests
