@@ -11,6 +11,8 @@ from graphmodel import Graph
 from selection import Selection
 from player import Player
 from edit import Sound
+import sys
+import os.path
 import gtk
 gtk.gdk.threads_init()
 
@@ -23,6 +25,10 @@ def run():
     win = MainWindow(controller, graph, selection)
     win.resize(700, 500)
     win.show_all()
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        controller.open(filename)
+        win.filedialog.curdir = os.path.dirname(filename)
     gtk.main()
 
 if __name__ == "__main__":
