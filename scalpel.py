@@ -23,8 +23,6 @@ def run():
     selection = Selection(graph)
     controller = Controller(sound, player, graph, selection)
     win = MainWindow(controller, graph, selection)
-    win.resize(700, 500)
-    win.show_all()
     if len(sys.argv) > 1:
         filename = sys.argv[1]
         controller.open(filename)

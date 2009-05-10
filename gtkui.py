@@ -35,6 +35,8 @@ class MainWindow(gtk.Window):
         
         self.connect("delete-event", self.quit)
         self.set_title("scalpel")
+        self.resize(700, 500)
+        self.show_all()
 
     def _make_ui_manager(self):
         ui = '''<ui>
