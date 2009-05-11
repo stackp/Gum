@@ -109,9 +109,12 @@ class MainWindow(gtk.Window):
                    ('Effects', None, '_Effects'),
                    ('Scalpel', None, '_Scalpel'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
-                   ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
-                   ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
-                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',self.save_as),
+                   ('Open', gtk.STOCK_OPEN, None, None, '',
+                                            self.display_exception(self.open)),
+                   ('Save', gtk.STOCK_SAVE, None, None, '',
+                                            self.display_exception(self.save)),
+                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',
+                                         self.display_exception(self.save_as)),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '', self.play),
                    ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',self.pause),
@@ -144,6 +147,24 @@ class MainWindow(gtk.Window):
         uimanager.insert_action_group(actiongroup, 0)
 
         return uimanager
+
+    def display_exception(self, func):
+        """A decorator that display caught exceptions in a window.
+
+        Caught exceptions are reraised.
+
+        """
+        def f(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception, e:
+                d = gtk.MessageDialog(parent=self, buttons=gtk.BUTTONS_CLOSE)
+                d.set_title("Error")
+                d.set_markup(str(e))
+                d.run()
+                d.destroy()
+                raise e
+        return f
 
     # -- Callbacks
 

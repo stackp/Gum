@@ -25,7 +25,7 @@ def run():
     win = MainWindow(controller, graph, selection)
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        controller.open(filename)
+        win.display_exception(controller.open)(filename)
         win.filedialog.curdir = os.path.dirname(filename)
     gtk.main()
 
