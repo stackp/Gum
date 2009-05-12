@@ -1,4 +1,4 @@
-# Scalpel sound editor (http://stackp.online.fr/?p=48)
+_# Scalpel sound editor (http://stackp.online.fr/?p=48)
 # Copyright 2008 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Python Software Foundation License
 # (http://www.python.org/psf/license/)
@@ -29,16 +29,6 @@ class Player(object):
         self.end = len(sound._data)
 
     def play(self):
-
-        # Reentrancy: only one thread is allowed to play at the same
-        # time. An attempt to play while a thread is already playing
-        # will return immediatly.
-        if not self._lock.acquire(False):
-            return
-
-        # FIXME: self.stop() might have been called before!
-        self._playing = True
-
         pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
                             mode=alsaaudio.PCM_NORMAL,
                             card='default')
@@ -61,20 +51,24 @@ class Player(object):
                 pcm.write(buf)
                 position = end
 
-        self._playing = False # useless ?
         # Closing the device flushes buffered frames.
         pcm.close()
         self._lock.release()
 
     def thread_play(self):
+        # Only one thread at a time can play. If a thread is already
+        # playing, stop it before creating a new thread.
+        self._playing = False
+        self._lock.acquire()
         self._playing = True
         t = threading.Thread(target=self.play, args=())
         t.start()
         return t
-                    
+
     def pause(self):
         self._playing = False
-        
+
+
 # test
 def testPlayer():
     class FakeSound: pass
@@ -89,24 +83,24 @@ def testPlayer():
     sound.numchan = 1
     
     player = Player(sound)
-    player.play()
+    player.thread_play().join()
 
     import pysndfile
     f = pysndfile.sndfile('sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
     sound._data = data
     player.set_sound(sound)
-    player.play()
-    player.play()
+    player.thread_play().join()
+    player.thread_play().join()
 
     # Testing position
     player.start = 40000
-    player.play()
+    player.thread_play().join()
     player.start = 0
 
     # Test reentrancy
-    print ("Two threads will try to play at the same time, you should "
-          "hear only one.")
+    print ("Two threads will attempt to play at a small interval, you should "
+           "hear the first one being interrupted by the second one.")
     
     from time import sleep
     t1 = player.thread_play()
@@ -114,7 +108,16 @@ def testPlayer():
     t2 = player.thread_play()
     t1.join()
     t2.join()
+
+    print ("Two threads will attempt to play simulatneously, you should "
+           "hear only one.")
     
+    from time import sleep
+    t1 = player.thread_play()
+    t2 = player.thread_play()
+    t1.join()
+    t2.join()
+
     # Testing pause
     print 
     print "Testing pause(): the sound should stop after 0.3 seconds."
@@ -128,7 +131,7 @@ def testPlayer():
     sound._data = data
     sound.numchan = 2
     player = Player(sound)
-    player.play()
+    player.thread_play().join()
 
 if __name__ == '__main__':
     testPlayer()
