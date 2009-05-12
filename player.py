@@ -33,7 +33,6 @@ class Player(object):
     def set_sound(self, sound):
         self._sound = sound
         self.start = 0
-        self.position = 0
         self.end = len(sound._data)
 
     def play(self):
@@ -51,7 +50,6 @@ class Player(object):
         while self._playing:
             if position > self.end:
                 self._playing = False
-                position = 0
             else:
                 start = position
                 end = position + self._periodsize
@@ -62,7 +60,6 @@ class Player(object):
                 self._pcm.write(buf)
                 position = end
 
-        self.position = position
         self._playing = False # useless ?
         self._lock.release()
 
