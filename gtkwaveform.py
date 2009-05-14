@@ -105,6 +105,7 @@ class WaveformLayer(object):
         self._layered = layered
         self._graph = graph
         self._cache = None
+        self.wavecolor = 0.0, 0.47058823529411764, 1.0
         layered.add_events(gtk.gdk.SCROLL_MASK)
         graph.changed.connect(self.update)
 
@@ -124,7 +125,7 @@ class WaveformLayer(object):
         c.stroke()
 
         # Waveform
-        c.set_source_rgb(0, 0.9, 0)
+        c.set_source_rgb(*self.wavecolor)
         for i, (mini, maxi) in enumerate(values):
             # -1 <= mini <= maxi <= 1
             x = i
