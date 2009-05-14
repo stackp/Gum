@@ -190,7 +190,7 @@ class SelectionLayer(object):
 
             if start != end:
                 # darken everything ...
-                c.set_source_rgba(0, 0, 0, 0.75)
+                c.set_source_rgba(0, 0, 0, 0.5)
                 c.paint()
 
                 # ... then clear selection
