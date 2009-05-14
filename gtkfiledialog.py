@@ -26,11 +26,14 @@ class FileDialog(object):
                                 action=gtk.FILE_CHOOSER_ACTION_OPEN,
                                 buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                          gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+            chooser.set_title('Open file:')
+
         elif action == 'save':
             chooser = gtk.FileChooserDialog(
                                 action=gtk.FILE_CHOOSER_ACTION_SAVE,
                                 buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                                          gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+            chooser.set_title('Save as:')
         else:
             raise Exception("action must be 'open' or 'save' (got '%s')"
                             % action)
