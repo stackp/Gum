@@ -12,7 +12,6 @@ from selection import Selection
 from player import Player
 from edit import Sound
 import sys
-import os.path
 import gtk
 gtk.gdk.threads_init()
 
