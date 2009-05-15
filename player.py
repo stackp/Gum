@@ -39,11 +39,11 @@ class Player(object):
         position = self.start
 
         while self._playing:
-            if position > self.end:
+            if position >= self.end:
                 self._playing = False
             else:
                 start = position
-                end = position + self._periodsize
+                end = min(position + self._periodsize, self.end)
                 buf = self._sound._data[start:end]
                 if self._sound.numchan == 1:
                     # converting mono to stereo
