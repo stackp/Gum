@@ -6,6 +6,7 @@
 import alsaaudio
 import threading
 from array import array
+from  event import Signal
 import numpy
 
 class Player(object):
@@ -22,6 +23,9 @@ class Player(object):
         self._playing = False
         self._periodsize = 128
         self._lock = threading.Lock()
+        self.start_playing = Signal()
+        self.stop_playing = Signal()
+        self.position = 0
 
     def set_sound(self, sound):
         self._sound = sound
@@ -36,23 +40,25 @@ class Player(object):
         pcm.setchannels(2)
         pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
         pcm.setperiodsize(self._periodsize)
-        position = self.start
+        self.position = self.start
 
+        self.start_playing()
         while self._playing:
-            if position >= self.end:
+            if self.position >= self.end:
                 self._playing = False
             else:
-                start = position
-                end = min(position + self._periodsize, self.end)
+                start = self.position
+                end = min(self.position + self._periodsize, self.end)
                 buf = self._sound._data[start:end]
                 if self._sound.numchan == 1:
                     # converting mono to stereo
                     buf = numpy.reshape([buf, buf], -1, 2)
                 pcm.write(buf)
-                position = end
+                self.position = end
 
         # Closing the device flushes buffered frames.
         pcm.close()
+        self.stop_playing()
         self._lock.release()
 
     def thread_play(self):

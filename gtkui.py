@@ -9,7 +9,7 @@ from gtkfiledialog import FileDialog
 
 class MainWindow(gtk.Window):
 
-    def __init__(self, controller, graph, selection):
+    def __init__(self, controller, graph, selection, cursor):
         gtk.Window.__init__(self)
 
         self.ctrl = controller
@@ -20,7 +20,7 @@ class MainWindow(gtk.Window):
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
         for w in self.toolbar:
             w.set_homogeneous(False)
-        self.waveform = GraphView(graph, selection)
+        self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
         self.filedialog = FileDialog()

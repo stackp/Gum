@@ -74,6 +74,7 @@ class LayeredGraphView(LayeredCairoWidget):
 #
 #    * waveform
 #    * selection
+#    * cursor
 #
 class GraphView(LayeredGraphView):
     """Sound visualization widget for the main window.
@@ -82,13 +83,14 @@ class GraphView(LayeredGraphView):
     * Mouse event listeners act on models (scroll and selection).
 
     """
-    def __init__(self, graph, selection):
+    def __init__(self, graph, selection, cursor):
         super(GraphView, self).__init__(graph)
         self._graph = graph
         self._selection = selection
         self.layers.append(WaveformLayer(self, graph))
         self.layers.append(SelectionLayer(self, selection))
-        MouseSelection(self, selection)
+        self.layers.append(CursorLayer(self, cursor))
+        MouseSelection(self, selection, cursor)
         MouseScroll(self, graph)
 
 
@@ -203,6 +205,37 @@ class SelectionLayer(object):
         context.set_operator(cairo.OPERATOR_OVER)
         context.paint()
 
+class CursorLayer(object):
+
+    def __init__(self, layered, cursor):
+        self._layered = layered
+        self._cache = None
+        self._cursor = cursor
+        self._cursor.changed.connect(self.update)
+        self._height = None
+        self.rgba = (1, 1, 1, 0.5)
+
+    def update(self):
+        self._layered.redraw() # called in all layers !
+
+    def draw(self, context, width, height):
+        if height != self._height:
+            self._height = height
+            surface = context.get_target()
+            self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
+                                                 1, height)
+            c = cairo.Context(self._cache)
+            c.set_source_rgba(*self.rgba)
+            c.set_line_width(1)
+            c.move_to(0.5, 0)
+            c.line_to(0.5, height)
+            c.stroke()
+
+        x = self._cursor.pixel()
+        context.set_source_surface(self._cache, x, 0)
+        context.set_operator(cairo.OPERATOR_OVER)
+        context.paint()
+
 
 # -- Mouse event listeners that act on models.
 #
@@ -222,15 +255,15 @@ class MouseScroll(object):
         elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
             self._graph.scroll_right()
 
-
 class MouseSelection(object):
     """Listens for mouse events and select graph area.
 
-    Must be attached to a gtk.Widget and a Selection.
+    Must be attached to a gtk.Widget, a Selection and a Cursor.
 
     """
-    def __init__(self, widget, selection):
+    def __init__(self, widget, selection, cursor):
         self._selection = selection
+        self._cursor = cursor
         self.pressed = False
         widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
                           gtk.gdk.BUTTON_RELEASE_MASK |
@@ -252,8 +285,9 @@ class MouseSelection(object):
             
     def button_release(self, widget, event):
         if event.button == 1:
+            start, end = self._selection.get()
+            self._cursor.set_frame(start)
             self.pressed = False
-
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
 #
@@ -362,7 +396,20 @@ if __name__ == '__main__':
             layered.layers.append(SelectionLayer(layered, selection))
             return layered
 
-        layereds = [randomized(), sine(), sines(), selection()]
+        def cursor():
+            graph = Mock({"channels": [], "set_width": None,
+                          "frames_info": (0, 0, 0)})
+            class Cursor: pass
+            cursor = Cursor()
+            cursor.changed = Fake()
+            cursor.pixel = lambda: 50
+            layered = LayeredGraphView(graph)
+            cursorlayer = CursorLayer(layered, cursor)
+            cursorlayer.rgba = (1, 0, 0, 1)
+            layered.layers.append(cursorlayer)
+            return layered
+
+        layereds = [randomized(), sine(), sines(), selection(), cursor()]
 
         for layered in layereds:
             window = gtk.Window()

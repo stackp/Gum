@@ -11,6 +11,7 @@ from graphmodel import Graph
 from selection import Selection
 from player import Player
 from edit import Sound
+from cursor import Cursor
 import sys
 import gtk
 gtk.gdk.threads_init()
@@ -20,8 +21,9 @@ def run():
     player = Player(sound)
     graph = Graph(sound)
     selection = Selection(graph)
+    cursor = Cursor(graph, player, selection)
     controller = Controller(sound, player, graph, selection)
-    win = MainWindow(controller, graph, selection)
+    win = MainWindow(controller, graph, selection, cursor)
     if len(sys.argv) > 1:
         filename = sys.argv[1]
         win.display_exception(controller.open)(filename)
