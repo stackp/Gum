@@ -137,8 +137,8 @@ class WaveformLayer(object):
                 c.fill()
             else:
                 # Draw a line from min to max
-                c.move_to(x + 0.5, ymin + 0.5)
-                c.line_to(x + 0.5, ymax + 0.5)
+                c.move_to(x + 0.5, ymin)
+                c.line_to(x + 0.5, ymax)
                 c.stroke()
         
     def draw(self, context, width, height):
