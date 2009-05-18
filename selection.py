@@ -60,8 +60,8 @@ class Selection(object):
         start is always lower than or equal to end.
 
         """
-        start = int(round(self.start))
-        end = int(round(self.end))
+        start = self.start
+        end = self.end
         if start > end:
             start, end = end, start
         return start, end
