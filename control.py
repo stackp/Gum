@@ -38,7 +38,6 @@ class Controller(object):
         start, end = self._selection.get()
         if start == end:
             end = len(self._sound._data)
-        self._position = start
         self._player.start = start
         self._player.end = end
         self._player.thread_play()
