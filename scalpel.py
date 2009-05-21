@@ -13,6 +13,7 @@ from player import Player
 from edit import Sound
 from cursor import Cursor
 import sys
+import os.path
 import gtk
 gtk.gdk.threads_init()
 
@@ -27,7 +28,7 @@ def run():
     if len(sys.argv) > 1:
         filename = sys.argv[1]
         win.display_exception(controller.open)(filename)
-        win.filedialog.filename = filename
+        win.filedialog.filename = os.path.abspath(filename)
     gtk.main()
 
 if __name__ == "__main__":
