@@ -92,7 +92,7 @@ def testPlayer():
     player.thread_play().join()
 
     import pysndfile
-    f = pysndfile.sndfile('sounds/test1.wav')
+    f = pysndfile.sndfile('../sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
     sound._data = data
     player.set_sound(sound)
@@ -132,7 +132,7 @@ def testPlayer():
     player.pause()
 
     # Testing stereo
-    f = pysndfile.sndfile('sounds/test2.wav')
+    f = pysndfile.sndfile('../sounds/test2.wav')
     data = f.read_frames(f.get_nframes())
     sound._data = data
     sound.numchan = 2

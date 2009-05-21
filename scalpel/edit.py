@@ -211,7 +211,7 @@ def testSound():
     assert snd._data.tolist() == sine2[start:end] + sine2
     
     # test with a mono file
-    snd = Sound("sounds/test1.wav")
+    snd = Sound("../sounds/test1.wav")
     assert snd._data != []
     start = 4444
     end = 55555
@@ -235,7 +235,7 @@ def testSound():
     assert snd._data.tolist() == data2[start:end] + data2
 
     # test with a stereo file
-    snd = Sound("sounds/test2.wav")
+    snd = Sound("../sounds/test2.wav")
     assert snd._data.tolist() != []
     start = 4444
     end = 55555
@@ -271,7 +271,7 @@ def testSound():
 
     # test save_as()
     import os
-    snd = Sound("sounds/test1.wav")
+    snd = Sound("../sounds/test1.wav")
     outfile = "/tmp/test.wav"
     snd.save_as(outfile)
     assert os.path.exists(outfile)
@@ -280,7 +280,7 @@ def testSound():
     assert abs((snd._data - snd2._data).max()) < 0.0001 # quantization errors!
     os.remove(outfile)
 
-    snd = Sound("sounds/test2.wav")
+    snd = Sound("../sounds/test2.wav")
     outfile = "/tmp/test2.wav"
     snd.save_as(outfile)
     assert os.path.exists(outfile)

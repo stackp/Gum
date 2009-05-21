@@ -116,7 +116,7 @@ def test_Controller():
     
     # Test opening a file
     ctrl = Controller(Fake(), Fake(), Fake(), Fake())
-    ctrl.open('sounds/test1.wav')
+    ctrl.open('../sounds/test1.wav')
     assert ctrl._sound != None
 
 if __name__ == "__main__":
