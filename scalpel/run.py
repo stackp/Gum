@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-# Scalpel sound editor (http://stackp.online.fr/?p=48)
+# Scalpel sound editor (http://scalpelsound.online.fr)
 # Copyright 2008 (C) Pierre Duquesne <stackp@online.fr>
-# Licensed under the BSD License.
+# Licensed under the Revised BSD License.
 
 from gtkui import MainWindow
 from control import Controller
