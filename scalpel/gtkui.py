@@ -227,7 +227,9 @@ def test():
                       "start_selection": None,
                       "end_selection": None})
     selection.changed = Fake()
-    win = MainWindow(Fake(), graph, selection)
+    cursor = Mock({'pixel': 20})
+    cursor.changed = Fake()    
+    win = MainWindow(Fake(), graph, selection, cursor)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
