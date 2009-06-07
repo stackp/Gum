@@ -114,7 +114,7 @@ def testPlayer():
     t1.join()
     t2.join()
 
-    print ("Two threads will attempt to play simulatneously, you should "
+    print ("Two threads will attempt to play simultaneously, you should "
            "hear only one.")
     
     from time import sleep
