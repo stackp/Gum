@@ -4,6 +4,7 @@
 
 from edit import Sound
 from player import Player
+import app
 
 class Controller(object):
 
@@ -15,9 +16,15 @@ class Controller(object):
         self.clip = []
 
     def new(self):
-        pass
+        app.open_()
 
     def open(self, filename):
+        if self._sound.is_fresh():
+            self.load_sound(filename)
+        else:
+            app.open_(filename)
+
+    def load_sound(self, filename):
         self._player.pause()
         self._sound = Sound(filename)
         self._graph.set_sound(self._sound)
@@ -110,7 +117,6 @@ class Controller(object):
 
 
 def test_Controller():
-    from time import sleep
     from mock import Fake
     
     # Test opening a file
@@ -120,4 +126,3 @@ def test_Controller():
 
 if __name__ == "__main__":
     test_Controller()
-

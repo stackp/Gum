@@ -140,6 +140,10 @@ class Sound(object):
     def redo(self):
         self.history.redo()
 
+    def is_fresh(self):
+        """True if sound is empty and has never been edited."""
+        return not len(self._data) and not self.history._actions
+
 
 # -- Tests
 
