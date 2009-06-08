@@ -2,9 +2,22 @@
 # Copyright 2008 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import gtk
+import app
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
+import gtk
+gtk.gdk.threads_init()
+
+def init():
+    """Called when the module is being imported."""
+    # Plug callbacks into app.
+    app.new_sound_loaded.connect(on_new_sound_loaded)
+
+def main_loop():
+    gtk.main()
+
+def on_new_sound_loaded(controller, graph, sel, curs):
+    EditorWindow(controller, graph, sel, curs)
 
 class EditorWindow(gtk.Window):
 
@@ -236,3 +249,6 @@ def test():
 
 if __name__ == '__main__':
     test()
+else:
+    # Module is being imported.
+    init()

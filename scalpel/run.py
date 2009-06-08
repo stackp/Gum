@@ -5,18 +5,18 @@
 # Licensed under the Revised BSD License.
 
 import app
+import gtkui
 import sys
-import gobject
-import gtk
-gtk.gdk.threads_init()
 
 def run():
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     else:
         filename = None
-    gobject.idle_add(app.open_, filename)
-    gtk.main()
+
+    # FIXME: problem when wrong filename passed from command-line
+    app.open_(filename)
+    gtkui.main_loop()
 
 if __name__ == "__main__":
     run()
