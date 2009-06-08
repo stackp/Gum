@@ -5,6 +5,7 @@
 import app
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
+import copy
 import gtk
 gtk.gdk.threads_init()
 
@@ -19,7 +20,10 @@ def main_loop():
 def on_new_sound_loaded(controller, graph, sel, curs):
     EditorWindow(controller, graph, sel, curs)
 
+
 class EditorWindow(gtk.Window):
+
+    _windows = []
 
     def __init__(self, controller, graph, selection, cursor):
         gtk.Window.__init__(self)
@@ -45,10 +49,11 @@ class EditorWindow(gtk.Window):
         self.vbox.pack_end(self.statusbar, expand=False, fill=False)
         self.add(self.vbox)
         
-        self.connect("delete-event", self.quit)
+        self.connect("delete-event", self.close)
         self.set_title("scalpel")
         self.resize(700, 500)
         self.show_all()
+        self._windows.append(self)
 
     def _make_ui_manager(self):
         ui = '''<ui>
@@ -59,6 +64,7 @@ class EditorWindow(gtk.Window):
                 <menuitem action="Save"/>
                 <menuitem action="Save as"/>
                 <separator/>
+                <menuitem action="Close"/>
                 <menuitem action="Quit"/>
               </menu>
               <menu action="Edit">
@@ -127,6 +133,7 @@ class EditorWindow(gtk.Window):
                                             self.display_exception(self.save)),
                    ('Save as', gtk.STOCK_SAVE_AS, None, None, '',
                                          self.display_exception(self.save_as)),
+                   ('Close', gtk.STOCK_CLOSE, None, None, '', self.close),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '', self.play),
                    ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',self.pause),
@@ -221,8 +228,17 @@ class EditorWindow(gtk.Window):
         if filename != None:
             self.ctrl.save_as(filename)
 
+    def close(self, *args):
+        self.ctrl.close()
+        self.destroy()
+        self._windows.remove(self)
+
+        if not self._windows:
+            self.quit()
+
     def quit(self, *args):
-        self.ctrl.quit()
+        for win in copy.copy(self._windows):
+            win.close()
         gtk.main_quit()
 
 

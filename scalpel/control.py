@@ -37,7 +37,7 @@ class Controller(object):
     def save_as(self, filename):
         self._sound.save_as(filename)
 
-    def quit(self):
+    def close(self):
         self._player.pause()
 
     def play(self):
