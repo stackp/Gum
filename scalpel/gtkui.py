@@ -6,7 +6,7 @@ import gtk
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 
-class MainWindow(gtk.Window):
+class EditorWindow(gtk.Window):
 
     def __init__(self, controller, graph, selection, cursor):
         gtk.Window.__init__(self)
@@ -229,7 +229,7 @@ def test():
     selection.changed = Fake()
     cursor = Mock({'pixel': 20})
     cursor.changed = Fake()    
-    win = MainWindow(Fake(), graph, selection, cursor)
+    win = EditorWindow(Fake(), graph, selection, cursor)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
