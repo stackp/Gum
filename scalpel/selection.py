@@ -47,10 +47,9 @@ class Selection(object):
         `start` is always lower than or equals to `end`.
 
         """
-        pix_start = self._graph.frmtopxl(self.start)
-        pix_end = self._graph.frmtopxl(self.end)
-        if pix_start > pix_end:
-            pix_start, pix_end = pix_end, pix_start
+        frame_start, frame_end = self.get()
+        pix_start = self._graph.frmtopxl(frame_start)
+        pix_end = self._graph.frmtopxl(frame_end)
         return pix_start, pix_end
 
     def get(self):
@@ -83,13 +82,20 @@ def test_selection():
         def pxltofrm(self, p):
             return int(round(self._view_start + p * self.density))
 
-        
     selection = Selection(FakeGraph())
-    selection.start_selection(10)
-    selection.end_selection(100)
+    x1, x2 = 10, 100
+    selection.start_selection(x1)
+    selection.end_selection(x2)
     selection._update()
     assert selection.pixels() == (10, 100)
-    assert selection.get() == (100 + 10 *  10, 100 + 10 * 100)
+    assert selection.get() == (100 + 10 * x1, 100 + 10 * x2)
+
+    # invert selection order
+    selection.start_selection(x2)
+    selection.end_selection(x1)
+    selection._update()
+    assert selection.pixels() == (10, 100)
+    assert selection.get() == (100 + 10 * x1, 100 + 10 * x2)
 
 if __name__ == "__main__":
     test_selection()
