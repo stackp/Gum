@@ -6,6 +6,12 @@ from edit import Sound
 from player import Player
 import app
 
+class Clipboard(object):
+    # OMG! A Borg! (http://code.activestate.com/recipes/66531/)
+    __shared_state = {"clip": []}
+    def __init__(self):
+        self.__dict__ = self.__shared_state
+
 class Controller(object):
 
     def __init__(self, sound, player, graph, selection):
@@ -13,7 +19,7 @@ class Controller(object):
         self._graph = graph
         self._selection = selection
         self._sound = sound
-        self.clip = []
+        self.clipboard = Clipboard()
 
     def new(self):
         app.open_()
@@ -67,16 +73,17 @@ class Controller(object):
         start, end = self._selection.get()
         self._selection.start = start
         self._selection.end = start
-        self.clip = self._sound.cut(start, end)
+        self.clipboard.clip = self._sound.cut(start, end)
         
     def copy(self):
         start, end = self._selection.get()
-        self.clip = self._sound.copy(start, end)
+        self.clipboard.clip = self._sound.copy(start, end)
         
     def paste(self):
         start, end = self._selection.get()
-        self._sound.paste(start, self.clip)
-        self._selection.set(start, start + len(self.clip))
+        # FIXME: error when number of channels doesn't match.
+        self._sound.paste(start, self.clipboard.clip)
+        self._selection.set(start, start + len(self.clipboard.clip))
 
     def trim(self):
         pass
