@@ -10,8 +10,9 @@ class Selection(object):
     Translates between frame numbers and pixels.
 
     """
-    def __init__(self, graph):
+    def __init__(self, graph, cursor):
         self._graph = graph
+        self._cursor = cursor
         self.changed = Signal()
         self.unselect()
         self._graph.changed.connect(self._update)
@@ -24,6 +25,7 @@ class Selection(object):
         "Set selection bounds (in frames)"
         self.start = start
         self.end = end
+        self._cursor.set_frame(min(self.start, self.end))
         self.changed()
 
     def unselect(self):
@@ -34,11 +36,13 @@ class Selection(object):
         "The pixel is an index in the graph."
         self.start = self._graph.pxltofrm(pixel)
         self.end = self.start
+        self._cursor.set_frame(self.start)
         self.changed()
         
     def end_selection(self, pixel):
         "The pixel is an index in the graph."
         self.end = self._graph.pxltofrm(pixel)
+        self._cursor.set_frame(min(self.start, self.end))
         self.changed()
 
     def pixels(self):
@@ -82,8 +86,8 @@ def test_selection():
         def pxltofrm(self, p):
             return int(round(self._view_start + p * self.density))
 
-    selection = Selection(FakeGraph())
     x1, x2 = 10, 100
+    selection = Selection(FakeGraph(), Fake())
     selection.start_selection(x1)
     selection.end_selection(x2)
     selection._update()

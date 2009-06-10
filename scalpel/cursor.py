@@ -5,7 +5,7 @@
 from event import Signal
 from threading import Thread, Event, Lock
 
-# Cursor position can be set by user interface. When Player is
+# Cursor position can be set by a Selection object. When Player is
 # playing, Cursor regularly updates itself with its own thread.
 
 class Repeat(Thread):
@@ -37,38 +37,57 @@ class Repeat(Thread):
 
 
 class Cursor(object):
-    """Cursor position (frame and pixel)."""
-    def __init__(self, graph, player, selection):
+    """Cursor position (frame and pixel).
+
+    When the player is playing, pixel() returns the player position,
+    otherwise the position that was set (through a Selection object)
+    is returned.
+
+    """
+    def __init__(self, graph, player):
         self._graph = graph
         self._player = player
-        self._selection = selection
+        # Position set through a Selection object
         self._frame = 0
+        # Position of the player
+        self._player_frame = 0
         self._pixel = 0
         self.changed = Signal()
-        self._follow = None
         self._player.start_playing.connect(self._on_start_playing)
         self._player.stop_playing.connect(self._on_stop_playing)
-        self._graph.changed.connect(self._update_pixel)
+        self._graph.changed.connect(self._on_graph_changed)
+        self._follow = None
         self._lock = Lock()
 
     def pixel(self):
         return self._pixel
 
-    # set_frame() is called by two concurrent threads: Cursor._follow
-    # and the main thread (through MouseSelection.button_release()).
-    # A lock ensures atomicity.
     def set_frame(self, frame):
-        self._lock.acquire()
-        if frame != self._frame:
-            self._frame = frame
-            self._update_pixel()
-        self._lock.release()
+        """This method may be called by a Selection object."""
+        self._frame = frame
+        if not self._follow:
+            self._update_pixel(frame)
 
-    def _update_pixel(self):
-        pixel = self._graph.frmtopxl(self._frame)
+    def _set_player_frame(self, frame):
+        """This method is only called by self._follow thread."""
+        self._player_frame = frame
+        self._update_pixel(frame)
+
+    # This method may be called concurrently. A lock ensures
+    # atomicity.
+    def _update_pixel(self, frame):
+        self._lock.acquire()
+        pixel = self._graph.frmtopxl(frame)
         if pixel != self._pixel:
             self._pixel = pixel
             self.changed()
+        self._lock.release()
+
+    def _on_graph_changed(self):
+        if self._follow:
+            self._update_pixel(self._player_frame)
+        else:
+            self._update_pixel(self._frame)
 
     def _on_start_playing(self):
         if not self._follow:
@@ -79,8 +98,39 @@ class Cursor(object):
         if self._follow:
             self._follow.stop()
             self._follow = None
-            frame, _ = self._selection.get()
-            self.set_frame(frame)
+        self.set_frame(self._frame)
 
     def _store_player_position(self):
-        self.set_frame(self._player.position)
+        self._set_player_frame(self._player.position)
+
+
+if __name__ == "__main__":
+
+    def test():
+        import time
+        from mock import Fake
+
+        class Empty: pass
+
+        graph = Empty()
+        graph.changed = Fake()
+        graph.frmtopxl = lambda x: x
+        player = Empty()
+        player.start_playing = Fake()
+        player.stop_playing = Fake()
+        c = Cursor(graph, player)
+
+        c.set_frame(5)
+        assert c.pixel() == 5
+
+        player.position = 0
+        c._on_start_playing()
+        time.sleep(0.2)
+        assert c.pixel() == 0
+        c.set_frame(10)
+        assert c.pixel() == 0
+        c._on_stop_playing()
+        time.sleep(0.2)
+        assert c.pixel() == 10
+
+    test()

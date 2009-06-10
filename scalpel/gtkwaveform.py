@@ -89,7 +89,7 @@ class GraphView(LayeredGraphView):
         self.layers.append(WaveformLayer(self, graph))
         self.layers.append(SelectionLayer(self, selection))
         self.layers.append(CursorLayer(self, cursor))
-        MouseSelection(self, selection, cursor)
+        MouseSelection(self, selection)
         MouseScroll(self, graph)
 
 
@@ -257,12 +257,11 @@ class MouseScroll(object):
 class MouseSelection(object):
     """Listens for mouse events and select graph area.
 
-    Must be attached to a gtk.Widget, a Selection and a Cursor.
+    Must be attached to a gtk.Widget and a Selection.
 
     """
-    def __init__(self, widget, selection, cursor):
+    def __init__(self, widget, selection):
         self._selection = selection
-        self._cursor = cursor
         self.pressed = False
         widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
                           gtk.gdk.BUTTON_RELEASE_MASK |
@@ -285,7 +284,6 @@ class MouseSelection(object):
     def button_release(self, widget, event):
         if event.button == 1:
             start, end = self._selection.get()
-            self._cursor.set_frame(start)
             self.pressed = False
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
