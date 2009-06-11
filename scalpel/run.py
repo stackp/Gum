@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Scalpel sound editor (http://scalpelsound.online.fr)
-# Copyright 2008 (C) Pierre Duquesne <stackp@online.fr>
+# Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
 import app
