@@ -58,10 +58,11 @@ class Controller(object):
         self._player.pause()
 
     def goto_start(self):
-        pass
+        self._selection.set(0, 0)
 
     def goto_end(self):
-        pass
+        end = len(self._sound._data)
+        self._selection.set(end, end)
 
     def rewind(self):
         pass
