@@ -52,6 +52,8 @@ class EditorWindow(gtk.Window):
         
         self.connect("delete-event", self.close)
         self.set_title(self.make_title())
+        icon = self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_MENU)
+        self.set_icon(icon)
         self.resize(700, 500)
         self.show_all()
         self._windows.append(self)
