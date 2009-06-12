@@ -6,6 +6,7 @@ import app
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 import copy
+import os.path
 import gtk
 gtk.gdk.threads_init()
 
@@ -50,7 +51,7 @@ class EditorWindow(gtk.Window):
         self.add(self.vbox)
         
         self.connect("delete-event", self.close)
-        self.set_title("scalpel")
+        self.set_title(self.make_title())
         self.resize(700, 500)
         self.show_all()
         self._windows.append(self)
@@ -167,6 +168,13 @@ class EditorWindow(gtk.Window):
 
         return uimanager
 
+    def make_title(self):
+        title = app.__appname__
+        filename = self.ctrl.filename()
+        if filename:
+            title = os.path.basename(filename) + ' - ' + title
+        return title
+
     def display_exception(self, func):
         """A decorator that display caught exceptions in a window.
 
@@ -223,11 +231,13 @@ class EditorWindow(gtk.Window):
         filename = self.filedialog.get_filename(action='open')
         if filename != None:
             self.ctrl.open(filename)
+            self.set_title(self.make_title())
 
     def save_as(self, *args):
         filename = self.filedialog.get_filename(action='save')
         if filename != None:
             self.ctrl.save_as(filename)
+            self.set_title(self.make_title())
 
     def close(self, *args):
         self.ctrl.close()

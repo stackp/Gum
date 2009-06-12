@@ -123,6 +123,9 @@ class Controller(object):
     def scroll_left(self):
         pass
 
+    def filename(self):
+        return self._sound.filename
+
 
 def test_Controller():
     from mock import Fake
