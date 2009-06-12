@@ -1,12 +1,8 @@
 import gtk
 
 class FileDialog(object):
-    """Handle a pair of file dialogs (open and save).
+    """Handle a pair of file dialogs (open and save)."""
 
-    Useful to keep the selected filename sync'ed between both
-    dialogs. Eliminates redundant code too.
-
-    """
     def __init__(self):
         self.filename = None
 
@@ -59,7 +55,6 @@ class FileDialog(object):
             gtk.main_iteration(False)
 
         if response == gtk.RESPONSE_OK:
-            self.filename = filename
             return filename
         else:
             return None
