@@ -212,7 +212,7 @@ class EditorWindow(gtk.Window):
         d.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         d.set_transient_for(self)
         d.set_program_name("Scalpel")
-        d.set_version("0.1")
+        d.set_version(app.__version__)
         d.set_copyright("(c) Pierre Duquesne <stackp@online.fr>")
         d.set_comments("A sound editor")
         d.run()

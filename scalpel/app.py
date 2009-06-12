@@ -11,6 +11,8 @@ import cursor
 import control
 import os.path
 
+__version__ = '0.3.0'
+
 # This signal is emitted when a new sound has been loaded. User
 # interface should connect to it. Values passed are: Controller,
 # Graph, Selection and Cursor instances.
