@@ -3,6 +3,12 @@
 # Licensed under the Revised BSD License.
 
 import app
+
+# pygtk gets program name from sys.argv[0]. This name appears in
+# taskbars when windows are grouped together.
+import sys
+sys.argv[0] = app.__appname__
+
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 import copy
