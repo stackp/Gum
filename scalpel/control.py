@@ -4,6 +4,7 @@
 
 from edit import Sound
 from player import Player
+from event import Signal
 import app
 
 class Clipboard(object):
@@ -19,6 +20,7 @@ class Controller(object):
         self._graph = graph
         self._selection = selection
         self._sound = sound
+        self.filename_changed = Signal()
         self.clipboard = Clipboard()
 
     def new(self):
@@ -36,12 +38,14 @@ class Controller(object):
         self._graph.set_sound(self._sound)
         self._player.set_sound(self._sound)
         self._selection.unselect()
+        self.filename_changed()
 
     def save(self):
         self._sound.save()
 
     def save_as(self, filename):
         self._sound.save_as(filename)
+        self.filename_changed()
 
     def close(self):
         self._player.pause()

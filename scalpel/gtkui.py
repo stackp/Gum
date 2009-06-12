@@ -51,7 +51,8 @@ class EditorWindow(gtk.Window):
         self.add(self.vbox)
         
         self.connect("delete-event", self.close)
-        self.set_title(self.make_title())
+        self._filename_update()
+        self.ctrl.filename_changed.connect(self._filename_update)
         icon = self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_MENU)
         self.set_icon(icon)
         self.resize(700, 500)
@@ -170,12 +171,16 @@ class EditorWindow(gtk.Window):
 
         return uimanager
 
-    def make_title(self):
-        title = app.__appname__
+    def _filename_update(self):
         filename = self.ctrl.filename()
+        self._update_title(filename)
+        self.filedialog.filename = filename
+
+    def _update_title(self, filename=None):
+        title = app.__appname__
         if filename:
             title = os.path.basename(filename) + ' - ' + title
-        return title
+        self.set_title(title)
 
     def display_exception(self, func):
         """A decorator that display caught exceptions in a window.
@@ -233,13 +238,11 @@ class EditorWindow(gtk.Window):
         filename = self.filedialog.get_filename(action='open')
         if filename != None:
             self.ctrl.open(filename)
-            self.set_title(self.make_title())
 
     def save_as(self, *args):
         filename = self.filedialog.get_filename(action='save')
         if filename != None:
             self.ctrl.save_as(filename)
-            self.set_title(self.make_title())
 
     def close(self, *args):
         self.ctrl.close()
@@ -270,8 +273,11 @@ def test():
                       "end_selection": None})
     selection.changed = Fake()
     cursor = Mock({'pixel': 20})
-    cursor.changed = Fake()    
-    win = EditorWindow(Fake(), graph, selection, cursor)
+    cursor.changed = Fake()
+    class FakeController(Fake):
+        def __init__(self):
+            self.filename_changed = Fake()
+    win = EditorWindow(FakeController(), graph, selection, cursor)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
