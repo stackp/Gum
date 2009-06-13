@@ -38,6 +38,9 @@ class EditorWindow(gtk.Window):
         self.ctrl = controller
         
         self.uimanager = self._make_ui_manager()
+        accelgroup = self.uimanager.get_accel_group()
+        self.add_accel_group(accelgroup)
+
         self.menubar = self.uimanager.get_widget('/menubar')
         self.toolbar = self.uimanager.get_widget('/toolbar')
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
@@ -123,6 +126,10 @@ class EditorWindow(gtk.Window):
               <toolitem action="Undo"/>
               <toolitem action="Redo"/>
             </toolbar>
+            <accelerator action="Start"/>
+            <accelerator action="End"/>
+            <accelerator action="Play"/>
+            <accelerator action="Pause"/>
         </ui>'''
 
         uimanager = gtk.UIManager()
@@ -130,6 +137,10 @@ class EditorWindow(gtk.Window):
 
         # An action is a tuple formed like this:
         # (action_name, stock_id, label, accelerator, tooltip, callback)
+        #
+        # Actions that are not in a menu (e.g. 'Play') must have an
+        # <accelerator> tag in the UI description for the accelerator
+        # defined below to be effective.
 
         actions = [('File', None, '_File'),
                    ('Edit', None, '_Edit'),
@@ -145,11 +156,12 @@ class EditorWindow(gtk.Window):
                                          self.display_exception(self.save_as)),
                    ('Close', gtk.STOCK_CLOSE, None, None, '', self.close),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
-                   ('Play', gtk.STOCK_MEDIA_PLAY, None, None, '', self.play),
-                   ('Pause', gtk.STOCK_MEDIA_PAUSE, None, None, '',self.pause),
-                   ('Start', gtk.STOCK_MEDIA_PREVIOUS, None, None, '',
+                   ('Play', gtk.STOCK_MEDIA_PLAY, None, 'p', '', self.play),
+                   ('Pause', gtk.STOCK_MEDIA_PAUSE, None, 'o', '', self.pause),
+                   ('Start', gtk.STOCK_MEDIA_PREVIOUS, None, 'Home', '',
                                                               self.goto_start),
-                   ('End', gtk.STOCK_MEDIA_NEXT, None, None, '',self.goto_end),
+                   ('End', gtk.STOCK_MEDIA_NEXT, None, 'End', '',
+                                                                self.goto_end),
                    ('Rewind', gtk.STOCK_MEDIA_REWIND, None, None, '',
                                                                   self.rewind),
                    ('Forward', gtk.STOCK_MEDIA_FORWARD, None, None, '',
@@ -157,16 +169,18 @@ class EditorWindow(gtk.Window):
                    ('Cut', gtk.STOCK_CUT, None, None, '', self.cut),
                    ('Copy', gtk.STOCK_COPY, None, None, '', self.copy),
                    ('Paste', gtk.STOCK_PASTE, None, None, '', self.paste),
-                   ('Undo', gtk.STOCK_UNDO, None, None, '', self.undo),
-                   ('Redo', gtk.STOCK_REDO, None, None, '', self.redo),
-                   ('SelectAll', gtk.STOCK_SELECT_ALL, None, None, '',
+                   ('Undo', gtk.STOCK_UNDO, None, '<Ctrl>z', None, self.undo),
+                   ('Redo', gtk.STOCK_REDO, None, '<Ctrl><Shift>z', None,
+                                                                    self.redo),
+                   ('SelectAll', gtk.STOCK_SELECT_ALL, None, '<Ctrl>a', '',
                                                          self.select_all),
                    ('Unselect', None, 'Unselect', None, '', self.unselect),
-                   ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, None, '',
+                   ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, 'equal', '',
                                                                 self.zoom_fit),
-                   ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, None, '',
+                   ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, 'KP_Subtract', '',
                                                                 self.zoom_out),
-                   ('ZoomIn', gtk.STOCK_ZOOM_IN, None, None, '', self.zoom_in),
+                   ('ZoomIn', gtk.STOCK_ZOOM_IN, None, 'KP_Add', '',
+                                                                 self.zoom_in),
                    ('Reverse', None, 'Reverse', None, '', self.reverse),
                    ('Normalize', None, 'Normalize', None, '', self.normalize),
                    ('About', gtk.STOCK_ABOUT, None, None, '', self.about)
