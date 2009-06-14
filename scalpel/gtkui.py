@@ -46,6 +46,7 @@ class EditorWindow(gtk.Window):
         self.toolbar.set_style(gtk.TOOLBAR_ICONS)
         for w in self.toolbar:
             w.set_homogeneous(False)
+            w.set_focus_chain([])
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
