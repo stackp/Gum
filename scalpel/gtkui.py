@@ -62,6 +62,7 @@ class EditorWindow(gtk.Window):
         self.connect("delete-event", self.close)
         self._filename_update()
         self.ctrl.filename_changed.connect(self._filename_update)
+        self.ctrl.error.connect(self.display_error)
         icon = self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_MENU)
         self.set_icon(icon)
         self.resize(700, 500)
@@ -148,12 +149,9 @@ class EditorWindow(gtk.Window):
                    ('Effects', None, '_Effects'),
                    ('Scalpel', None, '_Scalpel'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
-                   ('Open', gtk.STOCK_OPEN, None, None, '',
-                                            self.display_exception(self.open)),
-                   ('Save', gtk.STOCK_SAVE, None, None, '',
-                                            self.display_exception(self.save)),
-                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',
-                                         self.display_exception(self.save_as)),
+                   ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
+                   ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
+                   ('Save as', gtk.STOCK_SAVE_AS, None, None, '',self.save_as),
                    ('Close', gtk.STOCK_CLOSE, None, None, '', self.close),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, 'p', '', self.play),
@@ -202,23 +200,12 @@ class EditorWindow(gtk.Window):
             title = os.path.basename(filename) + ' - ' + title
         self.set_title(title)
 
-    def display_exception(self, func):
-        """A decorator that display caught exceptions in a window.
-
-        Caught exceptions are reraised.
-
-        """
-        def f(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception, e:
-                d = gtk.MessageDialog(parent=self, buttons=gtk.BUTTONS_CLOSE)
-                d.set_title("Error")
-                d.set_markup(str(e))
-                d.run()
-                d.destroy()
-                raise e
-        return f
+    def display_error(self, title, text):
+        d = gtk.MessageDialog(parent=self, buttons=gtk.BUTTONS_CLOSE)
+        d.set_title(title)
+        d.set_markup(text)
+        d.run()
+        d.destroy()
 
     # -- Callbacks
 
@@ -297,6 +284,7 @@ def test():
     class FakeController(Fake):
         def __init__(self):
             self.filename_changed = Fake()
+            self.error = Fake()
     win = EditorWindow(FakeController(), graph, selection, cursor)
     win.resize(700, 500)
     win.show_all()

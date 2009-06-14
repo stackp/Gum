@@ -6,6 +6,7 @@ from edit import Sound
 from player import Player
 from event import Signal
 import app
+import traceback
 
 class Clipboard(object):
     # OMG! A Borg! (http://code.activestate.com/recipes/66531/)
@@ -21,17 +22,38 @@ class Controller(object):
         self._selection = selection
         self._sound = sound
         self.filename_changed = Signal()
+        self.error = Signal()
         self.clipboard = Clipboard()
 
     def new(self):
         app.open_()
 
+    def _report_exception(method):
+        """Method decorator.
+
+        Call the self.error signal when an exception was raised in the
+        decorated method.
+
+        """
+        def wrapper(self, *args, **kwargs):
+            try:
+                method(self, *args, **kwargs)
+            except Exception, e:
+                print self.error("Error", str(e))
+                traceback.print_exc()
+
+        wrapper.__name__ = method.__name__
+        wrapper.__doc__ = method.__doc__
+        return wrapper
+
+    @_report_exception
     def open(self, filename):
         if self._sound.is_fresh():
             self.load_sound(filename)
         else:
             app.open_(filename)
 
+    @_report_exception
     def load_sound(self, filename):
         self._player.pause()
         self._sound = Sound(filename)
@@ -40,9 +62,11 @@ class Controller(object):
         self._selection.unselect()
         self.filename_changed()
 
+    @_report_exception
     def save(self):
         self._sound.save()
 
+    @_report_exception
     def save_as(self, filename):
         self._sound.save_as(filename)
         self.filename_changed()
@@ -84,6 +108,7 @@ class Controller(object):
         start, end = self._selection.get()
         self.clipboard.clip = self._sound.copy(start, end)
         
+    @_report_exception
     def paste(self):
         start, end = self._selection.get()
         # FIXME: error when number of channels doesn't match.
