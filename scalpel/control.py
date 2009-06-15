@@ -125,7 +125,7 @@ class Controller(object):
         self._sound.redo()
 
     def select_all(self):
-        pass
+        self._selection.select_all()
 
     def zoom_out(self):
         self._graph.zoom_out()
