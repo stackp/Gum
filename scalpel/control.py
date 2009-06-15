@@ -76,7 +76,7 @@ class Controller(object):
 
     def play(self):
         start, end = self._selection.get()
-        if start == end:
+        if not self._selection.selected():
             end = len(self._sound._data)
         self._player.start = start
         self._player.end = end
