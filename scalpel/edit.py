@@ -99,12 +99,12 @@ class Sound(object):
         do = (self._do_cut, (start, end))
         undo = (self._do_paste, (start, self._data[start:end]))
         self.history.add(do, undo)
+        self.changed()
         return clip
     
     def _do_cut(self, start, end):
         data = numpy.concatenate((self._data[:start], self._data[end:]))
         self._data = data
-        self.changed()
 
     def copy(self, start, end):
         clip = self._data[start:end]
@@ -114,11 +114,11 @@ class Sound(object):
         do = (self._do_paste, (start, clip))
         undo = (self._do_cut, (start, start + len(clip)))
         self.history.add(do, undo)
+        self.changed()
 
     def _do_paste(self, start, clip):
         data = numpy.concatenate((self._data[:start], clip,self._data[start:]))
         self._data = data
-        self.changed()
         
     def normalize(self, start, end):
         pass
@@ -138,9 +138,11 @@ class Sound(object):
     
     def undo(self):
         self.history.undo()
+        self.changed()
 
     def redo(self):
         self.history.redo()
+        self.changed()
 
     def is_fresh(self):
         """True if sound is empty and has never been edited."""
