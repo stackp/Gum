@@ -16,7 +16,7 @@ class Selection(object):
         self.changed = Signal()
         self.unselect()
         self._graph.changed.connect(self._update)
-    
+
     def _update(self):
         "Called when self._graph changes."
         self.changed()
@@ -29,16 +29,16 @@ class Selection(object):
         self.changed()
 
     def unselect(self):
-        self.start = 0
-        self.end = 0
-    
+        self.set(0, 0)
+
+    def select_all(self):
+        self.set(0, self._graph.numframes())
+
     def start_selection(self, pixel):
         "The pixel is an index in the graph."
-        self.start = self._graph.pxltofrm(pixel)
-        self.end = self.start
-        self._cursor.set_frame(self.start)
-        self.changed()
-        
+        start = self._graph.pxltofrm(pixel)
+        self.set(start, start)
+
     def end_selection(self, pixel):
         "The pixel is an index in the graph."
         self.end = self._graph.pxltofrm(pixel)
@@ -68,7 +68,7 @@ class Selection(object):
             start, end = end, start
         return start, end
 
-    
+
 def test_selection():
     from graphmodel import Graph
     from mock import Fake
@@ -100,6 +100,10 @@ def test_selection():
     selection._update()
     assert selection.pixels() == (10, 100)
     assert selection.get() == (100 + 10 * x1, 100 + 10 * x2)
+
+    # select all
+    selection.select_all()
+    assert selection.get() == (0, 5000)
 
 if __name__ == "__main__":
     test_selection()
