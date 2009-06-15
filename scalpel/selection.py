@@ -34,6 +34,9 @@ class Selection(object):
     def select_all(self):
         self.set(0, self._graph.numframes())
 
+    def selected(self):
+        return self.start != self.end
+
     def start_selection(self, pixel):
         "The pixel is an index in the graph."
         start = self._graph.pxltofrm(pixel)
@@ -104,6 +107,11 @@ def test_selection():
     # select all
     selection.select_all()
     assert selection.get() == (0, 5000)
+    assert selection.selected() == True
+
+    # unselect
+    selection.unselect()
+    assert selection.selected() == False
 
 if __name__ == "__main__":
     test_selection()
