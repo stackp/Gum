@@ -276,7 +276,8 @@ def test():
     graph.changed = Fake()
     selection = Mock({"pixels": [50, 100],
                       "start_selection": None,
-                      "end_selection": None})
+                      "end_selection": None,
+                      "selected": True})
     selection.changed = Fake()
     cursor = Mock({'pixel': 20})
     cursor.changed = Fake()
