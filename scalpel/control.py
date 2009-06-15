@@ -127,9 +127,6 @@ class Controller(object):
     def select_all(self):
         pass
 
-    def unselect(self):
-        pass
-
     def zoom_out(self):
         self._graph.zoom_out()
 

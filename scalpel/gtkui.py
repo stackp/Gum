@@ -91,7 +91,6 @@ class EditorWindow(gtk.Window):
                 <menuitem action="Paste"/>
                 <separator/>
                 <menuitem action="SelectAll"/>
-                <menuitem action="Unselect"/>
               </menu>
               <menu action="View">
                 <menuitem action="ZoomIn"/>
@@ -173,7 +172,6 @@ class EditorWindow(gtk.Window):
                                                                     self.redo),
                    ('SelectAll', gtk.STOCK_SELECT_ALL, None, '<Ctrl>a', '',
                                                          self.select_all),
-                   ('Unselect', None, 'Unselect', None, '', self.unselect),
                    ('ZoomFit', gtk.STOCK_ZOOM_FIT, None, 'equal', '',
                                                                 self.zoom_fit),
                    ('ZoomOut', gtk.STOCK_ZOOM_OUT, None, 'KP_Subtract', '',
@@ -218,7 +216,7 @@ class EditorWindow(gtk.Window):
         
         """
         if name in ["new", "save", "play", "pause", "rewind", "forward",
-                    "goto_start", "goto_end", "select_all", "unselect",
+                    "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit",
                     "reverse", "normalize"]:
