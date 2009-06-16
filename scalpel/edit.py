@@ -97,7 +97,7 @@ class Sound(object):
     def cut(self, start, end):
         clip = self._data[start:end]
         do = (self._do_cut, (start, end))
-        undo = (self._do_paste, (start, self._data[start:end]))
+        undo = (self._do_paste, (start, copy(self._data[start:end])))
         self.history.add(do, undo)
         self.changed()
         return clip
