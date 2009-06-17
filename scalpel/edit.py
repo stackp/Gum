@@ -119,18 +119,9 @@ class Sound(object):
     def _do_paste(self, start, clip):
         data = numpy.concatenate((self._data[:start], clip,self._data[start:]))
         self._data = data
-        
-    def normalize(self, start, end):
-        pass
 
-    def reverse(self, start, end):
-        do = (self._do_reverse, (start, end))
-        undo = (self._do_reverse, (start, end))
-        self.history.add(do, undo)
-
-    def _do_reverse(self, start, end):
-        rev = numpy.flipud(copy(self._data[start:end]))
-        self._data[start:end] = rev
+    def apply(self, fx):
+        self.history.add((fx.apply, ()), (fx.revert, ()))
         self.changed()
 
     def monoize(self, start, end):
@@ -264,17 +255,6 @@ def testSound():
     assert snd._data.tolist() == data2
     snd.paste(0, clip)
     assert snd._data.tolist() == data2[start:end] + data2
-
-    # test reverse()
-    snd = Sound()
-    snd._data = numpy.array(range(10))
-    snd.reverse(3, 6)
-    assert snd._data.tolist() == [0, 1, 2, 5, 4, 3, 6, 7, 8, 9]
-
-    snd._data = numpy.array(zip(range(8), range(8)))
-    snd.reverse(3, 6)
-    assert snd._data.tolist() == [[0, 0], [1, 1], [2, 2], [5, 5],
-                                  [4, 4], [3, 3], [6, 6], [7, 7]]
 
     # test save_as()
     import os

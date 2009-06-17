@@ -5,6 +5,7 @@
 from edit import Sound
 from player import Player
 from event import Signal
+import effect
 import app
 import traceback
 
@@ -137,11 +138,20 @@ class Controller(object):
         self._graph.zoom_fit()
 
     def reverse(self):
-        start, end = self._selection.get()
-        self._sound.reverse(start, end)
+        self.effect('reverse')
 
     def normalize(self):
-        pass
+        self.effect('normalize')
+
+    def effect(self, name):
+        fx_class = effect.effects[name]
+        if self._selection.selected():
+            start, end = self._selection.get()
+        else:
+            start = 0
+            end = len(self._sound._data)
+        fx = fx_class(self._sound, (start, end))
+        self._sound.apply(fx)
 
     def scroll_right(self):
         pass
