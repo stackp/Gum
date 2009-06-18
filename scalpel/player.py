@@ -35,7 +35,7 @@ class Player(object):
         pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
                             mode=alsaaudio.PCM_NORMAL,
                             card='default')
-        pcm.setrate(44100)
+        pcm.setrate(self._sound.samplerate)
         pcm.setchannels(2)
         pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
         pcm.setperiodsize(self._periodsize)
@@ -76,7 +76,8 @@ class Player(object):
 
 # test
 def testPlayer():
-    class FakeSound: pass
+    class FakeSound:
+        samplerate = 44100
     
     from math import sin
     SR = 44100

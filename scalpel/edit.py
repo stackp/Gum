@@ -71,11 +71,13 @@ class Sound(object):
             # empty sound
             self._data = numpy.array([])
             self.numchan = 1
+            self.samplerate = 44100
         else:
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self._data = f.read_frames(nframes)
             self.numchan = f.get_channels()
+            self.samplerate = f.get_samplerate()
             f.close()
         self.history = History()
         self.changed = Signal()
