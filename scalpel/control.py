@@ -78,7 +78,7 @@ class Controller(object):
     def play(self):
         start, end = self._selection.get()
         if not self._selection.selected():
-            end = len(self._sound._data)
+            end = len(self._sound.frames)
         self._player.start = start
         self._player.end = end
         self._player.thread_play()
@@ -90,7 +90,7 @@ class Controller(object):
         self._selection.set(0, 0)
 
     def goto_end(self):
-        end = len(self._sound._data)
+        end = len(self._sound.frames)
         self._selection.set(end, end)
 
     def rewind(self):
@@ -149,7 +149,7 @@ class Controller(object):
             start, end = self._selection.get()
         else:
             start = 0
-            end = len(self._sound._data)
+            end = len(self._sound.frames)
         fx = fx_class(self._sound, (start, end))
         self._sound.apply(fx)
 

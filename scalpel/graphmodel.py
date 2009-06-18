@@ -41,7 +41,7 @@ class Graph(object):
     def set_sound(self, sound):
         self._sound = sound
         self._view_start = 0
-        self._view_end = len(self._sound._data)
+        self._view_end = len(self._sound.frames)
         self._sound.changed.connect(self.update)
         self.changed()
 
@@ -58,7 +58,7 @@ class Graph(object):
         self.changed()
 
     def numframes(self):
-        return len(self._sound._data)
+        return len(self._sound.frames)
     
     def view(self):
         start = self._view_start
@@ -131,7 +131,7 @@ class Graph(object):
     def zoom_fit(self):
         "Fit everything in the view."
         self._view_start = 0
-        self._view_end = len(self._sound._data)
+        self._view_end = len(self._sound.frames)
         self.changed()
 
     def _scroll(self, factor):
@@ -167,7 +167,7 @@ class Graph(object):
         width = self._width
         numchan = self._sound.numchan
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
-        visible = self._sound._data[start:end]
+        visible = self._sound.frames[start:end]
         if numchan == 1:
             o = [_overview(visible, width)]
         else:
@@ -199,15 +199,15 @@ class Graph(object):
         if self._view_start < 0:
             self._view_end += -self._view_start 
             self._view_start = 0
-        elif self._view_end > len(self._sound._data):
-            self._view_start -= (self._view_end - len(self._sound._data))
-            self._view_end = len(self._sound._data)
+        elif self._view_end > len(self._sound.frames):
+            self._view_start -= (self._view_end - len(self._sound.frames))
+            self._view_end = len(self._sound.frames)
 
         # Ultimate check on bounds.
         if self._view_start < 0:
             self._view_start = 0
-        if self._view_end > len(self._sound._data):
-            self._view_end = len(self._sound._data)
+        if self._view_end > len(self._sound.frames):
+            self._view_end = len(self._sound.frames)
 
        
 def test_overview():
@@ -220,7 +220,7 @@ def test_Graph():
     import numpy
     
     sound = Mock({})
-    sound._data = numpy.array(range(1000))
+    sound.frames = numpy.array(range(1000))
     sound.numchan = 1
     sound.changed = Fake()
 
@@ -241,7 +241,7 @@ def test_Graph():
     # stereo
     import numpy
     data = numpy.array([[1, 1], [2, 2], [3, 3]])
-    sound._data = data
+    sound.frames = data
     sound.numchan = 2
     o = c.channels()
     assert(len(o)) == 2
@@ -253,7 +253,7 @@ def test_zoom():
 
     sound = Mock({})
     data = numpy.array([1, 2, 3, 4])
-    sound._data = data
+    sound.frames = data
     sound.numchan = 1
     sound.changed = Fake()
 
@@ -299,7 +299,7 @@ def test_zoom():
 
     g.set_width(3)
     data = numpy.array([1, 2, 3, 4, 5])
-    sound._data = data
+    sound.frames = data
     g._zoom(point=2, factor=0.5)
     o = g.channels()
     print o
@@ -320,7 +320,7 @@ def test_zoom_in():
     sound.changed = Fake()
 
     data = numpy.array([1, 2, 3, 4])
-    sound._data = data
+    sound.frames = data
     g = Graph(sound)
 
     g.set_width(2)
@@ -339,7 +339,7 @@ def test_scroll():
 
     sound = Mock({})
     data = numpy.array([1, 2, 3, 4])
-    sound._data = data
+    sound.frames = data
     sound.numchan = 1
     sound.changed = Fake()
 

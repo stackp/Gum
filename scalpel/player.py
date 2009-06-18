@@ -29,7 +29,7 @@ class Player(object):
     def set_sound(self, sound):
         self._sound = sound
         self.start = 0
-        self.end = len(sound._data)
+        self.end = len(sound.frames)
 
     def play(self):
         pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
@@ -48,7 +48,7 @@ class Player(object):
             else:
                 start = self.position
                 end = min(self.position + self._periodsize, self.end)
-                buf = self._sound._data[start:end]
+                buf = self._sound.frames[start:end]
                 if self._sound.numchan == 1:
                     # converting mono to stereo
                     buf = numpy.reshape([buf, buf], -1, 2)
@@ -85,7 +85,7 @@ def testPlayer():
     time = 1
     sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
     sound = FakeSound()
-    sound._data = sine
+    sound.frames = sine
     sound.numchan = 1
     
     player = Player(sound)
@@ -94,7 +94,7 @@ def testPlayer():
     import pysndfile
     f = pysndfile.sndfile('../sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
-    sound._data = data
+    sound.frames = data
     player.set_sound(sound)
     player.thread_play().join()
     player.thread_play().join()
@@ -134,7 +134,7 @@ def testPlayer():
     # Testing stereo
     f = pysndfile.sndfile('../sounds/test2.wav')
     data = f.read_frames(f.get_nframes())
-    sound._data = data
+    sound.frames = data
     sound.numchan = 2
     player = Player(sound)
     player.thread_play().join()
