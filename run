@@ -1,6 +1,3 @@
-#!/usr/bin/env python
+#!/bin/sh
 
-from scalpel.run import run
-
-if __name__ == '__main__':
-    run()
+PYTHONPATH=. scripts/scalpel
