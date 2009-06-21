@@ -48,8 +48,8 @@ class Normalize(Effect):
 
 
 # Register effects
-effects['reverse'] = Reverse
-effects['normalize'] = Normalize
+effects['Reverse'] = Reverse
+effects['Normalize'] = Normalize
 
 
 # Tests
