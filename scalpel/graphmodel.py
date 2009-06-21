@@ -165,7 +165,7 @@ class Graph(object):
     def channels(self):
         "Return the graph values."
         width = self._width
-        numchan = self._sound.numchan
+        numchan = self._sound.numchan()
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
         visible = self._sound.frames[start:end]
         if numchan == 1:
@@ -219,10 +219,9 @@ def test_Graph():
     from mock import Mock, Fake
     import numpy
     
-    sound = Mock({})
-    sound.frames = numpy.array(range(1000))
-    sound.numchan = 1
+    sound = Mock({"numchan": 1})
     sound.changed = Fake()
+    sound.frames = numpy.array(range(1000))
 
     c = Graph(sound)
     c.set_width(200)
@@ -240,9 +239,11 @@ def test_Graph():
 
     # stereo
     import numpy
+    sound = Mock({"numchan": 2})
+    sound.changed = Fake()
     data = numpy.array([[1, 1], [2, 2], [3, 3]])
     sound.frames = data
-    sound.numchan = 2
+    c = Graph(sound)
     o = c.channels()
     assert(len(o)) == 2
     
@@ -251,10 +252,9 @@ def test_zoom():
     from mock import Mock, Fake
     import numpy
 
-    sound = Mock({})
+    sound = Mock({"numchan": 1})
     data = numpy.array([1, 2, 3, 4])
     sound.frames = data
-    sound.numchan = 1
     sound.changed = Fake()
 
     g = Graph(sound)
@@ -315,8 +315,7 @@ def test_zoom():
 def test_zoom_in():
     import numpy 
     from mock import Mock, Fake
-    sound = Mock({})
-    sound.numchan = 1
+    sound = Mock({"numchan": 1})
     sound.changed = Fake()
 
     data = numpy.array([1, 2, 3, 4])
@@ -340,7 +339,6 @@ def test_scroll():
     sound = Mock({})
     data = numpy.array([1, 2, 3, 4])
     sound.frames = data
-    sound.numchan = 1
     sound.changed = Fake()
 
     g = Graph(sound)

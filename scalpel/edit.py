@@ -70,17 +70,18 @@ class Sound(object):
         if filename == None:
             # empty sound
             self.frames = numpy.array([])
-            self.numchan = 1
             self.samplerate = 44100
         else:
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self.frames = f.read_frames(nframes)
-            self.numchan = f.get_channels()
             self.samplerate = f.get_samplerate()
             f.close()
         self.history = History()
         self.changed = Signal()
+
+    def numchan(self):
+        return self.frames.ndim
 
     def save(self, format=pysndfile.formatinfo()):
         self.save_as(self.filename, format)
@@ -88,7 +89,7 @@ class Sound(object):
     def save_as(self, filename, format=pysndfile.formatinfo()):
         f = pysndfile.sndfile(filename, mode='write',
                               format=format,
-                              channels=self.numchan,
+                              channels=self.numchan(),
                               samplerate=44100)
         f.write_frames(self.frames)
         f.close()

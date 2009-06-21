@@ -50,7 +50,7 @@ class Player(object):
                     start = self.position
                     end = min(self.position + self._periodsize, self.end)
                     buf = self._sound.frames[start:end]
-                    if self._sound.numchan == 1:
+                    if self._sound.numchan() == 1:
                         # converting mono to stereo
                         buf = numpy.reshape([buf, buf], -1, 2)
                     pcm.write(buf)
@@ -78,17 +78,15 @@ class Player(object):
 
 # test
 def testPlayer():
-    class FakeSound:
-        samplerate = 44100
-    
+    from mock import Mock
     from math import sin
     SR = 44100
     f0 = 440
     time = 1
     sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
-    sound = FakeSound()
+    sound = Mock({"numchan": 1})
+    sound.samplerate = 44100
     sound.frames = sine
-    sound.numchan = 1
     
     player = Player(sound)
     player.thread_play().join()
@@ -136,8 +134,9 @@ def testPlayer():
     # Testing stereo
     f = pysndfile.sndfile('../sounds/test2.wav')
     data = f.read_frames(f.get_nframes())
+    sound = Mock({"numchan": 2})
+    sound.samplerate = 44100
     sound.frames = data
-    sound.numchan = 2
     player = Player(sound)
     player.thread_play().join()
 
