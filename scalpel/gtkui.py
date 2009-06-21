@@ -47,6 +47,16 @@ class EditorWindow(gtk.Window):
         for w in self.toolbar:
             w.set_homogeneous(False)
             w.set_focus_chain([])
+
+        # Create and fill the Effects menu
+        effect_menu = gtk.Menu()
+        for name in controller.list_effects():
+            item = gtk.MenuItem(label=name)
+            item.connect('activate', self.effect, None, name)
+            effect_menu.append(item)
+        w = self.uimanager.get_widget('/menubar/Effects')
+        w.set_submenu(effect_menu)
+
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
@@ -98,8 +108,6 @@ class EditorWindow(gtk.Window):
                 <menuitem action="ZoomFit"/>
               </menu>
               <menu action="Effects">
-                <menuitem action="Reverse"/>
-                <menuitem action="Normalize"/>
               </menu>                
               <menu action="Scalpel">
                 <menuitem action="About"/>
@@ -178,8 +186,6 @@ class EditorWindow(gtk.Window):
                                                                 self.zoom_out),
                    ('ZoomIn', gtk.STOCK_ZOOM_IN, None, 'KP_Add', '',
                                                                  self.zoom_in),
-                   ('Reverse', None, 'Reverse', None, '', self.reverse),
-                   ('Normalize', None, 'Normalize', None, '', self.normalize),
                    ('About', gtk.STOCK_ABOUT, None, None, '', self.about)
                    ]
         actiongroup = gtk.ActionGroup('')
@@ -219,7 +225,7 @@ class EditorWindow(gtk.Window):
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit",
-                    "reverse", "normalize"]:
+                    "effect"]:
             method = getattr(self.ctrl, name)
             def forward(self, *args):
                 method(*args[1:])

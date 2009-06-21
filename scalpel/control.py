@@ -137,11 +137,10 @@ class Controller(object):
     def zoom_fit(self):
         self._graph.zoom_fit()
 
-    def reverse(self):
-        self.effect('reverse')
-
-    def normalize(self):
-        self.effect('normalize')
+    def list_effects(self):
+        l = effect.effects.keys()
+        l.sort()
+        return l
 
     def effect(self, name):
         fx_class = effect.effects[name]
