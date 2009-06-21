@@ -36,15 +36,21 @@ class Reverse(Effect):
 class Normalize(Effect):
     """Normalize the selected part of sound."""
     def apply(self):
+        self.clip = None
         start, end = self.selection
-        self.clip = copy(self.sound.frames[start:end])
-        M = abs(self.sound.frames[start:end]).max()
-        factor = 1. / M
-        self.sound.frames[start:end] = self.sound.frames[start:end] * factor
+        x = self.sound.frames[start:end]
+        if len(x) > 0:
+            M = abs(x).max()
+            if M != 0:
+                self.clip = copy(x)
+                factor = 1. / M
+                x = x * factor
+                self.sound.frames[start:end] = x
 
     def revert(self):
-        start, end = self.selection
-        self.sound.frames[start:end] = self.clip
+        if self.clip is not None:
+            start, end = self.selection
+            self.sound.frames[start:end] = self.clip
 
 
 # Register effects
@@ -74,16 +80,30 @@ if __name__ == '__main__':
 
     # test normalize
     snd = Sound()
-    snd.frames = numpy.array([0, 0.5])
+    snd.frames = numpy.array([0, 0.5, 0.2])
     fx = Normalize(snd, (0, 2))
     fx.apply()
-    assert snd.frames.tolist() == [0, 1]
+    assert snd.frames.tolist() == [0, 1, 0.2]
     fx.revert()
-    assert snd.frames.tolist() == numpy.array([0, 0.5]).tolist()
+    assert snd.frames.tolist() == [0, 0.5, 0.2]
 
     snd.frames = numpy.array([0, -0.5])
     fx = Normalize(snd, (0, 2))
     fx.apply()
     assert snd.frames.tolist() == [0, -1]
     fx.revert()
-    assert snd.frames.tolist() == numpy.array([0, -0.5]).tolist()
+    assert snd.frames.tolist() == [0, -0.5]
+
+    snd.frames = numpy.array([0, 0, 0, 0, 0])
+    fx = Normalize(snd, (0, 5))
+    fx.apply()
+    assert snd.frames.tolist() == [0, 0, 0, 0, 0]
+    fx.revert()
+    assert snd.frames.tolist() == [0, 0, 0, 0, 0]
+
+    snd.frames = numpy.array([])
+    fx = Normalize(snd, (0, 1))
+    fx.apply()
+    assert snd.frames.tolist() == []
+    fx.revert()
+    assert snd.frames.tolist() == []
