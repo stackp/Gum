@@ -32,33 +32,35 @@ class Player(object):
         self.end = len(sound.frames)
 
     def play(self):
-        pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
-                            mode=alsaaudio.PCM_NORMAL,
-                            card='default')
-        pcm.setrate(self._sound.samplerate)
-        pcm.setchannels(2)
-        pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
-        pcm.setperiodsize(self._periodsize)
-        self.position = self.start
-
         self.start_playing()
-        while self._playing:
-            if self.position >= self.end:
-                self._playing = False
-            else:
-                start = self.position
-                end = min(self.position + self._periodsize, self.end)
-                buf = self._sound.frames[start:end]
-                if self._sound.numchan == 1:
-                    # converting mono to stereo
-                    buf = numpy.reshape([buf, buf], -1, 2)
-                pcm.write(buf)
-                self.position = end
+        try:
+            pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
+                                mode=alsaaudio.PCM_NORMAL,
+                                card='default')
+            pcm.setrate(self._sound.samplerate)
+            pcm.setchannels(2)
+            pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
+            pcm.setperiodsize(self._periodsize)
+            self.position = self.start
 
-        # Closing the device flushes buffered frames.
-        pcm.close()
-        self.stop_playing()
-        self._lock.release()
+            while self._playing:
+                if self.position >= self.end:
+                    self._playing = False
+                else:
+                    start = self.position
+                    end = min(self.position + self._periodsize, self.end)
+                    buf = self._sound.frames[start:end]
+                    if self._sound.numchan == 1:
+                        # converting mono to stereo
+                        buf = numpy.reshape([buf, buf], -1, 2)
+                    pcm.write(buf)
+                    self.position = end
+
+            # Closing the device flushes buffered frames.
+            pcm.close()
+        finally:
+            self.stop_playing()
+            self._lock.release()
 
     def thread_play(self):
         # Only one thread at a time can play. If a thread is already
