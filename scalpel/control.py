@@ -153,12 +153,6 @@ class Controller(object):
         fx = fx_class(self._sound, (start, end))
         self._sound.apply(fx)
 
-    def scroll_right(self):
-        pass
-
-    def scroll_left(self):
-        pass
-
     def filename(self):
         return self._sound.filename
 
