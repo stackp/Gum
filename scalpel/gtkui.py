@@ -27,6 +27,13 @@ def main_loop():
 def on_new_sound_loaded(controller, graph, sel, curs):
     EditorWindow(controller, graph, sel, curs)
 
+def display_error(title, text, parent=None):
+    d = gtk.MessageDialog(parent, buttons=gtk.BUTTONS_CLOSE)
+    d.set_title(title)
+    d.set_markup(text)
+    d.run()
+    d.destroy()
+
 
 class EditorWindow(gtk.Window):
 
@@ -206,11 +213,7 @@ class EditorWindow(gtk.Window):
         self.set_title(title)
 
     def display_error(self, title, text):
-        d = gtk.MessageDialog(parent=self, buttons=gtk.BUTTONS_CLOSE)
-        d.set_title(title)
-        d.set_markup(text)
-        d.run()
-        d.destroy()
+        display_error(title, text, parent=self)
 
     # -- Callbacks
 
@@ -295,6 +298,8 @@ def test():
     win.resize(700, 500)
     win.show_all()
     gtk.main()
+
+    display_error("Title", "Text")
 
 if __name__ == '__main__':
     test()
