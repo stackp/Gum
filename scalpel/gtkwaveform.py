@@ -78,7 +78,7 @@ class LayeredGraphView(LayeredCairoWidget):
 class GraphView(LayeredGraphView):
     """Sound visualization widget for the main window.
 
-    * Two graphical layers: the waveform and the selection.
+    * Three graphical layers: waveform, selection, and cursor.
     * Mouse event listeners act on models (scroll and selection).
 
     """
