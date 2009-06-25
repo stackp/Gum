@@ -40,7 +40,7 @@ class Controller(object):
             try:
                 method(self, *args, **kwargs)
             except Exception, e:
-                print self.error("Error", str(e))
+                self.error("Error", str(e))
                 traceback.print_exc()
 
         wrapper.__name__ = method.__name__
