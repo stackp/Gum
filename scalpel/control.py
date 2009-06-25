@@ -2,7 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from edit import Sound
+import edit
 from player import Player
 from event import Signal
 import effect
@@ -57,7 +57,7 @@ class Controller(object):
     @_report_exception
     def load_sound(self, filename):
         self._player.pause()
-        self._sound = Sound(filename)
+        self._sound = edit.Sound(filename)
         self._graph.set_sound(self._sound)
         self._player.set_sound(self._sound)
         self._selection.unselect()
@@ -141,6 +141,9 @@ class Controller(object):
         l = effect.effects.keys()
         l.sort()
         return l
+
+    def list_extensions(self):
+        return edit.list_extensions()
 
     def effect(self, name):
         fx_class = effect.effects[name]

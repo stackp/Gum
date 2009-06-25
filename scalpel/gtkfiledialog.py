@@ -3,8 +3,9 @@ import gtk
 class FileDialog(object):
     """Handle a pair of file dialogs (open and save)."""
 
-    def __init__(self):
+    def __init__(self, extensions=[]):
         self.filename = None
+        self.extensions = extensions
 
     def get_filename(self, action='open'):
         """Run a dialog and return a filename or None.
@@ -37,9 +38,24 @@ class FileDialog(object):
             raise Exception("action must be 'open' or 'save' (got '%s')"
                             % action)
 
+        # Supported files filter
+        filter = gtk.FileFilter()
+        filter.set_name("Supported files")
+        for ext in self.extensions:
+            filter.add_pattern("*." + ext)
+        chooser.add_filter(filter)
+        chooser.set_filter(filter)
+
+        # All files filter
+        filter = gtk.FileFilter()
+        filter.set_name("All files")
+        filter.add_pattern("*")
+        chooser.add_filter(filter)
+
         chooser.set_title(title)
         icon = chooser.render_icon(stock, gtk.ICON_SIZE_MENU)
         chooser.set_icon(icon)
+
         if self.filename:
             chooser.select_filename(self.filename)
         response = chooser.run()

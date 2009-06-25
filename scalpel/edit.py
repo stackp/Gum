@@ -7,6 +7,11 @@ from copy import copy
 import pysndfile
 import numpy
 
+def list_extensions():
+    extensions = pysndfile.supported_format()
+    extensions.append('aif')
+    return extensions
+
 class Action(object):
     """Describes an action, and a way to revert that action"""
      

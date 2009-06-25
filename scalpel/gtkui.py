@@ -67,7 +67,7 @@ class EditorWindow(gtk.Window):
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
-        self.filedialog = FileDialog()
+        self.filedialog = FileDialog(controller.list_extensions())
 
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)
