@@ -9,13 +9,20 @@ import gtkui
 import sys
 
 def run():
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    else:
-        filename = None
 
-    # FIXME: problem when wrong filename passed from command-line
-    app.open_(filename)
+    # Open files passed on the command line.
+    opened = False
+    for filename in sys.argv[1:]:
+        try:
+            app.open_(filename)
+            opened = True
+        except Exception, e:
+            gtkui.display_error("Error", str(e))
+
+    # Load an empty sound if no file was open.
+    if not opened:
+        app.open_()
+
     gtkui.main_loop()
 
 if __name__ == "__main__":
