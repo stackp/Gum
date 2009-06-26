@@ -3,17 +3,12 @@
 # Licensed under the Revised BSD License.
 
 import edit
+import clipboard
 from player import Player
 from event import Signal
 import effect
 import app
 import traceback
-
-class Clipboard(object):
-    # OMG! A Borg! (http://code.activestate.com/recipes/66531/)
-    __shared_state = {"clip": []}
-    def __init__(self):
-        self.__dict__ = self.__shared_state
 
 class Controller(object):
 
@@ -24,7 +19,7 @@ class Controller(object):
         self._sound = sound
         self.filename_changed = Signal()
         self.error = Signal()
-        self.clipboard = Clipboard()
+        self.clipboard = clipboard.Clipboard()
 
     def new(self):
         app.open_()
