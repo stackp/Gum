@@ -122,7 +122,6 @@ class EditorWindow(gtk.Window):
             </menubar>
             <toolbar name="toolbar">
               <toolitem action="Open"/>
-              <toolitem action="Save"/>
               <separator/>
               <toolitem action="ZoomFit"/>
               <toolitem action="ZoomOut"/>
