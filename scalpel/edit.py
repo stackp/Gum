@@ -12,6 +12,7 @@ def list_extensions():
     extensions.append('aif')
     return extensions
 
+
 class Action(object):
     """Describes an action, and a way to revert that action"""
      
@@ -101,9 +102,9 @@ class Sound(object):
         self.filename = filename
 
     def cut(self, start, end):
-        clip = self.frames[start:end]
+        clip = copy(self.frames[start:end])
         do = (self._do_cut, (start, end))
-        undo = (self._do_paste, (start, copy(self.frames[start:end])))
+        undo = (self._do_paste, (start, start, copy(self.frames[start:end])))
         self.history.add(do, undo)
         self.changed()
         return clip
@@ -113,7 +114,7 @@ class Sound(object):
         self.frames = data
 
     def copy(self, start, end):
-        clip = self.frames[start:end]
+        clip = copy(self.frames[start:end])
         return clip
 
     def paste(self, start, end, clip):
@@ -284,6 +285,26 @@ def testSound():
     assert snd.frames.size == snd2.frames.size
     assert abs((snd.frames - snd2.frames).flatten().max()) == 0
     os.remove(outfile)
+
+    # test cut
+    snd = Sound()
+    snd.frames = numpy.array([1, 2, 3, 4])
+    clip = snd.cut(1, 3)
+    assert snd.frames.tolist() == [1, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    # clip is a copy
+    clip[0] = 9
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+
+    # test copy
+    snd = Sound()
+    snd.frames = numpy.array([1, 2, 3, 4])
+    clip = snd.copy(1, 3)
+    assert clip.tolist() == [2, 3]
+    # clip is a copy
+    clip[0] = 9
+    assert snd.frames.tolist() == [1, 2, 3, 4]
 
     # test paste
     snd = Sound()
