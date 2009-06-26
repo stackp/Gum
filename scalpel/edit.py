@@ -116,15 +116,17 @@ class Sound(object):
         clip = self.frames[start:end]
         return clip
 
-    def paste(self, start, clip):
-        do = (self._do_paste, (start, clip))
-        undo = (self._do_cut, (start, start + len(clip)))
+    def paste(self, start, end, clip):
+        saved = copy(self.frames[start:end])
+        do = (self._do_paste, (start, end, clip))
+        undo = (self._do_paste, (start, start + len(clip), saved))
         self.history.add(do, undo)
         self.changed()
 
-    def _do_paste(self, start, clip):
-        data = numpy.concatenate((self.frames[:start], clip,self.frames[start:]))
-        self.frames = data
+    def _do_paste(self, start, end, clip):
+        x = self.frames
+        y = numpy.concatenate((x[:start], clip, x[end:]))
+        self.frames = y
 
     def apply(self, fx):
         self.history.add((fx.apply, ()), (fx.revert, ()))
@@ -207,7 +209,7 @@ def testSound():
     assert snd.frames.tolist() == sine2
 
     clip = snd.copy(start, end)
-    snd.paste(0, clip)
+    snd.paste(0, 0, clip)
     assert snd.frames.tolist() == sine2[start:end] + sine2
     snd.history.undo()
     assert snd.frames.tolist() == sine2
@@ -231,11 +233,11 @@ def testSound():
     snd.history.redo()
     assert snd.frames.tolist() == data2
     clip = snd.copy(start, end)
-    snd.paste(0, clip)
+    snd.paste(0, 0, clip)
     assert snd.frames.tolist() == data2[start:end] + data2
     snd.history.undo()
     assert snd.frames.tolist() == data2
-    snd.paste(0, clip)
+    snd.paste(0, 0, clip)
     assert snd.frames.tolist() == data2[start:end] + data2
 
     # test with a stereo file
@@ -255,11 +257,11 @@ def testSound():
     snd.history.redo()
     assert snd.frames.tolist() == data2
     clip = snd.copy(start, end)
-    snd.paste(0, clip)
+    snd.paste(0, 0, clip)
     assert snd.frames.tolist() == data2[start:end] + data2
     snd.history.undo()
     assert snd.frames.tolist() == data2
-    snd.paste(0, clip)
+    snd.paste(0, 0, clip)
     assert snd.frames.tolist() == data2[start:end] + data2
 
     # test save_as()
@@ -283,6 +285,17 @@ def testSound():
     assert abs((snd.frames - snd2.frames).flatten().max()) == 0
     os.remove(outfile)
 
+    # test paste
+    snd = Sound()
+    snd.frames = numpy.array([1, 2, 3, 4])
+    clip = numpy.array([22, 33])
+    snd.paste(1, 3, clip)
+    assert snd.frames.tolist() == [1, 22, 33, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    snd.paste(1, 1, clip)
+    assert snd.frames.tolist() == [1, 22, 33, 2, 3, 4]
+    
         
 if __name__ == '__main__':
     testAction()

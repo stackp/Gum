@@ -108,7 +108,7 @@ class Controller(object):
     def paste(self):
         start, end = self._selection.get()
         # FIXME: error when number of channels doesn't match.
-        self._sound.paste(start, self.clipboard.clip)
+        self._sound.paste(start, end, self.clipboard.clip)
         self._selection.set(start, start + len(self.clipboard.clip))
 
     def trim(self):
