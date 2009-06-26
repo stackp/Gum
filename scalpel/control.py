@@ -111,6 +111,18 @@ class Controller(object):
         self._sound.paste(start, end, self.clipboard.clip)
         self._selection.set(start, start + len(self.clipboard.clip))
 
+    @_report_exception
+    def mix(self):
+        start, end = self._selection.get()
+        # FIXME: error when number of channels doesn't match.
+        self._sound.mix(start, end, self.clipboard.clip)
+        # FIXME: should be dealt with in Sound.
+        if start == end:
+            l = len(self.clipboard.clip)
+        else:
+            l = min(end - start, len(self.clipboard.clip))
+        self._selection.set(start, start + l)
+
     def trim(self):
         pass
 

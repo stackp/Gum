@@ -106,6 +106,7 @@ class EditorWindow(gtk.Window):
                 <menuitem action="Cut"/>
                 <menuitem action="Copy"/>
                 <menuitem action="Paste"/>
+                <menuitem action="Mix"/>
                 <separator/>
                 <menuitem action="SelectAll"/>
               </menu>
@@ -137,6 +138,7 @@ class EditorWindow(gtk.Window):
               <toolitem action="Cut"/>
               <toolitem action="Copy"/>
               <toolitem action="Paste"/>
+              <toolitem action="Mix"/>
               <separator/>
               <toolitem action="Undo"/>
               <toolitem action="Redo"/>
@@ -181,6 +183,8 @@ class EditorWindow(gtk.Window):
                    ('Cut', gtk.STOCK_CUT, None, None, '', self.cut),
                    ('Copy', gtk.STOCK_COPY, None, None, '', self.copy),
                    ('Paste', gtk.STOCK_PASTE, None, None, '', self.paste),
+                   ('Mix', gtk.STOCK_ADD, 'Mix', '<Ctrl><Shift>v', None,
+                                                                     self.mix),
                    ('Undo', gtk.STOCK_UNDO, None, '<Ctrl>z', None, self.undo),
                    ('Redo', gtk.STOCK_REDO, None, '<Ctrl><Shift>z', None,
                                                                     self.redo),
@@ -225,7 +229,7 @@ class EditorWindow(gtk.Window):
         """
         if name in ["new", "save", "play", "pause", "rewind", "forward",
                     "goto_start", "goto_end", "select_all",
-                    "cut", "copy", "paste", "undo", "redo",
+                    "cut", "copy", "paste", "mix", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit",
                     "effect"]:
             method = getattr(self.ctrl, name)

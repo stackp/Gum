@@ -131,6 +131,29 @@ class Sound(object):
         y = numpy.concatenate((x[:start], clip, x[end:]))
         self.frames = y
 
+    def mix(self, start, end, clip):
+        saved = copy(self.frames[start:start + len(clip)])
+        do = (self._do_mix, (start, end, clip))
+        undo = (self._do_paste, (start, start + len(clip), saved))
+        self.history.add(do, undo)
+        self.changed()
+
+    def _do_mix(self, start, end, clip):
+        if start != end:
+            length = min(end - start, len(clip))
+            self.frames[start:start + length] += clip[:length]
+        else:
+            a = self.frames
+            b = clip
+            sound_length = max(len(a), start + len(b))
+            if self.numchan() > 1:
+                c = numpy.zeros((sound_length, self.numchan()))
+            else:
+                c = numpy.zeros(sound_length)
+            c[:len(a)] = a
+            c[start:start + len(b)] += b
+            self.frames = c
+
     def apply(self, fx):
         self.history.add((fx.apply, ()), (fx.revert, ()))
         self.changed()
@@ -319,6 +342,61 @@ def testSound():
     snd.paste(1, 1, clip)
     assert snd.frames.tolist() == [1, 22, 33, 2, 3, 4]
     
+    # test mix
+    snd = Sound()
+    snd.frames = numpy.array([1, 2, 3, 4])
+    clip = numpy.array([2, 3])
+    snd.mix(1, 3, clip)
+    assert snd.frames.tolist() == [1, 4, 6, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    #
+    # clip smaller than selection
+    snd = Sound()
+    snd.frames = numpy.array([1, 2, 3, 4])
+    clip = numpy.array([2])
+    snd.mix(1, 3, clip)
+    assert snd.frames.tolist() == [1, 4, 3, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    #
+    # must not go behind selection
+    clip = numpy.array([2, 3, 4])
+    snd.mix(1, 3, clip)
+    assert snd.frames.tolist() == [1, 4, 6, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+
+    clip = numpy.array([2, 3])
+    snd.mix(1, 1, clip)
+    assert snd.frames.tolist() == [1, 4, 6, 4]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    #
+    # mix() may extend sound length when there is no selection.
+    clip = numpy.array([2, 3, 4, 5])
+    snd.mix(1, 1, clip)
+    assert snd.frames.tolist() == [1, 4, 6, 8, 5]
+    snd.undo()
+    assert snd.frames.tolist() == [1, 2, 3, 4]
+    #
+    # stereo too
+    snd = Sound()
+    snd.frames = numpy.array([[1, 1], [2, 2], [3, 3], [4, 4]])
+    clip = numpy.array([[2, 2], [3, 3]])
+    snd.mix(1, 3, clip)
+    assert snd.frames.tolist() == [[1, 1], [4, 4], [6, 6], [4, 4]]
+    snd.undo()
+    assert snd.frames.tolist() == [[1, 1], [2, 2], [3, 3], [4, 4]]
+    #
+    snd = Sound()
+    snd.frames = numpy.array([[1, 1], [2, 1], [3, 2], [4, 4]])
+    clip = numpy.array([[2, 2], [3, 3]])
+    snd.mix(1, 1, clip) # no selection
+    assert snd.frames.tolist() == [[1, 1], [4, 3], [6, 5], [4, 4]]
+    snd.undo()
+    assert snd.frames.tolist() == [[1, 1], [2, 1], [3, 2], [4, 4]]
+
     # Do not crash when saving with None as filename
     snd = Sound()
     try:
