@@ -93,6 +93,8 @@ class Sound(object):
         self.save_as(self.filename, format)
 
     def save_as(self, filename, format=pysndfile.formatinfo()):
+        if filename is None:
+            raise Exception("No filename")
         f = pysndfile.sndfile(filename, mode='write',
                               format=format,
                               channels=self.numchan(),
@@ -317,6 +319,14 @@ def testSound():
     snd.paste(1, 1, clip)
     assert snd.frames.tolist() == [1, 22, 33, 2, 3, 4]
     
+    # Do not crash when saving with None as filename
+    snd = Sound()
+    try:
+        snd.save()
+    except:
+        print "OK"
+    else:
+        assert False
         
 if __name__ == '__main__':
     testAction()
