@@ -53,9 +53,19 @@ class Normalize(Effect):
             self.sound.frames[start:end] = self.clip
 
 
+class Negate(Effect):
+    """Negate the selected part of sound."""
+    def apply(self):
+        start, end = self.selection
+        self.sound.frames[start:end] = - self.sound.frames[start:end]
+
+    def revert(self):
+        self.apply()
+
 # Register effects
 effects['Reverse'] = Reverse
 effects['Normalize'] = Normalize
+effects['Negate'] = Negate
 
 
 # Tests
