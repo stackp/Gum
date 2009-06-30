@@ -4,9 +4,8 @@
 
 from event import Signal
 
-def _overview(data, width):
+def _overview(data, density):
     "Returns a list of (min, max) tuples."
-    density = len(data) / float(width)
     if density < 1:
         density = 1
     left = 0
@@ -169,12 +168,12 @@ class Graph(object):
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
         visible = self._sound.frames[start:end]
         if numchan == 1:
-            o = [_overview(visible, width)]
+            o = [_overview(visible, self.density())]
         else:
             visible = visible.transpose()
             o = []
             for chan in range(numchan):
-                values = _overview(visible[chan], width)
+                values = _overview(visible[chan], self.density())
                 o.append(values)
         return o
 
@@ -213,7 +212,8 @@ class Graph(object):
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))
-    print _overview(b, 30)
+    assert len(_overview(b, 100000)) == 10
+    assert len(_overview(b, 10000)) == 100
     
 def test_Graph():
     from mock import Mock, Fake
