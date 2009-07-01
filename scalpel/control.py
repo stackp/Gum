@@ -151,14 +151,13 @@ class Controller(object):
         return edit.list_extensions()
 
     def effect(self, name):
-        fx_class = effect.effects[name]
         if self._selection.selected():
             start, end = self._selection.get()
         else:
             start = 0
             end = len(self._sound.frames)
-        fx = fx_class(self._sound, (start, end))
-        self._sound.apply(fx)
+        fx = effect.effects[name]
+        fx(self._sound, start, end)
 
     def filename(self):
         return self._sound.filename
