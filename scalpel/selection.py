@@ -37,12 +37,12 @@ class Selection(object):
     def selected(self):
         return self.start != self.end
 
-    def start_selection(self, pixel):
+    def pin(self, pixel):
         "The pixel is an index in the graph."
         start = self._graph.pxltofrm(pixel)
         self.set(start, start)
 
-    def end_selection(self, pixel):
+    def extend(self, pixel):
         "The pixel is an index in the graph."
         self.end = self._graph.pxltofrm(pixel)
         self._cursor.set_frame(min(self.start, self.end))
@@ -91,15 +91,15 @@ def test_selection():
 
     x1, x2 = 10, 100
     selection = Selection(FakeGraph(), Fake())
-    selection.start_selection(x1)
-    selection.end_selection(x2)
+    selection.pin(x1)
+    selection.extend(x2)
     selection._update()
     assert selection.pixels() == (10, 100)
     assert selection.get() == (100 + 10 * x1, 100 + 10 * x2)
 
     # invert selection order
-    selection.start_selection(x2)
-    selection.end_selection(x1)
+    selection.pin(x2)
+    selection.extend(x1)
     selection._update()
     assert selection.pixels() == (10, 100)
     assert selection.get() == (100 + 10 * x1, 100 + 10 * x2)

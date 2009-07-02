@@ -261,6 +261,7 @@ class MouseSelection(object):
 
     """
     def __init__(self, widget, selection):
+        self.widget = widget
         self._selection = selection
         self.pressed = False
         widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
@@ -270,20 +271,47 @@ class MouseSelection(object):
         widget.connect("button_press_event", self.button_press)
         widget.connect("button_release_event", self.button_release)
         widget.connect("motion_notify_event", self.motion_notify)
-        
+
+    def near(self, x, y):
+        return abs(x - y) < 10
+
     def button_press(self, widget, event):
         if event.button == 1:
             self.pressed = True
-            self._selection.start_selection(event.x)
+            x = event.x
+            start, end = self._selection.pixels()
+            # extend towards left
+            if self._selection.selected() and self.near(start, x):
+                self._selection.pin(end)
+                self._selection.extend(x)
+            # extend towards right
+            elif self._selection.selected() and self.near(end, x):
+                self._selection.pin(start)
+                self._selection.extend(x)
+            # start fresh selection
+            else:
+                self._selection.pin(x)
 
     def motion_notify(self, widget, event):
         if self.pressed:
             x = event.window.get_pointer()[0]
-            self._selection.end_selection(x)
-            
+            self._selection.extend(x)
+
+        self.pointer_style(widget, event)
+
+    def pointer_style(self, widget, event):
+        style = None
+        x = event.window.get_pointer()[0]
+        if self._selection.selected():
+            start, end = self._selection.pixels()
+            if self.near(start, x):
+                style = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
+            elif self.near(end, x):
+                style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
+        self.widget.window.set_cursor(style)
+
     def button_release(self, widget, event):
         if event.button == 1:
-            start, end = self._selection.get()
             self.pressed = False
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
