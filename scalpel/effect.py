@@ -18,6 +18,21 @@ def normalize(x):
 def negate(x):
     return -x
 
+def fade(x, type='in'):
+    N = len(x)
+    curve = numpy.array(range(N)) / float(N - 1)
+    if type == 'out':
+        curve = reverse(curve)
+    if x.ndim > 1:
+        curve = [curve] * x.ndim
+        curve = numpy.array(curve)
+        curve = curve.transpose()
+    y = copy(x) * curve
+    return y
+
+def fade_out(x):
+    return fade(x, 'out')
+
 
 def mkfx_overwrite_selection(function):
     def apply(sound, start, end):
@@ -30,6 +45,8 @@ def mkfx_overwrite_selection(function):
 effects['Reverse'] = mkfx_overwrite_selection(reverse)
 effects['Normalize'] = mkfx_overwrite_selection(normalize)
 effects['Negate'] = mkfx_overwrite_selection(negate)
+effects['Fade In'] = mkfx_overwrite_selection(fade)
+effects['Fade Out'] = mkfx_overwrite_selection(fade_out)
 
 # Tests
 if __name__ == '__main__':
@@ -78,3 +95,22 @@ if __name__ == '__main__':
     assert snd.frames.tolist() == []
     snd.undo()
     assert snd.frames.tolist() == []
+
+    # test fade in
+    fx = effects['Fade In']  
+    snd = Sound()
+
+    snd.frames = numpy.array([1, 1, 1])
+    fx(snd, 0, 3)
+    assert snd.frames.tolist() == [0, 0.5, 1]
+    # stereo
+    snd.frames = numpy.array([[1, 1], [1, 1], [1, 1]])
+    fx(snd, 0, 3)
+    assert snd.frames.tolist() == [[0, 0], [0.5, 0.5], [1, 1]]
+
+    # test fade out
+    fx = effects['Fade Out']  
+    snd = Sound()
+    snd.frames = numpy.array([1, 1, 1])
+    fx(snd, 0, 3)
+    assert snd.frames.tolist() == [1, 0.5, 0]
