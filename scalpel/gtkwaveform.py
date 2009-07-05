@@ -86,6 +86,7 @@ class GraphView(LayeredGraphView):
         super(GraphView, self).__init__(graph)
         self._graph = graph
         self._selection = selection
+        self.layers.append(BackgroundLayer(self, selection))
         self.layers.append(WaveformLayer(self, graph))
         self.layers.append(SelectionLayer(self, selection))
         self.layers.append(CursorLayer(self, cursor))
@@ -146,19 +147,56 @@ class WaveformLayer(object):
         "Draw all sound channels."
         if not self._cache:
             surface = context.get_target()
-            self._cache = surface.create_similar(cairo.CONTENT_COLOR,
+            self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
                                                  width, height)
             c = cairo.Context(self._cache)
             channels = self._graph.channels()
             numchan = len(channels)
             for i in range(numchan):
-                s = surface.create_similar(cairo.CONTENT_COLOR,
+                s = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
                                            width, height / numchan)
                 self.draw_channel(channels[i], s, width, height / numchan)
                 c.set_source_surface(s, 0, (height / numchan) * i)
-                c.set_operator(cairo.OPERATOR_ATOP)
+                c.set_operator(cairo.OPERATOR_OVER)
                 c.paint()
                 
+        context.set_source_surface(self._cache, 0, 0)
+        context.set_operator(cairo.OPERATOR_OVER)
+        context.paint()
+
+
+class BackgroundLayer(object):
+    """A layer for LayeredGraphView.
+
+    """
+    def __init__(self, layered, selection):
+        self._layered = layered
+        self._cache = None
+        self._selection = selection
+        self._selection.changed.connect(self.update)
+
+    def update(self):
+        self._cache = None
+        self._layered.redraw()
+
+    def draw(self, context, width, height):
+        if not self._cache:
+            surface = context.get_target()
+            self._cache = surface.create_similar(cairo.CONTENT_COLOR,
+                                                 width, height)
+            c = cairo.Context(self._cache)
+
+            # Black background
+            c.set_source_rgb(0, 0, 0)
+            c.paint()
+
+            # Selection background
+            if self._selection.selected():
+                c.set_source_rgb(0, 0, 0.2)
+                start, end = self._selection.pixels()
+                c.rectangle(start, 0, end - start, height)
+                c.fill()
+            
         context.set_source_surface(self._cache, 0, 0)
         context.set_operator(cairo.OPERATOR_SOURCE)
         context.paint()
@@ -411,15 +449,21 @@ if __name__ == '__main__':
             layered.layers.append(WaveformLayer(layered, graph))
             return layered
 
-        def selection():
+        def test_selection_layer(layerclass):
             graph = Mock({"channels": [], "set_width": None,
                           "frames_info": (0, 0, 0)})
             graph.changed = Fake()
             selection = Mock({"pixels": (20, 100), "selected": True})
             selection.changed = Fake()
             layered = LayeredGraphView(graph)
-            layered.layers.append(SelectionLayer(layered, selection))
+            layered.layers.append(layerclass(layered, selection))
             return layered
+
+        def background():
+            return test_selection_layer(BackgroundLayer)
+
+        def selection():
+            return test_selection_layer(SelectionLayer)
 
         def cursor():
             graph = Mock({"channels": [], "set_width": None,
@@ -434,7 +478,8 @@ if __name__ == '__main__':
             layered.layers.append(cursorlayer)
             return layered
 
-        layereds = [randomized(), sine(), sines(), selection(), cursor()]
+        layereds = [randomized(), sine(), sines(), selection(), cursor(),
+                    background()]
 
         for layered in layereds:
             window = gtk.Window()
