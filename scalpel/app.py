@@ -12,7 +12,7 @@ import control
 import os.path
 
 __appname__ = "Scalpel"
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 __url__ = 'http://scalpelsound.online.fr'
 
 # This signal is emitted when a new sound has been loaded. User
