@@ -47,6 +47,7 @@ class Signal(object):
 
     def clear(self):
         self.__slots.clear()
+        self.__funchosts.clear()
 
 
 class _FuncHost(object):
