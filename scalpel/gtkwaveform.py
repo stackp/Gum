@@ -205,9 +205,8 @@ class BackgroundLayer(object):
 class SelectionLayer(object):
     """A layer for LayeredGraphView.
 
-    It highlights the selected area. It also listens to mouse events
-    and changes the selection accordingly. The cairo surface is
-    cached, it is redrawn only when selection has changed.
+    It highlights the selected area. The cairo surface is cached, it
+    is redrawn only when selection has changed.
 
     """
     def __init__(self, layered, selection):
