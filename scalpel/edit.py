@@ -156,10 +156,6 @@ class Sound(object):
             c[start:start + len(b)] += b
             self.frames = c
 
-    def apply(self, fx):
-        self.history.add((fx.apply, ()), (fx.revert, ()))
-        self.changed()
-
     def undo(self):
         self.history.undo()
         self.changed()
