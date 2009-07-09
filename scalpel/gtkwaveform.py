@@ -108,7 +108,6 @@ class WaveformLayer(object):
         self._graph = graph
         self._cache = None
         self.wavecolor = 0.0, 0.47058823529411764, 1.0
-        layered.add_events(gtk.gdk.SCROLL_MASK)
         graph.changed.connect(self.update)
 
     def update(self):
@@ -283,6 +282,7 @@ class MouseScroll(object):
     """
     def __init__(self, widget, graph):
         self._graph = graph
+        widget.add_events(gtk.gdk.SCROLL_MASK)
         widget.connect("scroll_event", self.scroll_event)
 
     def scroll_event(self, widget, event):
