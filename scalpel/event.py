@@ -66,6 +66,8 @@ if __name__ == '__main__':
         def foo():
             global a 
             a = a + 1
+        global a
+        a = 0
         s = Signal()
         s()
         s.connect(foo)
