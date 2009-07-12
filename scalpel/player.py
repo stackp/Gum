@@ -4,7 +4,6 @@
 
 import alsaaudio
 import threading
-from array import array
 from  event import Signal
 import numpy
 
