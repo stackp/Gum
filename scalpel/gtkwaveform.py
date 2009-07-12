@@ -129,9 +129,10 @@ class WaveformLayer(object):
         c.set_source_rgb(*self.wavecolor)
         for i, (mini, maxi) in enumerate(values):
             # -1 <= mini <= maxi <= 1
+            # 0 <= ymin <= ymax <= height - 1
             x = i
-            ymin = round((-mini * 0.5 + 0.5) * height)
-            ymax = round((-maxi * 0.5 + 0.5) * height)
+            ymin = round((-mini * 0.5 + 0.5) * (height - 1))
+            ymax = round((-maxi * 0.5 + 0.5) * (height - 1))
             if ymin == ymax:
                 # Fill one pixel 
                 c.rectangle(x, ymin, 1, 1)
