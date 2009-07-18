@@ -1,3 +1,5 @@
 #!/bin/sh
 
-PYTHONPATH=. scripts/scalpel $*
+DIRECTORY=`dirname $0`
+export PYTHONPATH=$DIRECTORY
+$DIRECTORY/scripts/scalpel $*
