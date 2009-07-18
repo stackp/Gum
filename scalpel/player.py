@@ -52,6 +52,7 @@ class Player(object):
                     if self._sound.numchan() == 1:
                         # converting mono to stereo
                         buf = numpy.reshape([buf, buf], -1, 2)
+                    buf = buf.tostring()
                     pcm.write(buf)
                     self.position = end
 
