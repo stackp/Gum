@@ -2,13 +2,14 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import app
+import constants
 
 # pygtk gets program name from sys.argv[0]. This name appears in
 # taskbars when windows are grouped together.
 import sys
-sys.argv[0] = app.__appname__
+sys.argv[0] = constants.__appname__
 
+import app
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 import copy
@@ -210,7 +211,7 @@ class EditorWindow(gtk.Window):
         self.filedialog.filename = filename
 
     def _update_title(self, filename=None):
-        title = app.__appname__
+        title = constants.__appname__
         if filename:
             title = os.path.basename(filename) + ' - ' + title
         self.set_title(title)
@@ -244,9 +245,9 @@ class EditorWindow(gtk.Window):
         d = gtk.AboutDialog()
         d.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         d.set_transient_for(self)
-        d.set_program_name(app.__appname__)
-        d.set_version(app.__version__)
-        d.set_website(app.__url__)
+        d.set_program_name(constants.__appname__)
+        d.set_version(constants.__version__)
+        d.set_website(constants.__url__)
         d.set_copyright("(c) Pierre Duquesne <stackp@online.fr>")
         d.set_comments("A sound editor")
         d.run()

@@ -11,10 +11,6 @@ import cursor
 import control
 import os.path
 
-__appname__ = "Scalpel"
-__version__ = '0.4.0'
-__url__ = 'http://scalpelsound.online.fr'
-
 # This signal is emitted when a new sound has been loaded. User
 # interface should connect to it. Values passed are: Controller,
 # Graph, Selection and Cursor instances.
