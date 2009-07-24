@@ -39,7 +39,9 @@ class Player(object):
             pcm.setrate(self._sound.samplerate)
             pcm.setchannels(2)
             pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
-            pcm.setperiodsize(self._periodsize)
+            # alsaaudio.PCM.setperiodsize() does not work but it
+            # returns the actual period size.
+            self._periodsize = pcm.setperiodsize(self._periodsize)
             self.position = self.start
 
             while self._playing:
@@ -52,12 +54,14 @@ class Player(object):
                     if self._sound.numchan() == 1:
                         # converting mono to stereo
                         buf = numpy.array([buf, buf]).transpose()
+                    if 0 < len(buf) < self._periodsize:
+                        # zero padding to flush the ALSA buffer
+                        padlen = self._periodsize - len(buf)
+                        padding = numpy.zeros((padlen, buf.ndim))
+                        buf = numpy.concatenate((buf, padding))
                     buf = buf.tostring()
                     pcm.write(buf)
                     self.position = end
-
-            # Closing the device flushes buffered frames.
-            pcm.close()
         finally:
             self.stop_playing()
             self._lock.release()
