@@ -330,6 +330,10 @@ class MouseSelection(object):
             else:
                 self._selection.pin(x)
 
+    def button_release(self, widget, event):
+        if event.button == 1:
+            self.pressed = False
+
     def motion_notify(self, widget, event):
         if self.pressed:
             x = event.window.get_pointer()[0]
@@ -347,10 +351,6 @@ class MouseSelection(object):
             elif self.near(end, x):
                 style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
         self.widget.window.set_cursor(style)
-
-    def button_release(self, widget, event):
-        if event.button == 1:
-            self.pressed = False
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
 #
