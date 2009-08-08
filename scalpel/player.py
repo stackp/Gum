@@ -10,11 +10,6 @@ import numpy
 class Player(object):
     """Play sound using alsa.
 
-    Public attributes:
-       * start
-       * end
-       * position
-
     """
     def __init__(self, sound):
         self.set_sound(sound)
