@@ -88,12 +88,6 @@ class Controller(object):
         end = len(self._sound.frames)
         self._selection.set(end, end)
 
-    def rewind(self):
-        pass
-
-    def forward(self):
-        pass
-
     def cut(self):
         start, end = self._selection.get()
         self._selection.start = start

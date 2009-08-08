@@ -130,10 +130,8 @@ class EditorWindow(gtk.Window):
               <toolitem action="ZoomIn"/>
               <separator/>
               <toolitem action="Start"/>
-              <toolitem action="Rewind"/>
               <toolitem action="Pause"/>
               <toolitem action="Play"/>
-              <toolitem action="Forward"/>
               <toolitem action="End"/>
               <separator/>
               <toolitem action="Cut"/>
@@ -177,10 +175,6 @@ class EditorWindow(gtk.Window):
                                                               self.goto_start),
                    ('End', gtk.STOCK_MEDIA_NEXT, None, 'End', '',
                                                                 self.goto_end),
-                   ('Rewind', gtk.STOCK_MEDIA_REWIND, None, None, '',
-                                                                  self.rewind),
-                   ('Forward', gtk.STOCK_MEDIA_FORWARD, None, None, '',
-                                                                 self.forward),
                    ('Cut', gtk.STOCK_CUT, None, None, '', self.cut),
                    ('Copy', gtk.STOCK_COPY, None, None, '', self.copy),
                    ('Paste', gtk.STOCK_PASTE, None, None, '', self.paste),
@@ -228,7 +222,7 @@ class EditorWindow(gtk.Window):
         not be passed to the controller method.
         
         """
-        if name in ["new", "save", "play", "pause", "rewind", "forward",
+        if name in ["new", "save", "play", "pause",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit",
