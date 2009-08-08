@@ -318,8 +318,11 @@ class MouseSelection(object):
             self.pressed = True
             x = event.x
             start, end = self._selection.pixels()
+            # a double click resumes selection.
+            if event.type == gtk.gdk._2BUTTON_PRESS:
+                self._selection.pin(x)
             # extend towards left
-            if self._selection.selected() and self.near(start, x):
+            elif self._selection.selected() and self.near(start, x):
                 self._selection.pin(end)
                 self._selection.extend(x)
             # extend towards right
