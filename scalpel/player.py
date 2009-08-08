@@ -19,6 +19,15 @@ class Player(object):
         self.start_playing = Signal()
         self.stop_playing = Signal()
         self.position = 0
+        self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
+                            mode=alsaaudio.PCM_NORMAL,
+                            card='default')
+        self._pcm.setrate(self._sound.samplerate)
+        self._pcm.setchannels(2)
+        self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
+        # alsaaudio.PCM.setperiodsize() does not work but it
+        # returns the actual period size.
+        self._periodsize = self._pcm.setperiodsize(self._periodsize)
 
     def set_sound(self, sound):
         self._sound = sound
@@ -28,15 +37,6 @@ class Player(object):
     def play(self):
         self.start_playing()
         try:
-            pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
-                                mode=alsaaudio.PCM_NORMAL,
-                                card='default')
-            pcm.setrate(self._sound.samplerate)
-            pcm.setchannels(2)
-            pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
-            # alsaaudio.PCM.setperiodsize() does not work but it
-            # returns the actual period size.
-            self._periodsize = pcm.setperiodsize(self._periodsize)
             self.position = self.start
 
             while self._playing:
@@ -55,7 +55,7 @@ class Player(object):
                         padding = numpy.zeros((padlen, buf.ndim))
                         buf = numpy.concatenate((buf, padding))
                     buf = buf.tostring()
-                    pcm.write(buf)
+                    self._pcm.write(buf)
                     self.position = end
         finally:
             self.stop_playing()
