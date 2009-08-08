@@ -35,10 +35,9 @@ class Player(object):
         self.end = len(sound.frames)
 
     def play(self):
+        self.position = self.start
         self.start_playing()
         try:
-            self.position = self.start
-
             while self._playing:
                 if self.position >= self.end:
                     self._playing = False
