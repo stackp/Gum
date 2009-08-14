@@ -316,7 +316,6 @@ def test_zoom():
     sound.frames = data
     g._zoom(point=2, factor=0.5)
     o = g.channels()
-    print o
     assert o == [[(2, 2), (3, 3), (4, 4)]]
 
     g._zoom(point=2, factor=0.5)
