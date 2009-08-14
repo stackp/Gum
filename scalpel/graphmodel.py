@@ -133,6 +133,20 @@ class Graph(object):
         self._view_end = len(self._sound.frames)
         self.changed()
 
+    def zoom_in_on(self, pixel):
+        mid = self._view_start + (self._view_end - self._view_start) * 0.5
+        point = self.pxltofrm(pixel)
+        self._zoom(point + ((mid - point) * 0.5), 0.5)
+        # the next call is necessary when the actual zoom factor has
+        # been less than 0.5. This happens when the zoom is already
+        # too strong.
+        self.move_to(point - pixel * self.density())
+
+    def zoom_out_on(self, pixel):
+        mid = self._view_start + (self._view_end - self._view_start) * 0.5
+        point = self.pxltofrm(pixel)
+        self._zoom(point + ((mid - point) * 2), 2)
+
     def _scroll(self, factor):
         """Shift the view.
 
@@ -332,6 +346,27 @@ def test_zoom_in():
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
 
+def test_zoom_in_on():
+    import numpy
+    from mock import Mock, Fake
+    sound = Mock({"numchan": 1})
+    sound.changed = Fake()
+    data = numpy.array([1, 2, 3, 4])
+    sound.frames = data
+    g = Graph(sound)
+    g.set_width(2)
+
+    g.zoom_in_on(0)
+    assert g.channels() == [[(1, 1), (2, 2)]]
+
+    g.zoom_out()
+    g.zoom_in_on(1)
+    assert g.channels() == [[(2, 2), (3, 3)]]
+
+    g.zoom_out()
+    g.zoom_in_on(2)
+    assert g.channels() == [[(3, 3), (4, 4)]]
+
 def test_scroll():
     import numpy
     from mock import Mock, Fake
@@ -358,3 +393,4 @@ if __name__ == "__main__":
     test_zoom()
     test_zoom_in()
     test_scroll()
+    test_zoom_in_on()

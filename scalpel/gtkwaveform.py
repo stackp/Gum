@@ -292,12 +292,12 @@ class MouseScroll(object):
             if event.state & gtk.gdk.MOD1_MASK:
                 self._graph.scroll_left()
             else:
-                self._graph.zoom_in()
+                self._graph.zoom_in_on(event.x)
         elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
             if event.state & gtk.gdk.MOD1_MASK:
                 self._graph.scroll_right()
             else:
-                self._graph.zoom_out()
+                self._graph.zoom_out_on(event.x)
 
 class MouseSelection(object):
     """Listens for mouse events and select graph area.
