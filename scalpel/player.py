@@ -7,32 +7,52 @@ import threading
 from  event import Signal
 import numpy
 
+class AlsaBackend(object):
+    def __init__(self, rate=44100):
+        self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
+                            mode=alsaaudio.PCM_NORMAL,
+                            card='default')
+        self._pcm.setchannels(2)
+        self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
+        self.set_samplerate(rate)
+        # alsaaudio.PCM.setperiodsize() does not work but it
+        # returns the actual period size.
+        self.periodsize = self._pcm.setperiodsize(128)
+
+    def set_samplerate(self, rate):
+        self._pcm.setrate(rate)
+
+    def write(self, buf):
+        if buf.ndim == 1:
+            # converting mono to stereo
+            buf = numpy.array([buf, buf]).transpose()
+        if 0 < len(buf) < self.periodsize: # FIXME: wrong
+            # zero padding to flush the ALSA buffer
+            padlen = self.periodsize - len(buf)
+            padding = numpy.zeros((padlen, buf.ndim))
+            buf = numpy.concatenate((buf, padding))
+        buf = buf.tostring()
+        self._pcm.write(buf)
+        
+
 class Player(object):
     """Play sound using alsa.
 
     """
     def __init__(self, sound):
-        self.set_sound(sound)
         self._playing = False
-        self._periodsize = 128
         self._lock = threading.Lock()
         self.start_playing = Signal()
         self.stop_playing = Signal()
         self.position = 0
-        self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
-                            mode=alsaaudio.PCM_NORMAL,
-                            card='default')
-        self._pcm.setrate(self._sound.samplerate)
-        self._pcm.setchannels(2)
-        self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
-        # alsaaudio.PCM.setperiodsize() does not work but it
-        # returns the actual period size.
-        self._periodsize = self._pcm.setperiodsize(self._periodsize)
+        self._backend = AlsaBackend()
+        self.set_sound(sound)
 
     def set_sound(self, sound):
         self._sound = sound
         self.start = 0
         self.end = len(sound.frames)
+        self._backend.set_samplerate(self._sound.samplerate)
 
     def play(self):
         self.position = self.start
@@ -43,19 +63,11 @@ class Player(object):
                     self._playing = False
                 else:
                     start = self.position
-                    end = min(self.position + self._periodsize, self.end)
+                    end = min(self.position + self._backend.periodsize, 
+                              self.end)
                     buf = self._sound.frames[start:end]
-                    if self._sound.numchan() == 1:
-                        # converting mono to stereo
-                        buf = numpy.array([buf, buf]).transpose()
-                    if 0 < len(buf) < self._periodsize:
-                        # zero padding to flush the ALSA buffer
-                        padlen = self._periodsize - len(buf)
-                        padding = numpy.zeros((padlen, buf.ndim))
-                        buf = numpy.concatenate((buf, padding))
-                    buf = buf.tostring()
-                    self._pcm.write(buf)
                     self.position = end
+                    self._backend.write(buf)
         finally:
             self.stop_playing()
             self._lock.release()
@@ -81,7 +93,7 @@ def testPlayer():
     SR = 44100
     f0 = 440
     time = 1
-    sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
+    sine = numpy.array([sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)])
     sound = Mock({"numchan": 1})
     sound.samplerate = 44100
     sound.frames = sine
