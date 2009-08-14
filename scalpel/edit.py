@@ -98,7 +98,7 @@ class Sound(object):
         f = pysndfile.sndfile(filename, mode='write',
                               format=format,
                               channels=self.numchan(),
-                              samplerate=44100)
+                              samplerate=self.samplerate)
         f.write_frames(self.frames)
         f.close()
         self.filename = filename
