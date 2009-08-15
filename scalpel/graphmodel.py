@@ -45,24 +45,22 @@ class Graph(object):
         self.changed()
 
     def update(self):
-        "Called when sound has changed."
         self._adjust_view()
         self.changed()
+
+    def set_view(self, start, end):
+        self._view_start = start
+        self._view_end = end
+        self.update()
 
     def move_to(self, frame):
         "Moves the view start and keep the view length"
         l = self._view_end - self._view_start
-        self._view_start = frame
-        self._view_end = frame + l
-        self._adjust_view()
-        self.changed()
+        self.set_view(frame, frame + l)
 
     def center_on(self, frame):
         l = self._view_end - self._view_start
-        self._view_start = frame - l * 0.5
-        self._view_end = frame + l * 0.5
-        self._adjust_view()
-        self.changed()
+        self.set_view(frame - l * 0.5, frame + l * 0.5)
 
     def numframes(self):
         return len(self._sound.frames)
@@ -133,9 +131,7 @@ class Graph(object):
 
     def zoom_fit(self):
         "Fit everything in the view."
-        self._view_start = 0
-        self._view_end = len(self._sound.frames)
-        self.changed()
+        self.set_view(0, len(self._sound.frames))
 
     def zoom_in_on(self, pixel):
         point = self.pxltofrm(pixel)
@@ -158,10 +154,7 @@ class Graph(object):
         """
         l = self._view_end - self._view_start
         l = int(l * factor)
-        self._view_start += l
-        self._view_end += l
-        self._adjust_view()
-        self.changed()
+        self.set_view(self._view_start + l, self._view_end + l)
 
     def scroll_left(self):
         self._scroll(-0.20)
@@ -172,8 +165,7 @@ class Graph(object):
     def set_width(self, width):
         "Set the number of values the graph must have."
         self._width = int(width)
-        self._adjust_view()
-        self.changed()
+        self.update()
         
     def channels(self):
         "Return the graph values."
