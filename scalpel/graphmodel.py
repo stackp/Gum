@@ -54,6 +54,14 @@ class Graph(object):
         l = self._view_end - self._view_start
         self._view_start = frame
         self._view_end = frame + l
+        self._adjust_view()
+        self.changed()
+
+    def center_on(self, frame):
+        l = self._view_end - self._view_start
+        self._view_start = frame - l * 0.5
+        self._view_end = frame + l * 0.5
+        self._adjust_view()
         self.changed()
 
     def numframes(self):
@@ -67,11 +75,9 @@ class Graph(object):
     def density(self):
         "Number of frames per pixel."
         number_frames_view = (self._view_end - self._view_start)
-        if number_frames_view < self._width:
-            # sound is too small to fill the width
+        d = float(number_frames_view) / self._width
+        if d < 1:
             d = 1
-        else:
-            d = float(number_frames_view) / self._width
         return d
 
     def frmtopxl(self, f):
@@ -92,7 +98,7 @@ class Graph(object):
             value = maxi
         return value
 
-    def _zoom(self, point, factor):
+    def _zoom(self, factor):
         """Expand or shrink view according to factor.
 
         0 < factor < 1     zoom in
@@ -111,21 +117,19 @@ class Graph(object):
         """
         l = self._view_end - self._view_start
         l = l * factor
-        self._view_start = point - l * 0.5
-        self._view_end = point + l * 0.5
-        self._adjust_view()
-        self.changed()
-
+        self._view_end = self._view_start + l
         
     def zoom_in(self):
         "Make view twice smaller, centering on the middle of the view."
         mid = self._view_start + (self._view_end - self._view_start) * 0.5
-        self._zoom(mid, 0.5)
-        
+        self._zoom(0.5)
+        self.center_on(mid)
+
     def zoom_out(self):
         "Make view twice larger, centering on the middle of the view."
-        mid = self._view_start + (self._view_end - self._view_start) * 0.5 
-        self._zoom(mid, 2)
+        mid = self._view_start + (self._view_end - self._view_start) * 0.5
+        self._zoom(2)
+        self.center_on(mid)
 
     def zoom_fit(self):
         "Fit everything in the view."
@@ -134,18 +138,14 @@ class Graph(object):
         self.changed()
 
     def zoom_in_on(self, pixel):
-        mid = self._view_start + (self._view_end - self._view_start) * 0.5
         point = self.pxltofrm(pixel)
-        self._zoom(point + ((mid - point) * 0.5), 0.5)
-        # the next call is necessary when the actual zoom factor has
-        # been less than 0.5. This happens when the zoom is already
-        # too strong.
+        self.zoom_in()
         self.move_to(point - pixel * self.density())
 
     def zoom_out_on(self, pixel):
-        mid = self._view_start + (self._view_end - self._view_start) * 0.5
         point = self.pxltofrm(pixel)
-        self._zoom(point + ((mid - point) * 2), 2)
+        self.zoom_out()
+        self.move_to(point - pixel * self.density())
 
     def _scroll(self, factor):
         """Shift the view.
@@ -274,55 +274,67 @@ def test_zoom():
     g = Graph(sound)
 
     g.set_width(4)
-    g._zoom(point=1.5, factor=1)
+    g._zoom(1)
+    g.center_on(1.5)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
     
-    g._zoom(point=0, factor=1)
+    g._zoom(factor=1)
+    g.center_on(0)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
 
-    g._zoom(point=6, factor=1)
+    g._zoom(1)
+    g.center_on(6)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
     
     g.set_width(2)
-    g._zoom(point=1.5, factor=0.5)
+    g._zoom(0.5)
+    g.center_on(1.5)
     o = g.channels()
     assert o == [[(2, 2), (3, 3)]]
 
-    g._zoom(point=1.5, factor=0.5)
+    g._zoom(factor=0.5)
+    g.center_on(1.5)
     g.set_width(4)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
 
     g.set_width(2)
-    g._zoom(point=0, factor=0.5)
+    g._zoom(0.5)
+    g.center_on(0)
     o = g.channels()
     assert o == [[(1, 1), (2, 2)]]
 
     g.set_width(4)
-    g._zoom(point=0, factor=0.25)
+    g._zoom(0.25)
+    g.center_on(0)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
     
     g.set_width(4)
-    g._zoom(point=4, factor=4)
+    g._zoom(4)
+    g.center_on(4)
     o = g.channels()
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
 
     g.set_width(3)
     data = numpy.array([1, 2, 3, 4, 5])
     sound.frames = data
-    g._zoom(point=2, factor=0.5)
+    g._zoom(0.5)
+    g.center_on(2)
     o = g.channels()
     assert o == [[(2, 2), (3, 3), (4, 4)]]
 
-    g._zoom(point=2, factor=0.5)
-    g._zoom(point=2, factor=0.5)
+    g._zoom(factor=0.5)
+    g.center_on(2)
+    g._zoom(factor=0.5)
+    g.center_on(2)
     start, end = g._view_start, g._view_end
     
-    g._zoom(point=2, factor=0.5 * 0.5)
+    g._zoom(factor=0.5 * 0.5)
+    g.center_on(2)
     assert (start, end) == (g._view_start, g._view_end)
 
 def test_zoom_in():
