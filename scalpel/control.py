@@ -134,7 +134,11 @@ class Controller(object):
         self._graph.zoom_in()
 
     def zoom_fit(self):
-        self._graph.zoom_fit()
+        if self._selection.selected():
+            start, end = self._selection.get()
+            self._graph.set_view(start, end)
+        else:
+            self._graph.zoom_out_full()
 
     def list_effects(self):
         l = effect.effects.keys()

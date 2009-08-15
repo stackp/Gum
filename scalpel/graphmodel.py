@@ -129,7 +129,7 @@ class Graph(object):
         self._zoom(2)
         self.center_on(mid)
 
-    def zoom_fit(self):
+    def zoom_out_full(self):
         "Fit everything in the view."
         self.set_view(0, len(self._sound.frames))
 
