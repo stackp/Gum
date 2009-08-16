@@ -14,6 +14,7 @@ from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 import copy
 import os.path
+import urllib
 import gtk
 gtk.gdk.threads_init()
 
@@ -78,6 +79,13 @@ class EditorWindow(gtk.Window):
         self.vbox.pack_end(self.statusbar, expand=False, fill=False)
         self.add(self.vbox)
         
+        # Setup drag and drop
+        TARGET_TYPE_TEXT = 80
+        self.drag_dest_set(gtk.DEST_DEFAULT_ALL,
+                           [("text/uri-list", 0, TARGET_TYPE_TEXT)],
+                           gtk.gdk.ACTION_COPY)
+        self.connect("drag_data_received", self._open_dropped_files)
+
         self.connect("delete-event", self.close)
         self._filename_update()
         self.ctrl.filename_changed.connect(self._filename_update)
@@ -209,6 +217,18 @@ class EditorWindow(gtk.Window):
         if filename:
             title = os.path.basename(filename) + ' - ' + title
         self.set_title(title)
+
+    def _open_dropped_files(self, widget, context, x, y,
+                            selection, targetType, time):
+        """Open files dragged and dropped on the window."""
+        filenames = selection.data.split()
+        for filename in filenames:
+            # Extract the actual filename
+            prefix = 'file://'
+            if filename.startswith(prefix):
+                filename = filename[len(prefix):]
+            filename = urllib.unquote(filename)
+            self.ctrl.open(filename)
 
     def display_error(self, title, text):
         display_error(title, text, parent=self)
