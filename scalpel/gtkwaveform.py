@@ -287,17 +287,21 @@ class MouseScroll(object):
         widget.connect("scroll_event", self.scroll_event)
 
     def scroll_event(self, widget, event):
-        # Scroll graph when Alt is pressed, zoom otherwise.
-        if event.direction in (gtk.gdk.SCROLL_UP, gtk.gdk.SCROLL_LEFT):
-            if event.state & gtk.gdk.MOD1_MASK:
-                self._graph.scroll_left()
-            else:
-                self._graph.zoom_in_on(event.x)
-        elif event.direction in (gtk.gdk.SCROLL_DOWN, gtk.gdk.SCROLL_RIGHT):
-            if event.state & gtk.gdk.MOD1_MASK:
-                self._graph.scroll_right()
-            else:
-                self._graph.zoom_out_on(event.x)
+        MOD1 = event.state & gtk.gdk.MOD1_MASK
+        LEFT = event.direction is gtk.gdk.SCROLL_LEFT
+        RIGHT = event.direction is gtk.gdk.SCROLL_RIGHT
+        UP = event.direction is gtk.gdk.SCROLL_UP
+        DOWN = event.direction is gtk.gdk.SCROLL_DOWN
+
+        if LEFT or (UP and MOD1):
+            self._graph.scroll_left()
+        elif RIGHT or (DOWN and MOD1):
+            self._graph.scroll_right()
+        elif UP:
+            self._graph.zoom_in_on(event.x)
+        elif DOWN:
+            self._graph.zoom_out_on(event.x)
+
 
 class MouseSelection(object):
     """Listens for mouse events and select graph area.
