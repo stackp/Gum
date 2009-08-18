@@ -67,7 +67,10 @@ class Controller(object):
         self._sound.save_as(filename)
         self.filename_changed()
 
-    def close(self):
+    def close(self, force=False):
+        sound = self._sound
+        if not sound.is_saved() and not sound.is_fresh() and not force:
+            raise FileNotSaved
         self._player.pause()
 
     def play(self):
@@ -163,6 +166,7 @@ class Controller(object):
     def filename(self):
         return self._sound.filename
 
+class FileNotSaved: pass
 
 def test_Controller():
     from mock import Fake

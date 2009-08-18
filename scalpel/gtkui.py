@@ -10,6 +10,7 @@ import sys
 sys.argv[0] = constants.__appname__
 
 import app
+import control
 from gtkwaveform import GraphView, GraphScrollbar
 from gtkfiledialog import FileDialog
 import copy
@@ -207,6 +208,42 @@ class EditorWindow(gtk.Window):
 
         return uimanager
 
+    def _close(self):
+        try:
+            self.ctrl.close()
+        except control.FileNotSaved:
+            proceed = self._show_dialog_close()
+            if not proceed:
+                return False
+            self.ctrl.close(force=True)
+
+        self.destroy()
+        self._windows.remove(self)
+
+        if not self._windows:
+            self.quit()
+
+        return True
+
+    def _show_dialog_close(self):
+        dialog = gtk.MessageDialog(parent=self, type=gtk.MESSAGE_WARNING)
+        name = self.ctrl.filename() or "sound"
+        name = os.path.basename(name)
+        dialog.set_markup("<b>Save %s before closing?</b>" % name)
+        dialog.add_button("Close _without saving", gtk.RESPONSE_NO)
+        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        dialog.add_button(gtk.STOCK_SAVE_AS, gtk.RESPONSE_YES)
+        response = dialog.run()
+        dialog.destroy()
+        proceed = False
+        if response == gtk.RESPONSE_NO:
+            proceed = True
+        elif response == gtk.RESPONSE_YES:
+            saved = self.save_as()
+            if saved:
+                proceed = True
+        return proceed
+
     def _filename_update(self):
         filename = self.ctrl.filename()
         self._update_title(filename)
@@ -233,7 +270,7 @@ class EditorWindow(gtk.Window):
     def display_error(self, title, text):
         display_error(title, text, parent=self)
 
-    # -- Callbacks
+    # -- GTK Callbacks
 
     def __getattr__(self, name):
         """Redirect callbacks to the controller.
@@ -274,20 +311,21 @@ class EditorWindow(gtk.Window):
 
     def save_as(self, *args):
         filename = self.filedialog.get_filename(action='save')
+        saved = False
         if filename != None:
             self.ctrl.save_as(filename)
+            saved = True
+        return saved
 
     def close(self, *args):
-        self.ctrl.close()
-        self.destroy()
-        self._windows.remove(self)
-
-        if not self._windows:
-            self.quit()
+        self._close()
+        # Tell GTK not to hide the window, we take care of that:
+        return True
 
     def quit(self, *args):
         for win in copy.copy(self._windows):
-            win.close()
+            if not win._close():
+                return
         gtk.main_quit()
 
 
