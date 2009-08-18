@@ -101,8 +101,11 @@ class Controller(object):
     @_report_exception
     def paste(self):
         start, end = self._selection.get()
+        was_zoomed_out_full = self._graph.is_zoomed_out_full()
         self._sound.paste(start, end, self.clipboard.clip)
         self._selection.set(start, start + len(self.clipboard.clip))
+        if was_zoomed_out_full:
+            self._graph.zoom_out_full()
 
     @_report_exception
     def mix(self):

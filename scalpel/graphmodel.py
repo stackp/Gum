@@ -133,6 +133,10 @@ class Graph(object):
         "Fit everything in the view."
         self.set_view(0, len(self._sound.frames))
 
+    def is_zoomed_out_full(self):
+        start, end = self.view()
+        return start == 0 and end == len(self._sound.frames)
+
     def zoom_in_on(self, pixel):
         point = self.pxltofrm(pixel)
         self.zoom_in()
