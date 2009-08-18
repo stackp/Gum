@@ -37,6 +37,7 @@ class History(object):
     def __init__(self):
         self._actions = []
         self._last = -1
+        self._counter = 0
 
     def _push(self, action):
         if self._last < len(self._actions) - 1:
@@ -44,6 +45,8 @@ class History(object):
             del self._actions[self._last + 1:]
         self._actions.append(action)
         self._last = self._last + 1
+        self._counter += 1
+        action.number = self._counter
         
     def undo(self):
         if self._last < 0:
@@ -67,24 +70,34 @@ class History(object):
         self._push(action)
         return action.do()
 
+    def revision(self):
+        if self._last < 0:
+            return 0
+        else:
+            action = self._actions[self._last]
+            return action.number
+
+
 class Sound(object):
 
     # frames is a numpy.ndarray, as returned by pysndfile
     
     def __init__(self, filename=None):
         self.filename = filename
+        self.history = History()
+        self.changed = Signal()
         if filename == None:
             # empty sound
             self.frames = numpy.array([])
             self.samplerate = 44100
+            self._saved_revision = None
         else:
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self.frames = f.read_frames(nframes)
             self.samplerate = f.get_samplerate()
             f.close()
-        self.history = History()
-        self.changed = Signal()
+            self._saved_revision = self.history.revision()
 
     def numchan(self):
         return self.frames.ndim
@@ -102,6 +115,7 @@ class Sound(object):
         f.write_frames(self.frames)
         f.close()
         self.filename = filename
+        self._saved_revision = self.history.revision()
 
     def cut(self, start, end):
         clip = copy(self.frames[start:end])
@@ -167,6 +181,9 @@ class Sound(object):
     def is_fresh(self):
         """True if sound is empty and has never been edited."""
         return not len(self.frames) and not self.history._actions
+
+    def is_saved(self):
+        return self._saved_revision == self.history.revision()
 
 
 def mix_channels(frames, gain_lists):
@@ -285,6 +302,28 @@ def testHistory():
     assert history.redo() == 1
     assert history.redo() == 1
     assert history.redo() == None
+
+    # Test Revisions
+    history = History()
+    assert history.revision() == 0
+    history.add(do, undo)
+    assert history.revision() == 1
+    history.add(do, undo)
+    assert history.revision() == 2
+    history.undo()
+    assert history.revision() == 1
+    history.redo()
+    assert history.revision() == 2
+    history.add(do, undo)
+    assert history.revision() == 3
+    history.undo()
+    assert history.revision() == 2
+    history.add(do, undo)
+    assert history.revision() == 4
+    history.undo()
+    assert history.revision() == 2
+    history.redo()
+    assert history.revision() == 4
     
 def testSound():
     from copy import copy
