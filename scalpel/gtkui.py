@@ -105,6 +105,7 @@ class EditorWindow(gtk.Window):
                 <menuitem action="Open"/>
                 <menuitem action="Save"/>
                 <menuitem action="Save as"/>
+                <menuitem action="Save Selection as"/>
                 <separator/>
                 <menuitem action="Close"/>
                 <menuitem action="Quit"/>
@@ -176,6 +177,8 @@ class EditorWindow(gtk.Window):
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
                    ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
                    ('Save as', gtk.STOCK_SAVE_AS, None, None, '',self.save_as),
+                   ('Save Selection as', gtk.STOCK_SAVE_AS,'Save Selection As',
+                                 '<Ctrl><Alt>s', None, self.save_selection_as),
                    ('Close', gtk.STOCK_CLOSE, None, None, '', self.close),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, 'p', '', self.play),
@@ -316,6 +319,12 @@ class EditorWindow(gtk.Window):
             self.ctrl.save_as(filename)
             saved = True
         return saved
+
+    def save_selection_as(self, *args):
+        # FIXME: title
+        filename = self.filedialog.get_filename(action='save')
+        if filename != None:
+            self.ctrl.save_selection_as(filename)
 
     def close(self, *args):
         self._close()

@@ -67,6 +67,16 @@ class Controller(object):
         self._sound.save_as(filename)
         self.filename_changed()
 
+    @_report_exception
+    def save_selection_as(self, filename):
+        sound = edit.Sound()
+        if not self._selection.selected():
+            raise Exception("There is no selection.")
+        start, end = self._selection.get()
+        sound.frames = self._sound.copy(start, end)
+        sound.samplerate = self._sound.samplerate
+        sound.save_as(filename)
+
     def close(self, force=False):
         sound = self._sound
         if not sound.is_saved() and not sound.is_fresh() and not force:
