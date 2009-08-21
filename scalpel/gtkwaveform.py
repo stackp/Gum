@@ -479,14 +479,21 @@ class GraphScrollbar(gtk.HScrollbar):
             length = self._graph.numframes()
             start, end = self._graph.view()
             if start != end:
-                self._adjustment.upper = length
-                self._adjustment.value = start
-                self._adjustment.page_size = (end - start)
+                page_size = (end - start)
+                self._adjustment.set_all(value = start,
+                                         lower = 0,
+                                         upper = length,
+                                         page_increment = page_size,
+                                         step_increment = page_size / 5.,
+                                         page_size = page_size)
             else:
                 # empty sound
-                self._adjustment.upper = 1
-                self._adjustment.value = 0
-                self._adjustment.page_size = 1
+                self._adjustment.set_all(value = 0,
+                                         lower = 0,
+                                         upper = 1,
+                                         page_increment = 0,
+                                         step_increment = 0,
+                                         page_size = 1)
             self.inhibit = False
 
 
