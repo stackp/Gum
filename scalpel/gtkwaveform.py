@@ -93,6 +93,7 @@ class GraphView(LayeredGraphView):
         MouseSelection(self, selection)
         MouseScroll(self, graph)
         MouseMiddleClick(self, graph)
+        PointerStyle(self, selection)
 
 
 # -- Layers that can be added to LayeredGraphview.
@@ -276,6 +277,10 @@ class CursorLayer(object):
 
 # -- Mouse event listeners that act on models.
 #
+
+def near(x, y):
+    return abs(x - y) < 10
+
 class MouseScroll(object):
     """Listens for mouse wheel events and scroll a graph.
 
@@ -322,9 +327,6 @@ class MouseSelection(object):
         widget.connect("button_release_event", self.button_release)
         widget.connect("motion_notify_event", self.motion_notify)
 
-    def near(self, x, y):
-        return abs(x - y) < 10
-
     def button_press(self, widget, event):
         if event.button == 1:
             self.pressed = True
@@ -334,11 +336,11 @@ class MouseSelection(object):
             if event.type == gtk.gdk._2BUTTON_PRESS:
                 self._selection.pin(x)
             # extend towards left
-            elif self._selection.selected() and self.near(start, x):
+            elif self._selection.selected() and near(start, x):
                 self._selection.pin(end)
                 self._selection.extend(x)
             # extend towards right
-            elif self._selection.selected() and self.near(end, x):
+            elif self._selection.selected() and near(end, x):
                 self._selection.pin(start)
                 self._selection.extend(x)
             # start fresh selection
@@ -353,19 +355,6 @@ class MouseSelection(object):
         if self.pressed:
             x = event.window.get_pointer()[0]
             self._selection.extend(x)
-
-        self.pointer_style(widget, event)
-
-    def pointer_style(self, widget, event):
-        style = None
-        x = event.window.get_pointer()[0]
-        if self._selection.selected():
-            start, end = self._selection.pixels()
-            if self.near(start, x):
-                style = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
-            elif self.near(end, x):
-                style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
-        self.widget.window.set_cursor(style)
 
 
 class MouseMiddleClick(object):
@@ -398,6 +387,27 @@ class MouseMiddleClick(object):
             self._xlast = x
             start, _ = self.graph.view()
             self.graph.move_to(start + delta * self.graph.density())
+
+
+class PointerStyle(object):
+    """Change the pointer style according to position."""
+    def __init__(self, widget, selection):
+        self.widget = widget
+        self._selection = selection
+        widget.add_events(gtk.gdk.POINTER_MOTION_MASK |
+                          gtk.gdk.POINTER_MOTION_HINT_MASK)
+        widget.connect("motion_notify_event", self.motion_notify)
+
+    def motion_notify(self, widget, event):
+        style = None
+        x = event.window.get_pointer()[0]
+        if self._selection.selected():
+            start, end = self._selection.pixels()
+            if near(start, x):
+                style = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
+            elif near(end, x):
+                style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
+        self.widget.window.set_cursor(style)
 
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
