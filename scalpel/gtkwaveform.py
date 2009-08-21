@@ -391,6 +391,10 @@ class MouseMiddleClick(object):
 
 class PointerStyle(object):
     """Change the pointer style according to position."""
+
+    LEFT_SIDE = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
+    RIGHT_SIDE = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
+
     def __init__(self, widget, selection):
         self.widget = widget
         self._selection = selection
@@ -404,9 +408,9 @@ class PointerStyle(object):
         if self._selection.selected():
             start, end = self._selection.pixels()
             if near(start, x):
-                style = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
+                style = self.LEFT_SIDE
             elif near(end, x):
-                style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
+                style = self.RIGHT_SIDE
         self.widget.window.set_cursor(style)
 
 
