@@ -390,28 +390,49 @@ class MouseMiddleClick(object):
 
 
 class PointerStyle(object):
-    """Change the pointer style according to position."""
+    """Change the pointer style.
 
+    Show a hand when the middle click is pressed, otherwise show
+    special cursors if the pointer is next to a selection bound.
+
+    """
     LEFT_SIDE = gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE)
     RIGHT_SIDE = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
+    HAND = gtk.gdk.Cursor(gtk.gdk.HAND1)
 
     def __init__(self, widget, selection):
         self.widget = widget
         self._selection = selection
-        widget.add_events(gtk.gdk.POINTER_MOTION_MASK |
+        self.pressed = False
+        widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
+                          gtk.gdk.BUTTON_RELEASE_MASK |
+                          gtk.gdk.POINTER_MOTION_MASK |
                           gtk.gdk.POINTER_MOTION_HINT_MASK)
+        widget.connect("button_press_event", self.button_press)
+        widget.connect("button_release_event", self.button_release)
         widget.connect("motion_notify_event", self.motion_notify)
 
+    def button_press(self, widget, event):
+        if event.button == 2:
+            self.pressed = True
+            self.widget.window.set_cursor(self.HAND)
+
+    def button_release(self, widget, event):
+        if event.button == 2:
+            self.pressed = False
+            self.widget.window.set_cursor(None)
+
     def motion_notify(self, widget, event):
-        style = None
-        x = event.window.get_pointer()[0]
-        if self._selection.selected():
-            start, end = self._selection.pixels()
-            if near(start, x):
-                style = self.LEFT_SIDE
-            elif near(end, x):
-                style = self.RIGHT_SIDE
-        self.widget.window.set_cursor(style)
+        if not self.pressed:
+            style = None
+            x = event.window.get_pointer()[0]
+            if self._selection.selected():
+                start, end = self._selection.pixels()
+                if near(start, x):
+                    style = self.LEFT_SIDE
+                elif near(end, x):
+                    style = self.RIGHT_SIDE
+            self.widget.window.set_cursor(style)
 
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
