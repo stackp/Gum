@@ -92,6 +92,7 @@ class GraphView(LayeredGraphView):
         self.layers.append(CursorLayer(self, cursor))
         MouseSelection(self, selection)
         MouseScroll(self, graph)
+        MouseMiddleClick(self, graph)
 
 
 # -- Layers that can be added to LayeredGraphview.
@@ -365,6 +366,39 @@ class MouseSelection(object):
             elif self.near(end, x):
                 style = gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE)
         self.widget.window.set_cursor(style)
+
+
+class MouseMiddleClick(object):
+    """Shift the wave display when the middle button is pressed."""
+    def __init__(self, widget, graph):
+        self.widget = widget
+        self.graph = graph
+        self.pressed = False
+        widget.add_events(gtk.gdk.BUTTON_PRESS_MASK |
+                          gtk.gdk.BUTTON_RELEASE_MASK |
+                          gtk.gdk.POINTER_MOTION_MASK |
+                          gtk.gdk.POINTER_MOTION_HINT_MASK)
+        widget.connect("button_press_event", self.button_press)
+        widget.connect("button_release_event", self.button_release)
+        widget.connect("motion_notify_event", self.motion_notify)
+
+    def button_press(self, widget, event):
+        if event.button == 2:
+            self.pressed = True
+            self._xlast = event.x
+
+    def button_release(self, widget, event):
+        if event.button == 2:
+            self.pressed = False
+
+    def motion_notify(self, widget, event):
+        if self.pressed:
+            x = event.window.get_pointer()[0]
+            delta = self._xlast - x
+            self._xlast = x
+            start, _ = self.graph.view()
+            self.graph.move_to(start + delta * self.graph.density())
+
 
 # -- Horizontal scrollbar, subclassed to control a Graph object.
 #
