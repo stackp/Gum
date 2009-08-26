@@ -140,7 +140,7 @@ class EditorWindow(gtk.Window):
               <toolitem action="ZoomIn"/>
               <separator/>
               <toolitem action="Start"/>
-              <toolitem action="Pause"/>
+              <toolitem action="Stop"/>
               <toolitem action="Play"/>
               <toolitem action="End"/>
               <separator/>
@@ -155,7 +155,7 @@ class EditorWindow(gtk.Window):
             <accelerator action="Start"/>
             <accelerator action="End"/>
             <accelerator action="Play"/>
-            <accelerator action="Pause"/>
+            <accelerator action="Stop"/>
         </ui>'''
 
         uimanager = gtk.UIManager()
@@ -182,7 +182,7 @@ class EditorWindow(gtk.Window):
                    ('Close', gtk.STOCK_CLOSE, None, None, '', self.close),
                    ('Quit', gtk.STOCK_QUIT, None, None, '', self.quit),
                    ('Play', gtk.STOCK_MEDIA_PLAY, None, 'p', '', self.play),
-                   ('Pause', gtk.STOCK_MEDIA_PAUSE, None, 'o', '', self.pause),
+                   ('Stop', gtk.STOCK_MEDIA_STOP, None, 'o', '', self.stop),
                    ('Start', gtk.STOCK_MEDIA_PREVIOUS, None, 'Home', '',
                                                               self.goto_start),
                    ('End', gtk.STOCK_MEDIA_NEXT, None, 'End', '',
@@ -282,7 +282,7 @@ class EditorWindow(gtk.Window):
         not be passed to the controller method.
         
         """
-        if name in ["new", "save", "play", "pause",
+        if name in ["new", "save", "play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit",

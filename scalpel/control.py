@@ -51,7 +51,7 @@ class Controller(object):
 
     @_report_exception
     def load_sound(self, filename):
-        self._player.pause()
+        self._player.stop()
         self._sound = edit.Sound(filename)
         self._graph.set_sound(self._sound)
         self._player.set_sound(self._sound)
@@ -81,7 +81,7 @@ class Controller(object):
         sound = self._sound
         if not sound.is_saved() and not sound.is_fresh() and not force:
             raise FileNotSaved
-        self._player.pause()
+        self._player.stop()
 
     def play(self):
         start, end = self._selection.get()
@@ -91,8 +91,8 @@ class Controller(object):
         self._player.end = end
         self._player.thread_play()
 
-    def pause(self):
-        self._player.pause()
+    def stop(self):
+        self._player.stop()
 
     def goto_start(self):
         self._selection.set(0, 0)

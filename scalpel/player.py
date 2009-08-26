@@ -82,7 +82,7 @@ class Player(object):
         t.start()
         return t
 
-    def pause(self):
+    def stop(self):
         self._playing = False
 
 
@@ -134,12 +134,12 @@ def testPlayer():
     t1.join()
     t2.join()
 
-    # Testing pause
+    # Testing stop
     print 
-    print "Testing pause(): the sound should stop after 0.3 seconds."
+    print "Testing stop(): the sound should stop after 0.3 seconds."
     player.thread_play()
     sleep(0.3)
-    player.pause()
+    player.stop()
 
     # Testing stereo
     f = pysndfile.sndfile('../sounds/test2.wav')
