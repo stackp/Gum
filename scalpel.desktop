@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Scalpel
+GenericName=Audio Editor
+Comment=An audio editor
+Exec=scalpel %f
+Terminal=false
+Type=Application
+Icon=editcut
+Categories=Audio;AudioVideoEditing;
+MimeType=audio/basic;audio/flac;audio/x-aiff;audio/x-wav;
+
