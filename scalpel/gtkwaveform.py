@@ -75,8 +75,8 @@ class LayeredGraphView(LayeredCairoWidget):
 class GraphView(LayeredGraphView):
     """Sound visualization widget for the main window.
 
-    * Three graphical layers: waveform, selection, and cursor.
-    * Mouse event listeners act on models (scroll and selection).
+    * Four graphical layers: background, waveform, selection, and cursor.
+    * Mouse event listeners act on models (scroll, selection, middle-click).
 
     """
     def __init__(self, graph, selection, cursor):
