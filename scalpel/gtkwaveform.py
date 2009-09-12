@@ -81,8 +81,6 @@ class GraphView(LayeredGraphView):
     """
     def __init__(self, graph, selection, cursor):
         super(GraphView, self).__init__(graph)
-        self._graph = graph
-        self._selection = selection
         self.layers.append(BackgroundLayer(self, selection))
         self.layers.append(WaveformLayer(self, graph))
         self.layers.append(SelectionLayer(self, selection))
