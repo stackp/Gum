@@ -15,9 +15,6 @@ class CairoWidget(gtk.DrawingArea):
 
     __gsignals__ = {"expose-event": "override"}
 
-    def __init__(self):
-        super(CairoWidget, self).__init__()
-    
     def do_expose_event(self, event):
         context = self.window.cairo_create()
         context.rectangle(event.area.x, event.area.y,
