@@ -42,10 +42,11 @@ class Graph(object):
         self._view_start = 0
         self._view_end = len(self._sound.frames)
         self._sound.changed.connect(self.update)
-        self.changed()
+        self.update()
 
     def update(self):
         self._adjust_view()
+        self._cache = None
         self.changed()
 
     def set_view(self, start, end):
@@ -173,6 +174,11 @@ class Graph(object):
         
     def channels(self):
         "Return the graph values."
+        if self._cache is None:
+            self._cache = self._channels()
+        return self._cache
+
+    def _channels(self):
         width = self._width
         numchan = self._sound.numchan()
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
