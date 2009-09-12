@@ -105,63 +105,45 @@ class WaveformLayer(object):
     def __init__(self, layered, graph):
         self._layered = layered
         self._graph = graph
-        self._cache = None
         self.wavecolor = 0.0, 0.47058823529411764, 1.0
         graph.changed.connect(self.update)
 
     def update(self):
-        self._cache = None
         self._layered.redraw()
 
-    def draw_channel(self, values, surface, width, height):
-        "Draw one sound channel on a cairo surface."
-        c = cairo.Context(surface)
-
+    def draw_channel(self, values, context, ystart, width, height):
         # Line at zero
-        c.set_line_width(1)
-        c.set_source_rgb(0.2, 0.2, 0.2)
-        c.move_to(0, round(height / 2) + 0.5)
-        c.line_to(width, round(height / 2) + 0.5)
-        c.stroke()
+        context.set_line_width(1)
+        context.set_source_rgb(0.2, 0.2, 0.2)
+        context.move_to(0, ystart + round(height / 2) + 0.5)
+        context.line_to(width, ystart + round(height / 2) + 0.5)
+        context.stroke()
 
         # Waveform
-        c.set_source_rgb(*self.wavecolor)
+        context.set_source_rgb(*self.wavecolor)
         for i, (mini, maxi) in enumerate(values):
             # -1 <= mini <= maxi <= 1
-            # 0 <= ymin <= ymax <= height - 1
+            # ystart <= ymin <= ymax <= ystart + height - 1
             x = i
-            ymin = round((-mini * 0.5 + 0.5) * (height - 1))
-            ymax = round((-maxi * 0.5 + 0.5) * (height - 1))
+            ymin = ystart + round((-mini * 0.5 + 0.5) * (height - 1))
+            ymax = ystart + round((-maxi * 0.5 + 0.5) * (height - 1))
             if ymin == ymax:
                 # Fill one pixel 
-                c.rectangle(x, ymin, 1, 1)
-                c.fill()
+                context.rectangle(x, ymin, 1, 1)
+                context.fill()
             else:
                 # Draw a line from min to max
-                c.move_to(x + 0.5, ymin)
-                c.line_to(x + 0.5, ymax)
-                c.stroke()
+                context.move_to(x + 0.5, ymin)
+                context.line_to(x + 0.5, ymax)
+                context.stroke()
         
     def draw(self, context, width, height):
         "Draw all sound channels."
-        if not self._cache:
-            surface = context.get_target()
-            self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
-                                                 width, height)
-            c = cairo.Context(self._cache)
-            channels = self._graph.channels()
-            numchan = len(channels)
-            for i in range(numchan):
-                s = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
-                                           width, height / numchan)
-                self.draw_channel(channels[i], s, width, height / numchan)
-                c.set_source_surface(s, 0, (height / numchan) * i)
-                c.set_operator(cairo.OPERATOR_OVER)
-                c.paint()
-                
-        context.set_source_surface(self._cache, 0, 0)
-        context.set_operator(cairo.OPERATOR_OVER)
-        context.paint()
+        channels = self._graph.channels()
+        numchan = len(channels)
+        for i in range(numchan):
+            y = (height / numchan) * i
+            self.draw_channel(channels[i], context, y, width, height / numchan)
 
 
 class BackgroundLayer(object):
@@ -175,30 +157,19 @@ class BackgroundLayer(object):
         self._selection.changed.connect(self.update)
 
     def update(self):
-        self._cache = None
         self._layered.redraw()
 
     def draw(self, context, width, height):
-        if not self._cache:
-            surface = context.get_target()
-            self._cache = surface.create_similar(cairo.CONTENT_COLOR,
-                                                 width, height)
-            c = cairo.Context(self._cache)
-
-            # Black background
-            c.set_source_rgb(0, 0, 0)
-            c.paint()
-
-            # Selection background
-            if self._selection.selected():
-                c.set_source_rgb(0, 0, 0.2)
-                start, end = self._selection.pixels()
-                c.rectangle(start, 0, end - start, height)
-                c.fill()
-            
-        context.set_source_surface(self._cache, 0, 0)
-        context.set_operator(cairo.OPERATOR_SOURCE)
+        # Black background
+        context.set_source_rgb(0, 0, 0)
         context.paint()
+
+        # Selection background
+        if self._selection.selected():
+            context.set_source_rgb(0, 0, 0.2)
+            start, end = self._selection.pixels()
+            context.rectangle(start, 0, end - start, height)
+            context.fill()
 
 
 class SelectionLayer(object):
@@ -210,66 +181,38 @@ class SelectionLayer(object):
     """
     def __init__(self, layered, selection):
         self._layered = layered
-        self._cache = None
         self._selection = selection
         self._selection.changed.connect(self.update)
 
     def update(self):
-        self._cache = None
         self._layered.redraw()
 
     def draw(self, context, width, height):
-        if not self._cache:
-            surface = context.get_target()
-            self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
-                                                 width, height)
-            c = cairo.Context(self._cache)
-
-            if self._selection.selected():
-                start, end = self._selection.pixels()
-                # darken everything ...
-                c.set_source_rgba(0, 0, 0, 0.5)
-                c.paint()
-
-                # ... then clear selection
-                c.set_operator(cairo.OPERATOR_CLEAR)
-                c.rectangle(start, 0, end - start, height)
-                c.fill()
-            
-        context.set_source_surface(self._cache, 0, 0)
-        context.set_operator(cairo.OPERATOR_OVER)
-        context.paint()
+        if self._selection.selected():
+            start, end = self._selection.pixels()
+            context.set_source_rgba(0, 0, 0, 0.5)
+            context.rectangle(0, 0, start, height)
+            context.rectangle(end, 0, width - end, height)
+            context.fill()
 
 class CursorLayer(object):
 
     def __init__(self, layered, cursor):
         self._layered = layered
-        self._cache = None
         self._cursor = cursor
         self._cursor.changed.connect(self.update)
-        self._height = None
         self.rgba = (1, 1, 1, 0.5)
 
     def update(self):
         self._layered.redraw() # called in all layers !
 
     def draw(self, context, width, height):
-        if height != self._height:
-            self._height = height
-            surface = context.get_target()
-            self._cache = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
-                                                 1, height)
-            c = cairo.Context(self._cache)
-            c.set_source_rgba(*self.rgba)
-            c.set_line_width(1)
-            c.move_to(0.5, 0)
-            c.line_to(0.5, height)
-            c.stroke()
-
         x = self._cursor.pixel()
-        context.set_source_surface(self._cache, x, 0)
-        context.set_operator(cairo.OPERATOR_OVER)
-        context.paint()
+        context.set_source_rgba(*self.rgba)
+        context.set_line_width(1)
+        context.move_to(x + 0.5, 0)
+        context.line_to(x + 0.5, height)
+        context.stroke()
 
 
 # -- Mouse event listeners that act on models.
