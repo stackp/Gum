@@ -96,8 +96,7 @@ class GraphView(LayeredGraphView):
 class WaveformLayer(object):
     """A layer for LayeredGraphView.
 
-    It paints the graph (the waveform). The cairo surface is cached,
-    it is redrawn only when graph has changed.
+    It paints the graph (the waveform).
 
     """
     def __init__(self, layered, graph):
@@ -173,8 +172,7 @@ class BackgroundLayer(object):
 class SelectionLayer(object):
     """A layer for LayeredGraphView.
 
-    It highlights the selected area. The cairo surface is cached, it
-    is redrawn only when selection has changed.
+    It highlights the selected area.
 
     """
     def __init__(self, layered, selection):
