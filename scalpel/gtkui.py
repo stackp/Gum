@@ -147,7 +147,6 @@ class EditorWindow(gtk.Window):
               <toolitem action="Cut"/>
               <toolitem action="Copy"/>
               <toolitem action="Paste"/>
-              <toolitem action="Mix"/>
               <separator/>
               <toolitem action="Undo"/>
               <toolitem action="Redo"/>
