@@ -151,7 +151,7 @@ class Graph(object):
     def _scroll(self, factor):
         """Shift the view.
 
-        A negative factor shift the view to the left, a positive one
+        A negative factor shifts the view to the left, a positive one
         to the right. The absolute value of the factor determines the
         length of the shift, relative to the view length. For example:
         0.1 is 10%, O.5 is one half, 1.0 is 100%.
