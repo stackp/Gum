@@ -4,19 +4,27 @@
 
 from event import Signal
 
-def _overview(data, density):
-    "Returns a list of (min, max) tuples."
+def _cell_start(frame, density):
+    """Return the first frame of the cell in which `frame` belongs."""
+    return int(frame / density) * density
+
+def _overview(data, start, end, density):
+    """Returns a list of (min, max) tuples.
+
+    A density slices the data in "cells", each cell containing several
+    frames. This function returns the min and max of each visible cell.
+
+    """
     if density < 1:
         density = 1
-    left = 0
-    end = len(data)
+    left = _cell_start(start, density)
     res = []
-    while round(left) < end:
+    while left < end:
         right = left + density
         if right > end:
             right = end
-        i = int(round(left))
-        j = int(round(right))
+        i = int(left)
+        j = int(right)
         d = data[i:j]
         mini = d.min()
         maxi = d.max()
@@ -182,14 +190,14 @@ class Graph(object):
         width = self._width
         numchan = self._sound.numchan()
         start, end = [int(round(v)) for v in self._view_start, self._view_end]
-        visible = self._sound.frames[start:end]
+        frames = self._sound.frames
         if numchan == 1:
-            o = [_overview(visible, self.density())]
+            o = [_overview(frames, start, end, self.density())]
         else:
-            visible = visible.transpose()
+            frames = frames.transpose()
             o = []
             for chan in range(numchan):
-                values = _overview(visible[chan], self.density())
+                values = _overview(frames[chan], start, end, self.density())
                 o.append(values)
         return o
 
@@ -228,8 +236,8 @@ class Graph(object):
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))
-    assert len(_overview(b, 100000)) == 10
-    assert len(_overview(b, 10000)) == 100
+    assert len(_overview(b, 0, len(b), 100000)) == 10
+    assert len(_overview(b, 0, len(b), 10000)) == 100
     
 def test_Graph():
     from mock import Mock, Fake
