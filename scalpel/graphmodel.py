@@ -9,6 +9,19 @@ def _cell_start(frame, density):
     return int(frame / density) * density
 
 def _overview(data, start, end, density):
+    start, end = [int(round(v)) for v in start, end]
+    numchan = data.ndim
+    if numchan == 1:
+        o = [_condense(data, start, end, density)]
+    else:
+        data = data.transpose()
+        o = []
+        for chan in range(numchan):
+            values = _condense(data[chan], start, end, density)
+            o.append(values)
+    return o
+
+def _condense(data, start, end, density):
     """Returns a list of (min, max) tuples.
 
     A density slices the data in "cells", each cell containing several
@@ -188,17 +201,9 @@ class Graph(object):
 
     def _channels(self):
         width = self._width
-        numchan = self._sound.numchan()
-        start, end = [int(round(v)) for v in self._view_start, self._view_end]
+        start, end = self._view_start, self._view_end
         frames = self._sound.frames
-        if numchan == 1:
-            o = [_overview(frames, start, end, self.density())]
-        else:
-            frames = frames.transpose()
-            o = []
-            for chan in range(numchan):
-                values = _overview(frames[chan], start, end, self.density())
-                o.append(values)
+        o = _overview(frames, start, end, self.density())
         return o
 
     def _adjust_view(self):
@@ -236,8 +241,8 @@ class Graph(object):
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))
-    assert len(_overview(b, 0, len(b), 100000)) == 10
-    assert len(_overview(b, 0, len(b), 10000)) == 100
+    assert len(_condense(b, 0, len(b), 100000)) == 10
+    assert len(_condense(b, 0, len(b), 10000)) == 100
     
 def test_Graph():
     from mock import Mock, Fake
