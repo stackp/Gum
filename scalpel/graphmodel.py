@@ -12,13 +12,13 @@ def _overview(data, start, end, density):
     start, end = [int(round(v)) for v in start, end]
     numchan = data.ndim
     if numchan == 1:
-        o = [_condense(data, start, end, density)]
+        channels = [data]
     else:
-        data = data.transpose()
-        o = []
-        for chan in range(numchan):
-            values = _condense(data[chan], start, end, density)
-            o.append(values)
+        channels = data.transpose()
+    o = []
+    for chan in range(numchan):
+        values = _condense(channels[chan], start, end, density)
+        o.append(values)
     return o
 
 def _condense(data, start, end, density):
