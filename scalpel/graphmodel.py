@@ -45,6 +45,23 @@ def _condense(data, start, end, density):
         left = right
     return res
 
+
+class OverviewCache(object):
+
+    def set_data(self, data):
+        self._data = data
+        # _cache is a tuple (start_index, end_index, density, values)
+        self._cache = None, None, None, None
+
+    def get(self, start, end, density):
+        c_start, c_end, c_density, _ = self._cache
+        if (c_start, c_end, c_density) != (start, end, density):
+            ov = _overview(self._data, start, end, density)
+            self._cache = (start, end, density, ov)
+
+        return self._cache[3]
+
+
 class Graph(object):
     """Scale the sound visualization.
     
@@ -55,6 +72,7 @@ class Graph(object):
     """
     def __init__(self, sound):
         self.changed = Signal()
+        self._overview = OverviewCache()
         self._width = 100
         self.set_sound(sound)
 
@@ -62,12 +80,15 @@ class Graph(object):
         self._sound = sound
         self._view_start = 0
         self._view_end = len(self._sound.frames)
-        self._sound.changed.connect(self.update)
+        self._sound.changed.connect(self.on_sound_changed)
+        self.on_sound_changed()
+
+    def on_sound_changed(self):
+        self._overview.set_data(self._sound.frames)
         self.update()
 
     def update(self):
         self._adjust_view()
-        self._cache = None
         self.changed()
 
     def set_view(self, start, end):
@@ -195,15 +216,7 @@ class Graph(object):
         
     def channels(self):
         "Return the graph values."
-        if self._cache is None:
-            self._cache = self._channels()
-        return self._cache
-
-    def _channels(self):
-        width = self._width
-        start, end = self._view_start, self._view_end
-        frames = self._sound.frames
-        o = _overview(frames, start, end, self.density())
+        o = self._overview.get(self._view_start, self._view_end,self.density())
         return o
 
     def _adjust_view(self):
@@ -237,13 +250,13 @@ class Graph(object):
         if self._view_end > len(self._sound.frames):
             self._view_end = len(self._sound.frames)
 
-       
+
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))
     assert len(_condense(b, 0, len(b), 100000)) == 10
     assert len(_condense(b, 0, len(b), 10000)) == 100
-    
+
 def test_Graph():
     from mock import Mock, Fake
     import numpy
