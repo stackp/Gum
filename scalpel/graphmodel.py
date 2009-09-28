@@ -9,7 +9,7 @@ def _cell_start(frame, density):
     return int(frame / density) * density
 
 def _overview(data, start, end, density):
-    start, end = [int(round(v)) for v in start, end]
+    start, end = [_cell_start(round(v), density) for v in start, end]
     numchan = data.ndim
     if numchan == 1:
         channels = [data]
@@ -30,7 +30,7 @@ def _condense(data, start, end, density):
     """
     if density < 1:
         density = 1
-    left = _cell_start(start, density)
+    left = start
     res = []
     while left < end:
         right = left + density
