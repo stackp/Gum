@@ -16,12 +16,12 @@ def _overview(data, start, end, density):
     else:
         channels = data.transpose()
     o = []
-    for chan in range(numchan):
-        values = _condense(channels[chan], start, end, density)
+    for chan in channels:
+        values = _condense(chan[start:end], density)
         o.append(values)
     return o
 
-def _condense(data, start, end, density):
+def _condense(data, density):
     """Returns a list of (min, max) tuples.
 
     A density slices the data in "cells", each cell containing several
@@ -30,7 +30,8 @@ def _condense(data, start, end, density):
     """
     if density < 1:
         density = 1
-    left = start
+    left = 0
+    end = len(data)
     res = []
     while left < end:
         right = left + density
@@ -254,8 +255,8 @@ class Graph(object):
 def test_overview():
     import numpy
     b = numpy.array(range(1000000))
-    assert len(_condense(b, 0, len(b), 100000)) == 10
-    assert len(_condense(b, 0, len(b), 10000)) == 100
+    assert len(_condense(b, 100000)) == 10
+    assert len(_condense(b, 10000)) == 100
 
 def test_Graph():
     from mock import Mock, Fake
