@@ -426,7 +426,23 @@ def test_scroll():
     assert start == 0
     assert end == 4
 
+def test_OverviewCache():
+    import numpy
     
+    cache = OverviewCache()
+    cache.set_data(numpy.array([1, 2, 3, 4]))
+    o = cache.get(start=0, end=4, density=1)
+    assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
+
+    o2 = cache.get(start=0, end=4, density=1)
+    assert o2 == o
+    assert o2 is o
+
+    cache.set_data(numpy.array([1, 2, 3, 4]))
+    o3 = cache.get(start=0, end=4, density=1)
+    assert o3 == o
+    assert o3 is not o
+
 if __name__ == "__main__":
     test_overview()
     test_Graph()
@@ -434,3 +450,4 @@ if __name__ == "__main__":
     test_zoom_in()
     test_scroll()
     test_zoom_in_on()
+    test_OverviewCache()
