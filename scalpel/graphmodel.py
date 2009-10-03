@@ -6,10 +6,10 @@ from event import Signal
 
 def _cell_start(frame, density):
     """Return the first frame of the cell in which `frame` belongs."""
-    return int(frame / density) * density
+    return int(round(frame) / density) * density
 
 def _overview(data, start, end, density):
-    start, end = [_cell_start(round(v), density) for v in start, end]
+    start, end = [_cell_start(v, density) for v in start, end]
     numchan = data.ndim
     if numchan == 1:
         channels = [data]
