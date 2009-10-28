@@ -9,7 +9,7 @@ def _cell_start(frame, density):
     return int(round(frame) / density) * density
 
 def _overview(data, start, end, density):
-    start, end = [_cell_start(v, density) for v in start, end]
+    start = _cell_start(start, density)
     numchan = data.ndim
     if numchan == 1:
         channels = [data]
@@ -28,17 +28,13 @@ def _condense(data, density):
     frames. This function returns the min and max of each visible cell.
 
     """
-    if density < 1:
-        density = 1
     left = 0
     end = len(data)
     res = []
-    while left < end:
+    while round(left) < end:
         right = left + density
-        if right > end:
-            right = end
-        i = int(left)
-        j = int(right)
+        i = int(round(left))
+        j = int(round(right))
         d = data[i:j]
         mini = d.min()
         maxi = d.max()
@@ -442,6 +438,21 @@ def test_scroll():
     assert start == 0
     assert end == 4
 
+def test_channels():
+    import numpy
+    from mock import Mock, Fake
+    sound = Mock({"numchan": 1})
+    sound.changed = Fake()
+    sound.frames = numpy.array(range(1000000))
+    g = Graph(sound)
+
+    for w in [1, 10, 11, 12, 13, 14, 15, 29, 54, 12.0, 347, 231., 1030]:
+        g.set_width(w)
+        c = g.channels()
+        assert len(c[0]) == w, \
+             "expected: %d, got: %d, density: %f, last value: %s " % \
+                                     (w, len(c[0]), g.density(), str(c[0][-1]))
+
 def test_OverviewCache():
     import numpy
     
@@ -467,4 +478,5 @@ if __name__ == "__main__":
     test_zoom_in()
     test_scroll()
     test_zoom_in_on()
+    test_channels()
     test_OverviewCache()
