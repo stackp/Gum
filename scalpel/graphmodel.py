@@ -104,7 +104,7 @@ class Graph(object):
 
     def center_on(self, frame):
         l = self._view_end - self._view_start
-        self.set_view(frame - l * 0.5, frame + l * 0.5)
+        self.set_view(frame - l * 0.5 + 0.5, frame + l * 0.5 + 0.5)
 
     def numframes(self):
         return len(self._sound.frames)
@@ -161,15 +161,19 @@ class Graph(object):
         l = l * factor
         self._view_end = self._view_start + l
         
+    def middle(self):
+        start, end = self._view_start, self._view_end
+        return start + (end - 1 - start) * 0.5
+
     def zoom_in(self):
         "Make view twice smaller, centering on the middle of the view."
-        mid = self._view_start + (self._view_end - self._view_start) * 0.5
+        mid = self.middle()
         self._zoom(0.5)
         self.center_on(mid)
 
     def zoom_out(self):
         "Make view twice larger, centering on the middle of the view."
-        mid = self._view_start + (self._view_end - self._view_start) * 0.5
+        mid = self.middle()
         self._zoom(2)
         self.center_on(mid)
 
@@ -257,6 +261,18 @@ def test_overview():
     b = numpy.array(range(1000000))
     assert len(_condense(b, 100000)) == 10
     assert len(_condense(b, 10000)) == 100
+
+def test_middle():
+    from mock import Mock, Fake
+    import numpy
+    sound = Mock({"numchan": 1})
+    sound.changed = Fake()
+    sound.frames = []
+    g = Graph(sound)
+    for nframes, mid in [(4, 1.5), (9, 4), (10, 4.5)]:
+        sound.frames = numpy.array(range(nframes))
+        g.set_sound(sound)
+        assert g.middle() == mid
 
 def test_Graph():
     from mock import Mock, Fake
@@ -446,6 +462,7 @@ def test_OverviewCache():
 if __name__ == "__main__":
     test_overview()
     test_Graph()
+    test_middle()
     test_zoom()
     test_zoom_in()
     test_scroll()
