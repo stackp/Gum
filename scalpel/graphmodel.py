@@ -6,7 +6,7 @@ from event import Signal
 
 def _cell_start(frame, density):
     """Return the first frame of the cell in which `frame` belongs."""
-    return int(round(frame) / density) * density
+    return round(frame / density) * density
 
 def _overview(data, start, end, density):
     start = _cell_start(start, density)
