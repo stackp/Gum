@@ -112,10 +112,13 @@ class Graph(object):
 
     def density(self):
         "Number of frames per pixel."
-        number_frames_view = (self._view_end - self._view_start)
+        number_frames_view = self._view_end - self._view_start
         d = float(number_frames_view) / self._width
+        # Round to disregard inacurracy of floating point operations,
+        # as shown in the test_density() function.
+        d = round(d, 10)
         if d < 1:
-            d = 1
+            d = 1.
         return d
 
     def frmtopxl(self, f):
@@ -438,6 +441,25 @@ def test_scroll():
     assert start == 0
     assert end == 4
 
+def test_density():
+    import edit
+    g = Graph(edit.Sound("../sounds/test1.wav"))
+    g.set_width(700)
+    g.zoom_in()
+    g.channels()
+    g.zoom_in()
+    g.channels()
+    g.zoom_in()
+    d = g.density()
+
+    pos = [26744.9875, 18793.775, 15902.425, 13011.075, 10119.725, 7228.375,
+           4337.025, 1445.675, 0.0, 2891.35, 5782.7, 8674.05, 11565.4,
+           14456.75, 17348.1, 20239.45]
+
+    for x in pos:
+        g.move_to(x)
+        assert d == g.density()
+
 def test_channels():
     import numpy
     from mock import Mock, Fake
@@ -480,3 +502,4 @@ if __name__ == "__main__":
     test_zoom_in_on()
     test_channels()
     test_OverviewCache()
+    test_density()
