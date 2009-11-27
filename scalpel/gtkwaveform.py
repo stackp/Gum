@@ -322,7 +322,7 @@ class MouseMiddleClick(object):
             delta = self._xlast - x
             self._xlast = x
             start, _ = self.graph.view()
-            self.graph.move_to(start + delta * self.graph.density())
+            self.graph.move_to(start + delta * self.graph.density)
 
 
 class PointerStyle(object):
