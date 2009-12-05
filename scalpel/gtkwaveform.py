@@ -103,10 +103,18 @@ class WaveformLayer(object):
         self._layered = layered
         self._graph = graph
         self.wavecolor = 0.0, 0.47058823529411764, 1.0
+        self._must_draw = True
+        self._surface = None
         graph.changed.connect(self.update)
+        layered.connect("size_allocate", self.resized)
 
     def update(self):
+        self._must_draw = True
         self._layered.redraw()
+
+    def resized(self, widget, rect):
+        self._surface = None
+        self._must_draw = True
 
     def draw_channel(self, values, context, ystart, width, height):
         # Line at zero
@@ -136,11 +144,29 @@ class WaveformLayer(object):
         
     def draw(self, context, width, height):
         "Draw all sound channels."
-        channels = self._graph.channels()
-        numchan = len(channels)
-        for i in range(numchan):
-            y = (height / numchan) * i
-            self.draw_channel(channels[i], context, y, width, height / numchan)
+        if self._surface is None:
+            surface = context.get_target()
+            self._surface = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
+                                                   width, height)
+        if self._must_draw:
+            channels = self._graph.channels()
+            numchan = len(channels)
+            c = cairo.Context(self._surface)
+
+            # clear context
+            c.set_source_rgba(0, 0, 0, 0)
+            c.set_operator(cairo.OPERATOR_SOURCE)
+            c.paint()
+            
+            for i in range(numchan):
+                y = (height / numchan) * i
+                self.draw_channel(channels[i], c, y,
+                                  width, height / numchan)
+            self._must_draw = False
+
+        context.set_source_surface(self._surface, 0, 0)
+        context.set_operator(cairo.OPERATOR_OVER)
+        context.paint()
 
 
 class BackgroundLayer(object):
