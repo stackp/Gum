@@ -94,6 +94,12 @@ class Controller(object):
     def stop(self):
         self._player.stop()
 
+    def toggle_play(self):
+        if self._player._playing:
+            self.stop()
+        else:
+            self.play()
+
     def goto_start(self):
         self._selection.set(0, 0)
 

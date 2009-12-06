@@ -87,6 +87,12 @@ class EditorWindow(gtk.Window):
                            gtk.gdk.ACTION_COPY)
         self.connect("drag_data_received", self._open_dropped_files)
 
+        # Keyboard shortcuts
+        kval = gtk.gdk.keyval_from_name
+        self.handlers = {kval('space'): self.ctrl.toggle_play,
+                         kval('ISO_Level3_Shift'): self.ctrl.play}
+        self.connect('key_press_event', self.on_key_press_event)
+
         self.connect("delete-event", self.close)
         self._filename_update()
         self.ctrl.filename_changed.connect(self._filename_update)
@@ -294,6 +300,10 @@ class EditorWindow(gtk.Window):
         else:
             raise AttributeError(name)
 
+    def on_key_press_event(self, widget, event):
+        if event.keyval in self.handlers:
+            handler = self.handlers[event.keyval]
+            handler()
 
     def about(self, *args):
         d = gtk.AboutDialog()
