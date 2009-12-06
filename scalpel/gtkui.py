@@ -231,6 +231,7 @@ class EditorWindow(gtk.Window):
         dialog = gtk.MessageDialog(parent=self, type=gtk.MESSAGE_WARNING)
         name = self.ctrl.filename() or "sound"
         name = os.path.basename(name)
+        name = name.replace('&', '&amp;')
         dialog.set_markup("<b>Save %s before closing?</b>" % name)
         dialog.add_button("Close _without saving", gtk.RESPONSE_NO)
         dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
