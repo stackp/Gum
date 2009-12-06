@@ -15,6 +15,10 @@ class CairoWidget(gtk.DrawingArea):
 
     __gsignals__ = {"expose-event": "override"}
 
+    def __init__(self):
+        gtk.DrawingArea.__init__(self)
+        self._redrawing = False
+
     def do_expose_event(self, event):
         context = self.window.cairo_create()
         context.rectangle(event.area.x, event.area.y,
@@ -22,11 +26,14 @@ class CairoWidget(gtk.DrawingArea):
         context.clip()
         width, height = self.window.get_size()
         self.draw(context, width, height)
+        self._redrawing = False
 
     def redraw(self):
         # queue_draw() emits an expose event. Double buffering is used
         # automatically in the expose event handler.
-        self.queue_draw()
+        if not self._redrawing:
+            self._redrawing = True
+            self.queue_draw()
 
     def draw(self, context, width, height):
         """Must be overriden to draw to the cairo context."""
@@ -47,7 +54,7 @@ class LayeredCairoWidget(CairoWidget):
         
     def draw(self, context, width, height):
         for layer in self.layers:
-            layer.draw(context, width, height)
+            layer.stack(context, width, height)
 
 
 class LayeredGraphView(LayeredCairoWidget):
@@ -93,28 +100,64 @@ class GraphView(LayeredGraphView):
 
 # -- Layers that can be added to LayeredGraphview.
 #
-class WaveformLayer(object):
+
+class Layer(object):
+    """The base class for layers.
+
+    Implements the cairo surface caching.
+
+    """
+    def __init__(self, layered):
+        self._layered = layered
+        self._must_draw = True
+        self._surface = None
+        layered.connect("size_allocate", self.resized)
+
+    def resized(self, widget, rect):
+        self._surface = None
+        self._must_draw = True
+
+    def update(self):
+        self._must_draw = True
+        self._layered.redraw()
+
+    def stack(self, context, width, height):
+        """ 
+        Paint the layer on top of the passed context.
+        """
+        if self._surface is None:
+            surface = context.get_target()
+            self._surface = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
+                                                   width, height)
+        if self._must_draw:
+            # clear context
+            c = cairo.Context(self._surface)
+            c.set_source_rgba(0, 0, 0, 0)
+            c.set_operator(cairo.OPERATOR_SOURCE)
+            c.paint()
+
+            self.draw(c, width, height)
+            self._must_draw = False
+
+        context.set_source_surface(self._surface, 0, 0)
+        context.set_operator(cairo.OPERATOR_OVER)
+        context.paint()
+    
+    def draw(context, width, height):
+        raise NotImplemented
+
+
+class WaveformLayer(Layer):
     """A layer for LayeredGraphView.
 
     It paints the graph (the waveform).
 
     """
     def __init__(self, layered, graph):
-        self._layered = layered
+        Layer.__init__(self, layered)
         self._graph = graph
         self.wavecolor = 0.0, 0.47058823529411764, 1.0
-        self._must_draw = True
-        self._surface = None
         graph.changed.connect(self.update)
-        layered.connect("size_allocate", self.resized)
-
-    def update(self):
-        self._must_draw = True
-        self._layered.redraw()
-
-    def resized(self, widget, rect):
-        self._surface = None
-        self._must_draw = True
 
     def draw_channel(self, values, context, ystart, width, height):
         # Line at zero
@@ -143,44 +186,21 @@ class WaveformLayer(object):
                 context.stroke()
         
     def draw(self, context, width, height):
-        "Draw all sound channels."
-        if self._surface is None:
-            surface = context.get_target()
-            self._surface = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
-                                                   width, height)
-        if self._must_draw:
-            channels = self._graph.channels()
-            numchan = len(channels)
-            c = cairo.Context(self._surface)
-
-            # clear context
-            c.set_source_rgba(0, 0, 0, 0)
-            c.set_operator(cairo.OPERATOR_SOURCE)
-            c.paint()
-            
-            for i in range(numchan):
-                y = (height / numchan) * i
-                self.draw_channel(channels[i], c, y,
-                                  width, height / numchan)
-            self._must_draw = False
-
-        context.set_source_surface(self._surface, 0, 0)
-        context.set_operator(cairo.OPERATOR_OVER)
-        context.paint()
+        channels = self._graph.channels()
+        numchan = len(channels)
+        for i in range(numchan):
+            y = (height / numchan) * i
+            self.draw_channel(channels[i], context, y, width, height / numchan)
 
 
-class BackgroundLayer(object):
+class BackgroundLayer(Layer):
     """A layer for LayeredGraphView.
 
     """
     def __init__(self, layered, selection):
-        self._layered = layered
-        self._cache = None
+        Layer.__init__(self, layered)
         self._selection = selection
         self._selection.changed.connect(self.update)
-
-    def update(self):
-        self._layered.redraw()
 
     def draw(self, context, width, height):
         # Black background
@@ -195,19 +215,16 @@ class BackgroundLayer(object):
             context.fill()
 
 
-class SelectionLayer(object):
+class SelectionLayer(Layer):
     """A layer for LayeredGraphView.
 
     It highlights the selected area.
 
     """
     def __init__(self, layered, selection):
-        self._layered = layered
+        Layer.__init__(self, layered)
         self._selection = selection
         self._selection.changed.connect(self.update)
-
-    def update(self):
-        self._layered.redraw()
 
     def draw(self, context, width, height):
         if self._selection.selected():
@@ -217,16 +234,13 @@ class SelectionLayer(object):
             context.rectangle(end, 0, width - end, height)
             context.fill()
 
-class CursorLayer(object):
+class CursorLayer(Layer):
 
     def __init__(self, layered, cursor):
-        self._layered = layered
+        Layer.__init__(self, layered)
         self._cursor = cursor
         self._cursor.changed.connect(self.update)
         self.rgba = (1, 1, 1, 0.5)
-
-    def update(self):
-        self._layered.redraw() # called in all layers !
 
     def draw(self, context, width, height):
         x = self._cursor.pixel()
