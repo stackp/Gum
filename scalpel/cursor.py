@@ -9,7 +9,7 @@ from threading import Thread, Event, Lock
 # playing, Cursor regularly updates itself with its own thread.
 
 class Repeat(Thread):
-    """Regularly call a funtion.
+    """Regularly call a function.
 
     This object is a thread that calls a function repeatedly, with a
     delay between each call.
