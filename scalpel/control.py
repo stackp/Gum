@@ -142,9 +142,20 @@ class Controller(object):
 
     def undo(self):
         self._sound.undo()
+        self.fix_selection()
 
     def redo(self):
         self._sound.redo()
+        self.fix_selection()
+
+    def fix_selection(self):
+        start, end = self._selection.get()
+        n = len(self._sound.frames)
+        if end > n:
+            # Selection has become invalid.
+            start = min(start, n)
+            end = n
+            self._selection.set(start, end)
 
     def select_all(self):
         self._selection.select_all()
@@ -192,5 +203,47 @@ def test_Controller():
     ctrl.open('../sounds/test1.wav')
     assert ctrl._sound != None
 
+def test_fix_selection():
+    from mock import Fake, Mock
+    from selection import Selection
+    import numpy
+
+    # Undo
+    graph = Mock({})
+    graph.changed = Fake()
+    selection = Selection(graph, Fake())
+    sound = edit.Sound()
+    sound.frames = numpy.array(range(1000))
+    ctrl = Controller(sound, Fake(), Fake(), selection)
+    frames = sound.frames
+    selection.set(0, 999)
+    ctrl.copy()
+    ctrl.paste()
+    selection.set(1500, 1500)
+    ctrl.undo()
+    ctrl.paste()
+    ctrl.undo()
+    assert sound.frames.tolist() == frames.tolist()
+
+    # Redo
+    graph = Mock({})
+    graph.changed = Fake()
+    selection = Selection(graph, Fake())
+    sound = edit.Sound()
+    sound.frames = numpy.array(range(1000))
+    ctrl = Controller(sound, Fake(), Fake(), selection)
+    frames = sound.frames
+    selection.set(10, 999)
+    ctrl.cut()
+    ctrl.undo()
+    selection.set(900, 900)
+    ctrl.redo()
+    frames = sound.frames 
+    ctrl.paste()
+    ctrl.undo()
+    assert sound.frames.tolist() == frames.tolist()
+    
+
 if __name__ == "__main__":
     test_Controller()
+    test_fix_selection()
