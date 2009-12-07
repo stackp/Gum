@@ -135,40 +135,48 @@ class Sound(object):
 
     def paste(self, start, end, clip):
         saved = copy(self.frames[start:end])
-        clip = mix_channels_auto(clip, self.numchan())
         do = (self._do_paste, (start, end, clip))
         undo = (self._do_paste, (start, start + len(clip), saved))
         self.history.add(do, undo)
         self.changed()
 
     def _do_paste(self, start, end, clip):
-        x = self.frames
-        y = numpy.concatenate((x[:start], clip, x[end:]))
-        self.frames = y
+        if self.is_empty():
+            self.frames = clip
+        else:
+            # FIXME: should resample
+            clip = mix_channels_auto(clip, self.numchan())
+            x = self.frames
+            y = numpy.concatenate((x[:start], clip, x[end:]))
+            self.frames = y
 
     def mix(self, start, end, clip):
         saved = copy(self.frames[start:start + len(clip)])
-        clip = mix_channels_auto(clip, self.numchan())
         do = (self._do_mix, (start, end, clip))
         undo = (self._do_paste, (start, start + len(clip), saved))
         self.history.add(do, undo)
         self.changed()
 
     def _do_mix(self, start, end, clip):
-        if start != end:
-            length = min(end - start, len(clip))
-            self.frames[start:start + length] += clip[:length]
+        if self.is_empty():
+            self.frames = clip
         else:
-            a = self.frames
-            b = clip
-            sound_length = max(len(a), start + len(b))
-            if self.numchan() > 1:
-                c = numpy.zeros((sound_length, self.numchan()))
+            # FIXME: should resample
+            clip = mix_channels_auto(clip, self.numchan())
+            if start != end:
+                length = min(end - start, len(clip))
+                self.frames[start:start + length] += clip[:length]
             else:
-                c = numpy.zeros(sound_length)
-            c[:len(a)] = a
-            c[start:start + len(b)] += b
-            self.frames = c
+                a = self.frames
+                b = clip
+                sound_length = max(len(a), start + len(b))
+                if self.numchan() > 1:
+                    c = numpy.zeros((sound_length, self.numchan()))
+                else:
+                    c = numpy.zeros(sound_length)
+                c[:len(a)] = a
+                c[start:start + len(b)] += b
+                self.frames = c
 
     def undo(self):
         self.history.undo()
@@ -178,9 +186,12 @@ class Sound(object):
         self.history.redo()
         self.changed()
 
+    def is_empty(self):
+        return not len(self.frames)
+
     def is_fresh(self):
         """True if sound is empty and has never been edited."""
-        return not len(self.frames) and not self.history._actions
+        return self.is_empty() and not self.history._actions
 
     def is_saved(self):
         return self._saved_revision == self.history.revision()
@@ -337,7 +348,7 @@ def testSound():
     sine = [sin(2 * 3.14 * f0/SR * x) for x in range(time * SR)]
     start, end = 2*SR, 4*SR
     sine2 = copy(sine)
-    snd.frames = copy(sine)
+    snd.frames = numpy.array(copy(sine))
     del sine2[start:end]
     snd.cut(start, end)
     assert snd.frames.tolist() == sine2
@@ -508,6 +519,10 @@ def testSound():
     assert snd.frames.tolist() == [1, 2, 3, 4]
     snd.paste(1, 1, clip)
     assert snd.frames.tolist() == [1, 20, 30, 2, 3, 4]
+    # pasting in empty sound: keep it stereo
+    snd.frames = numpy.array([])
+    snd.paste(1, 2, clip)
+    assert snd.frames.ndim == 2
     #
     # paste a mono clip into a stereo file
     snd.frames = numpy.array([[1, 1], [2, 2], [3, 3], [4, 4]])
@@ -519,6 +534,10 @@ def testSound():
     snd.paste(1, 1, clip)
     assert snd.frames.tolist() == [[1, 1], [22, 22], [33, 33],\
                                                         [2, 2], [3, 3], [4, 4]]
+    # pasting in empty sound: keep it mono
+    snd.frames = numpy.array([])
+    snd.paste(1, 2, clip)
+    assert snd.frames.ndim == 1
 
     # test mix
     snd = Sound()
