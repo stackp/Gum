@@ -102,6 +102,7 @@ class Controller(object):
 
     def goto_start(self):
         self._selection.set(0, 0)
+        self._graph.move_to(0)
 
     def goto_end(self):
         end = len(self._sound.frames)
