@@ -148,7 +148,6 @@ class EditorWindow(gtk.Window):
               <toolitem action="Start"/>
               <toolitem action="Stop"/>
               <toolitem action="Play"/>
-              <toolitem action="End"/>
               <separator/>
               <toolitem action="Cut"/>
               <toolitem action="Copy"/>
