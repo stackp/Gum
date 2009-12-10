@@ -62,7 +62,7 @@ class EditorWindow(gtk.Window):
         effect_menu = gtk.Menu()
         for name in controller.list_effects():
             item = gtk.MenuItem(label=name)
-            item.connect('activate', self.effect, None, name)
+            item.connect('activate', self.effect, name)
             effect_menu.append(item)
         w = self.uimanager.get_widget('/menubar/Effects')
         w.set_submenu(effect_menu)
@@ -273,10 +273,26 @@ class EditorWindow(gtk.Window):
             if filename.startswith(prefix):
                 filename = filename[len(prefix):]
             filename = urllib.unquote(filename)
-            self.ctrl.open(filename)
+            self._do_open(filename)
 
     def display_error(self, title, text):
         display_error(title, text, parent=self)
+
+    def busy(method):
+        """A decorator to show a "busy" mouse cursor."""
+        def decorated(self, *args):
+            self.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+            while gtk.events_pending():
+                gtk.main_iteration(False)
+            try:
+                method(self, *args)
+            finally:
+                self.window.set_cursor(None)
+        return decorated
+
+    @busy
+    def _do_open(self, filename):
+        self.ctrl.open(filename)
 
     # -- GTK Callbacks
 
@@ -290,8 +306,7 @@ class EditorWindow(gtk.Window):
         if name in ["new", "save", "play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
-                    "zoom_in", "zoom_out", "zoom_fit",
-                    "effect"]:
+                    "zoom_in", "zoom_out", "zoom_fit"]:
             method = getattr(self.ctrl, name)
             def forward(self, *args):
                 method(*args[1:])
@@ -303,6 +318,10 @@ class EditorWindow(gtk.Window):
         if event.keyval in self.handlers:
             handler = self.handlers[event.keyval]
             handler()
+    
+    @busy
+    def effect(self, widget, *args):
+        self.ctrl.effect(*args)
 
     def about(self, *args):
         d = gtk.AboutDialog()
@@ -315,11 +334,11 @@ class EditorWindow(gtk.Window):
         d.set_comments("A sound editor")
         d.run()
         d.destroy()
-        
+
     def open(self, *args):
         filename = self.filedialog.get_filename(action='open')
         if filename != None:
-            self.ctrl.open(filename)
+            self._do_open(filename)
 
     def save_as(self, *args):
         filename = self.filedialog.get_filename(action='save')
