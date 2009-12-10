@@ -60,7 +60,7 @@ class EditorWindow(gtk.Window):
 
         # Create and fill the Effects menu
         effect_menu = gtk.Menu()
-        for name in controller.list_effects():
+        for name in app.list_effects():
             item = gtk.MenuItem(label=name)
             item.connect('activate', self.effect, name)
             effect_menu.append(item)
@@ -70,7 +70,7 @@ class EditorWindow(gtk.Window):
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
-        self.filedialog = FileDialog(controller.list_extensions())
+        self.filedialog = FileDialog(app.list_extensions())
 
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)

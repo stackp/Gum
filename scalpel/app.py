@@ -9,6 +9,7 @@ import graphmodel
 import selection
 import cursor
 import control
+import effect
 import os.path
 
 # This signal is emitted when a new sound has been loaded. User
@@ -24,3 +25,11 @@ def open_(filename=None):
     sel = selection.Selection(graph, curs)
     controller = control.Controller(sound, p, graph, sel)
     new_sound_loaded(controller, graph, sel, curs)
+
+def list_effects():
+    l = effect.effects.keys()
+    l.sort()
+    return l
+
+def list_extensions():
+    return edit.list_extensions()

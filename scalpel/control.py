@@ -174,14 +174,6 @@ class Controller(object):
         else:
             self._graph.zoom_out_full()
 
-    def list_effects(self):
-        l = effect.effects.keys()
-        l.sort()
-        return l
-
-    def list_extensions(self):
-        return edit.list_extensions()
-
     def effect(self, name):
         if self._selection.selected():
             start, end = self._selection.get()
