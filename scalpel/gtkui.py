@@ -175,7 +175,7 @@ class EditorWindow(gtk.Window):
         actions = [('File', None, '_File'),
                    ('Edit', None, '_Edit'),
                    ('View', None, '_View'),
-                   ('Effects', None, '_Effects'),
+                   ('Effects', None, 'Effe_cts'),
                    ('Scalpel', None, '_Scalpel'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
