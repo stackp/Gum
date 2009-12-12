@@ -17,19 +17,19 @@ from gtkfiledialog import OpenFileDialog, SaveFileDialog, \
 import copy
 import os.path
 import urllib
+import gobject
 import gtk
 gtk.gdk.threads_init()
 
 def init():
     """Called when the module is being imported."""
+    notebook = EditorNotebook()
+    win = EditorWindow(notebook)
     # Plug callbacks into app.
-    app.new_sound_loaded.connect(on_new_sound_loaded)
+    app.new_sound_loaded.connect(win.on_new_sound_loaded)
 
 def main_loop():
     gtk.main()
-
-def on_new_sound_loaded(controller, graph, sel, curs):
-    EditorWindow(controller, graph, sel, curs)
 
 def display_error(title, text, parent=None):
     d = gtk.MessageDialog(parent, type=gtk.MESSAGE_ERROR,
@@ -40,16 +40,16 @@ def display_error(title, text, parent=None):
     d.run()
     d.destroy()
 
-
 class EditorWindow(gtk.Window):
 
-    _windows = []
-
-    def __init__(self, controller, graph, selection, cursor):
+    def __init__(self, notebook):
         gtk.Window.__init__(self)
 
-        self.ctrl = controller
-        
+        self.notebook = notebook
+        self.notebook.root_window = self
+        self.notebook.connect('filename-changed', self._on_filename_changed)
+        self.notebook.connect('error', self.display_error)
+
         self.uimanager = self._make_ui_manager()
         accelgroup = self.uimanager.get_accel_group()
         self.add_accel_group(accelgroup)
@@ -70,16 +70,10 @@ class EditorWindow(gtk.Window):
         w = self.uimanager.get_widget('/menubar/Effects')
         w.set_submenu(effect_menu)
 
-        self.waveform = GraphView(graph, selection, cursor)
-        self.scrollbar = GraphScrollbar(graph)
-        self.statusbar = gtk.Statusbar()
-
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)
         self.vbox.pack_start(self.toolbar, expand=False, fill=False)
-        self.vbox.pack_start(self.waveform, expand=True, fill=True)
-        self.vbox.pack_start(self.scrollbar, expand=False, fill=False)
-        self.vbox.pack_end(self.statusbar, expand=False, fill=False)
+        self.vbox.pack_start(self.notebook, expand=True, fill=True)
         self.add(self.vbox)
         
         # Setup drag and drop
@@ -91,18 +85,14 @@ class EditorWindow(gtk.Window):
 
         # Keyboard shortcuts
         kval = gtk.gdk.keyval_from_name
-        self.handlers = {kval('space'): self.ctrl.toggle_play,
-                         kval('ISO_Level3_Shift'): self.ctrl.play}
+        self.handlers = {kval('space'): self.toggle_play,
+                         kval('ISO_Level3_Shift'): self.play}
         self.connect('key_press_event', self.on_key_press_event)
 
-        self.connect("delete-event", self.close)
-        self._filename_update()
-        self.ctrl.filename_changed.connect(self._filename_update)
-        self.ctrl.error.connect(self.display_error)
+        self.connect("delete-event", self.quit)
         self.set_icon(self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
         self.resize(700, 500)
         self.show_all()
-        self._windows.append(self)
 
     def _make_ui_manager(self):
         ui = '''<ui>
@@ -217,45 +207,14 @@ class EditorWindow(gtk.Window):
 
         return uimanager
 
-    def _close(self):
-        try:
-            self.ctrl.close()
-        except control.FileNotSaved:
-            proceed = self._show_dialog_close()
-            if not proceed:
-                return False
-            self.ctrl.close(force=True)
+    def on_new_sound_loaded(self, controller, graph, sel, curs):
+        page = EditorPage(controller, graph, sel, curs)
+        self.notebook.add_page(page)
 
-        self.destroy()
-        self._windows.remove(self)
+    def _on_filename_changed(self, notebook, filename):
+        self._filename_update(filename)
 
-        if not self._windows:
-            self.quit()
-
-        return True
-
-    def _show_dialog_close(self):
-        dialog = gtk.MessageDialog(parent=self, type=gtk.MESSAGE_WARNING)
-        name = self.ctrl.filename() or "sound"
-        name = os.path.basename(name)
-        name = name.replace('&', '&amp;')
-        dialog.set_markup("<b>Save %s before closing?</b>" % name)
-        dialog.add_button("Close _without saving", gtk.RESPONSE_NO)
-        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-        dialog.add_button(gtk.STOCK_SAVE_AS, gtk.RESPONSE_YES)
-        response = dialog.run()
-        dialog.destroy()
-        proceed = False
-        if response == gtk.RESPONSE_NO:
-            proceed = True
-        elif response == gtk.RESPONSE_YES:
-            saved = self.save_as()
-            if saved:
-                proceed = True
-        return proceed
-
-    def _filename_update(self):
-        filename = self.ctrl.filename()
+    def _filename_update(self, filename):
         self._update_title(filename)
 
     def _update_title(self, filename=None):
@@ -276,7 +235,7 @@ class EditorWindow(gtk.Window):
             filename = urllib.unquote(filename)
             self._do_open(filename)
 
-    def display_error(self, title, text):
+    def display_error(self, widget, title, text):
         display_error(title, text, parent=self)
 
     def busy(method):
@@ -293,23 +252,23 @@ class EditorWindow(gtk.Window):
 
     @busy
     def _do_open(self, filename):
-        self.ctrl.open(filename)
+        self.notebook.open(filename)
 
     # -- GTK Callbacks
 
     def __getattr__(self, name):
-        """Redirect callbacks to the controller.
+        """Redirect callbacks.
 
         The gtk widget passed to the callback (first argument) will
-        not be passed to the controller method.
-        
+        not be passed to the invoked method.
+
         """
-        if name in ["new", "save", "play", "stop",
+        if name in ["new", "save", "play", "toggle_play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit"]:
-            method = getattr(self.ctrl, name)
-            def forward(self, *args):
+            method = getattr(self.notebook, name)
+            def forward(*args):
                 method(*args[1:])
             return forward
         else:
@@ -319,10 +278,10 @@ class EditorWindow(gtk.Window):
         if event.keyval in self.handlers:
             handler = self.handlers[event.keyval]
             handler()
-    
+
     @busy
     def effect(self, widget, *args):
-        dialog = self.ctrl.effect(*args)
+        dialog = self.notebook.effect(*args)
         if dialog:
             dialog.set_transient_for(self)
             dialog.proceed()
@@ -341,38 +300,233 @@ class EditorWindow(gtk.Window):
 
     def open(self, *args):
         dialog = OpenFileDialog(app.list_extensions(), parent=self,
-                                filename=self.ctrl.filename())
+                                filename=self.notebook.filename())
         filenames = dialog.get_filenames()
         for filename in filenames:
             self._do_open(filename)
 
     def save_as(self, *args):
         dialog = SaveFileDialog(app.list_extensions(), parent=self,
-                                filename=self.ctrl.filename())
+                                filename=self.notebook.filename())
         filename = dialog.get_filename()
         saved = False
         if filename != None:
-            self.ctrl.save_as(filename)
+            self.notebook.save_as(filename)
             saved = True
         return saved
 
     def save_selection_as(self, *args):
         dialog = SaveSelectionFileDialog(app.list_extensions(), parent=self,
-                                         filename=self.ctrl.filename())
+                                         filename=self.filename())
         filename = dialog.get_filename()
         if filename != None:
-            self.ctrl.save_selection_as(filename)
+            self.notebook.save_selection_as(filename)
 
     def close(self, *args):
-        self._close()
-        # Tell GTK not to hide the window, we take care of that:
-        return True
+        closed = self.notebook.close_page()
+        if self.notebook.is_empty():
+            self.quit()
+        return closed
 
     def quit(self, *args):
-        for win in copy.copy(self._windows):
-            if not win._close():
-                return
+        while not self.notebook.is_empty():
+            if not self.close():
+                # Tell GTK not to hide the window:
+                return True
         gtk.main_quit()
+
+
+class EditorNotebook(gtk.Notebook):
+
+    __gsignals__ = {'filename-changed': (gobject.SIGNAL_RUN_LAST,
+                                         gobject.TYPE_NONE,
+                                         (gobject.TYPE_PYOBJECT,)),
+                    'error': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT))}
+
+    def __init__(self):
+        gtk.Notebook.__init__(self)
+        self.root_window = None
+        self.set_scrollable(True)
+        self.set_show_border(False)
+        self.popup_enable()
+        self.connect("switch-page", self.on_page_switch)
+        self.connect("page-added", self.hide_show_tabs)
+        self.connect("page-removed", self.hide_show_tabs)
+
+    def on_page_switch(self, notebook, _, numpage):
+        page = self.get_nth_page(numpage)
+        self.emit("filename-changed", page.filename())
+
+    def on_filename_changed(self, widget, filename):
+        current_page = self.get_nth_page(self.get_current_page())
+        if widget is current_page:
+            self.emit("filename-changed", filename)
+
+    def on_error(self, widget, title, text):
+        self.emit('error', title, text)
+
+    def hide_show_tabs(self, *args):
+        if self.get_n_pages() <= 1:
+            self.set_property('show-tabs', False)
+        else:
+            self.set_property('show-tabs', True)
+
+    def add_page(self, page):
+        page.show_all()
+        i = self.append_page(page, page.tab)
+        self.set_tab_reorderable(page, True)
+        self.set_current_page(i)
+        page.connect("filename-changed", self.on_filename_changed)
+        page.connect('must-close', self.close_page_by_id)
+        page.connect('error', self.on_error)
+        self.emit("filename-changed", page.filename())
+
+    def is_empty(self):
+        return self.get_n_pages() == 0
+
+    def close_page_by_id(self, widget):
+        for numpage in range(self.get_n_pages()):
+            page = self.get_nth_page(numpage)
+            if page is widget:
+                return self.close_page(numpage)
+
+    def close_page(self, numpage=None):
+        if numpage is None:
+            numpage = self.get_current_page()
+        try:
+            self._close_page(numpage, force=False)
+        except control.FileNotSaved:
+            proceed = self._show_dialog_close()
+            if not proceed:
+                return False
+            else:
+                self._close_page(numpage, force=True)
+        return True
+
+    def _close_page(self, numpage, force=False):
+        page = self.get_nth_page(numpage)
+        page.close(force)
+        self.remove_page(numpage)
+        page.destroy()
+        return True
+
+    def _show_dialog_close(self):
+        dialog = gtk.MessageDialog(parent=self.root_window,
+                                   type=gtk.MESSAGE_WARNING)
+        name = self.filename() or "sound"
+        name = os.path.basename(name)
+        name = name.replace('&', '&amp;')
+        dialog.set_markup("<b>Save %s before closing?</b>" % name)
+        dialog.add_button("Close _without saving", gtk.RESPONSE_NO)
+        dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        dialog.add_button(gtk.STOCK_SAVE, gtk.RESPONSE_YES)
+        dialog.set_default_response(gtk.RESPONSE_CANCEL)
+        response = dialog.run()
+        dialog.destroy()
+        proceed = False
+        if response == gtk.RESPONSE_NO:
+            proceed = True
+        elif response == gtk.RESPONSE_YES:
+            self.save()
+            proceed = True
+        return proceed
+
+    def __getattr__(self, name):
+        if name in ["new", "save", "play", "toggle_play", "stop",
+                    "goto_start", "goto_end", "select_all",
+                    "cut", "copy", "paste", "mix", "undo", "redo",
+                    "zoom_in", "zoom_out", "zoom_fit", "effect",
+                    "open", "save_as", "save_selection_as",
+                    "filename"]:
+            def forward(*args):
+                page = self.get_nth_page(self.get_current_page())
+                method = getattr(page, name)
+                return method(*args)
+            return forward
+        else:
+            raise AttributeError(name)
+
+
+class EditorPage(gtk.VBox):
+
+    __gsignals__ = {'filename-changed': (gobject.SIGNAL_RUN_LAST,
+                                        gobject.TYPE_NONE,
+                                         (gobject.TYPE_PYOBJECT,)),
+                    'must-close': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                                   ()),
+                    'error': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT))}
+
+    def __init__(self, controller, graph, selection, cursor):
+        gtk.VBox.__init__(self)
+        self.ctrl = controller
+
+        # Close button
+        image = gtk.image_new_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_MENU)
+        button = gtk.Button()
+        button.set_relief(gtk.RELIEF_NONE)
+        button.set_focus_on_click(False)
+        button.set_image(image)
+        style = gtk.RcStyle()
+        style.xthickness = 0
+        style.ythickness = 0
+        button.modify_style(style)
+        button.connect("clicked", self.must_close)
+
+        # Tab title
+        title = gtk.Label()
+
+        tab = gtk.HBox()
+        tab.modify_style(style)
+        tab.pack_start(title, True, True)
+        tab.pack_end(button, False, False)
+        tab.show_all()
+
+        self.tab = tab
+        self.title = title
+        self.waveform = GraphView(graph, selection, cursor)
+        self.scrollbar = GraphScrollbar(graph)
+        self.statusbar = gtk.Statusbar()
+        self.pack_start(self.waveform, expand=True, fill=True)
+        self.pack_start(self.scrollbar, expand=False, fill=False)
+        self.pack_end(self.statusbar, expand=False, fill=False)
+        self.ctrl.filename_changed.connect(self._update_filename)
+        self.ctrl.error.connect(self.emit_error)
+        self._update_filename()
+
+    def must_close(self, *args):
+        self.emit('must-close')
+
+    def close(self, force=False):
+        self.ctrl.close(force)
+
+    def emit_error(self, title, text):
+        self.emit('error', title, text)
+
+    def _update_filename(self):
+        filename = self.ctrl.filename() or None
+        if filename:
+            name = os.path.basename(filename)
+        else:
+            name = "Unsaved"
+        self.title.set_text(name)
+        self.emit('filename-changed', filename)
+
+    def __getattr__(self, name):
+        if name in ["new", "save", "play", "toggle_play", "stop",
+                    "goto_start", "goto_end", "select_all",
+                    "cut", "copy", "paste", "mix", "undo", "redo",
+                    "zoom_in", "zoom_out", "zoom_fit", "effect",
+                    "open", "save_as", "save_selection_as",
+                    "filename"]:
+            method = getattr(self.ctrl, name)
+            def forward(*args):
+                return method(*args)
+            return forward
+        else:
+            raise AttributeError(name)
+
 
 
 # -- Tests
@@ -396,7 +550,11 @@ def test():
         def __init__(self):
             self.filename_changed = Fake()
             self.error = Fake()
-    win = EditorWindow(FakeController(), graph, selection, cursor)
+
+    notebook = EditorNotebook()
+    win = EditorWindow(notebook)
+    page = EditorPage(FakeController(), graph, selection, cursor)
+    notebook.add_page(page)
     win.resize(700, 500)
     win.show_all()
     gtk.main()
