@@ -267,9 +267,9 @@ class EditorWindow(gtk.Window):
                             selection, targetType, time):
         """Open files dragged and dropped on the window."""
         filenames = selection.data.split()
+        prefix = 'file://'
         for filename in filenames:
             # Extract the actual filename
-            prefix = 'file://'
             if filename.startswith(prefix):
                 filename = filename[len(prefix):]
             filename = urllib.unquote(filename)
