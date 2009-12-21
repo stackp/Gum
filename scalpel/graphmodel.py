@@ -167,7 +167,7 @@ class Graph(object):
 
     def frmtopxl(self, f):
         "Converts a frame index to a pixel index."
-        return frame2cell(f, self.density) - self._view_start
+        return int(frame2cell(f, self.density) - self._view_start)
 
     def pxltofrm(self, p):
         "Converts a pixel index to a frame index."
