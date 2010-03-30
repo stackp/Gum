@@ -19,7 +19,6 @@ class Controller(object):
         self._sound = sound
         self.filename_changed = Signal()
         self.error = Signal()
-        self.clipboard = clipboard.Clipboard()
 
     def new(self):
         app.open_()
@@ -112,30 +111,30 @@ class Controller(object):
         start, end = self._selection.get()
         self._selection.start = start
         self._selection.end = start
-        self.clipboard.clip = self._sound.cut(start, end)
+        clipboard.clip = self._sound.cut(start, end)
         
     def copy(self):
         start, end = self._selection.get()
-        self.clipboard.clip = self._sound.copy(start, end)
+        clipboard.clip = self._sound.copy(start, end)
         
     @_report_exception
     def paste(self):
         start, end = self._selection.get()
         was_zoomed_out_full = self._graph.is_zoomed_out_full()
-        self._sound.paste(start, end, self.clipboard.clip)
-        self._selection.set(start, start + len(self.clipboard.clip))
+        self._sound.paste(start, end, clipboard.clip)
+        self._selection.set(start, start + len(clipboard.clip))
         if was_zoomed_out_full:
             self._graph.zoom_out_full()
 
     @_report_exception
     def mix(self):
         start, end = self._selection.get()
-        self._sound.mix(start, end, self.clipboard.clip)
+        self._sound.mix(start, end, clipboard.clip)
         # FIXME: should be dealt with in Sound.
         if start == end:
-            l = len(self.clipboard.clip)
+            l = len(clipboard.clip)
         else:
-            l = min(end - start, len(self.clipboard.clip))
+            l = min(end - start, len(clipboard.clip))
         self._selection.set(start, start + l)
 
     def trim(self):
