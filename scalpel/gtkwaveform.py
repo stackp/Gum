@@ -169,10 +169,9 @@ class WaveformLayer(Layer):
 
         # Waveform
         context.set_source_rgb(*self.wavecolor)
-        for i, (mini, maxi) in enumerate(values):
+        for x, (mini, maxi) in enumerate(values):
             # -1 <= mini <= maxi <= 1
             # ystart <= ymin <= ymax <= ystart + height - 1
-            x = i
             ymin = ystart + round((-mini * 0.5 + 0.5) * (height - 1))
             ymax = ystart + round((-maxi * 0.5 + 0.5) * (height - 1))
             if ymin == ymax:
