@@ -4,6 +4,12 @@
 
 import gtk
 import cairo
+try:
+    import fast
+except ImportError:
+    HAVE_FAST = False
+else:
+    HAVE_FAST = True
 
 # -- Base classes for drawing sound visualization.
 #
@@ -183,7 +189,10 @@ class WaveformLayer(Layer):
                 context.move_to(x + 0.5, ymin)
                 context.line_to(x + 0.5, ymax)
                 context.stroke()
-        
+
+    if HAVE_FAST:
+        draw_channel = fast.draw_channel
+
     def draw(self, context, width, height):
         channels = self._graph.channels()
         numchan = len(channels)

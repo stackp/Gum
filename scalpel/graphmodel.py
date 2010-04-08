@@ -3,6 +3,13 @@
 # Licensed under the Revised BSD License.
 
 from event import Signal
+try:
+    import fast
+except ImportError:
+    HAVE_FAST = False
+    print "Warning: 'fast' module not found. You won't have fast display!"
+else:
+    HAVE_FAST = True
 
 def frame2cell(frame, density):
     return frame / float(density)
@@ -42,6 +49,10 @@ def _condense(data, start, width, density):
         maxi = d.max()
         res.append((mini, maxi))
     return res
+
+if HAVE_FAST:
+    _condense = fast._condense
+
 
 def intersection((a, b), (x, y)):
     if b <= x or a >= y:
@@ -267,11 +278,14 @@ class Graph(object):
         if self._view_start < 0:
             self._view_start = 0
 
+# Test functions
+
+DTYPE = 'float64'
 
 def test_overview():
     import numpy
     l = 1000000
-    b = numpy.array(range(l))
+    b = numpy.array(range(l), DTYPE)
     assert len(_condense(b, 0, l, l/10)) == 10
     assert len(_condense(b, 0, l, l/100)) == 100
 
@@ -301,7 +315,7 @@ def test_Graph():
     
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
-    sound.frames = numpy.array(range(1000))
+    sound.frames = numpy.array(range(1000), DTYPE)
 
     c = Graph(sound)
     c.set_width(200)
@@ -320,7 +334,7 @@ def test_Graph():
     import numpy
     sound = Mock({"numchan": 2})
     sound.changed = Fake()
-    data = numpy.array([[1, 1], [2, 2], [3, 3]])
+    data = numpy.array([[1, 1], [2, 2], [3, 3]], DTYPE)
     sound.frames = data
     c = Graph(sound)
     o = c.channels()
@@ -332,7 +346,7 @@ def test_zoom():
     import numpy
 
     sound = Mock({"numchan": 1})
-    data = numpy.array([1, 2, 3, 4])
+    data = numpy.array([1, 2, 3, 4], DTYPE)
     sound.frames = data
     sound.changed = Fake()
 
@@ -395,7 +409,7 @@ def test_zoom_in():
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
 
-    data = numpy.array([1, 2, 3, 4])
+    data = numpy.array([1, 2, 3, 4], DTYPE)
     sound.frames = data
     g = Graph(sound)
 
@@ -414,7 +428,7 @@ def test_zoom_in_on():
     from mock import Mock, Fake
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
-    data = numpy.array([1, 2, 3, 4])
+    data = numpy.array([1, 2, 3, 4], DTYPE)
     sound.frames = data
     g = Graph(sound)
     g.set_width(2)
@@ -473,7 +487,7 @@ def test_channels():
     from mock import Mock, Fake
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
-    sound.frames = numpy.array(range(1000000))
+    sound.frames = numpy.array(range(1000000), DTYPE)
     g = Graph(sound)
 
     for w in [1, 10, 11, 12, 13, 14, 15, 29, 54, 12.0, 347, 231., 1030]:
@@ -487,7 +501,7 @@ def test_OverviewCache():
     import numpy
     
     cache = OverviewCache()
-    cache.set_data(numpy.array([1, 2, 3, 4]))
+    cache.set_data(numpy.array([1, 2, 3, 4], DTYPE))
     o = cache.get(start=0, width=4, density=1)
     assert o == [[(1, 1), (2, 2), (3, 3), (4, 4)]]
 
@@ -495,12 +509,12 @@ def test_OverviewCache():
     assert o2 == o
     assert o2 is o
 
-    cache.set_data(numpy.array([1, 2, 3, 4]))
+    cache.set_data(numpy.array([1, 2, 3, 4], DTYPE))
     o3 = cache.get(start=0, width=4, density=1)
     assert o3 == o
     assert o3 is not o
 
-    cache.set_data(numpy.array(range(1000)))
+    cache.set_data(numpy.array(range(1000), DTYPE))
     o1 = cache.get(start=0, width=10, density=10)
     o2 = cache.get(start=4, width=10, density=10)
     o3 = cache.get(start=0, width=10, density=10)
