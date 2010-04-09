@@ -108,11 +108,26 @@ class GraphView(LayeredGraphView):
 #
 
 class Layer(object):
-    """The base class for layers.
+    """Base class for layers."""
 
-    Implements the cairo surface caching.
+    def __init__(self, layered):
+        self._layered = layered
 
-    """
+    def stack(self, context, width, height):
+        """Paint the layer on top of the passed context."""
+        context.set_operator(cairo.OPERATOR_OVER)
+        self.draw(context, width, height)
+
+    def update(self):
+        self._layered.redraw()
+
+    def draw(context, width, height):
+        raise NotImplemented
+
+
+class CachedLayer(Layer):
+    """Implements surface caching."""
+    
     def __init__(self, layered):
         self._layered = layered
         self._must_draw = True
@@ -125,23 +140,20 @@ class Layer(object):
 
     def update(self):
         self._must_draw = True
-        self._layered.redraw()
+        Layer.update(self)
 
     def stack(self, context, width, height):
-        """ 
-        Paint the layer on top of the passed context.
-        """
         if self._surface is None:
             surface = context.get_target()
             self._surface = surface.create_similar(cairo.CONTENT_COLOR_ALPHA,
                                                    width, height)
-        if self._must_draw:
-            # clear context
-            c = cairo.Context(self._surface)
-            c.set_source_rgba(0, 0, 0, 0)
-            c.set_operator(cairo.OPERATOR_SOURCE)
-            c.paint()
 
+        if self._must_draw:
+            # clear the cached surface
+            c = cairo.Context(self._surface)
+            c.set_operator(cairo.OPERATOR_CLEAR)
+            c.paint()
+            c.set_operator(cairo.OPERATOR_OVER)
             self.draw(c, width, height)
             self._must_draw = False
 
@@ -149,18 +161,15 @@ class Layer(object):
         context.set_operator(cairo.OPERATOR_OVER)
         context.paint()
     
-    def draw(context, width, height):
-        raise NotImplemented
 
-
-class WaveformLayer(Layer):
+class WaveformLayer(CachedLayer):
     """A layer for LayeredGraphView.
 
     It paints the graph (the waveform).
 
     """
     def __init__(self, layered, graph):
-        Layer.__init__(self, layered)
+        CachedLayer.__init__(self, layered)
         self._graph = graph
         self.wavecolor = 0.0, 0.47058823529411764, 1.0
         graph.changed.connect(self.update)
@@ -241,6 +250,7 @@ class SelectionLayer(Layer):
             context.rectangle(0, 0, start, height)
             context.rectangle(end, 0, width - end, height)
             context.fill()
+
 
 class CursorLayer(Layer):
 
