@@ -3,9 +3,10 @@ import gtk
 class FileDialog(object):
     """Handle a pair of file dialogs (open and save)."""
 
-    def __init__(self, extensions=[]):
+    def __init__(self, extensions=[], parent=None):
         self.filename = None
         self.extensions = extensions
+        self.parent = parent
 
     def get_filename(self, action='open'):
         """Run a dialog and return a filename or None.
@@ -55,6 +56,7 @@ class FileDialog(object):
         chooser.set_title(title)
         icon = chooser.render_icon(stock, gtk.ICON_SIZE_MENU)
         chooser.set_icon(icon)
+        chooser.set_transient_for(self.parent)
 
         if self.filename:
             chooser.select_filename(self.filename)
