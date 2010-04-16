@@ -242,10 +242,10 @@ class Graph(object):
         self.move_to(point - pixel * self.density)
 
     def zoom_in_on(self, pixel):
-        self.zoom_on(pixel, 0.5)
+        self.zoom_on(pixel, 0.8)
 
     def zoom_out_on(self, pixel):
-        self.zoom_on(pixel, 2)
+        self.zoom_on(pixel, 1.2)
 
     def _scroll(self, factor):
         """Shift the view.
