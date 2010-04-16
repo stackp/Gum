@@ -48,6 +48,7 @@ effects['Negate'] = mkfx_overwrite_selection(negate)
 effects['Fade In'] = mkfx_overwrite_selection(fade)
 effects['Fade Out'] = mkfx_overwrite_selection(fade_out)
 import fx.volume
+import fx.svf
 
 # Tests
 if __name__ == '__main__':

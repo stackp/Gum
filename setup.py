@@ -16,10 +16,12 @@ Programming Language :: Python
 Topic :: Multimedia :: Sound/Audio :: Editors
 """
 
+c_files = ['scalpel/fast/fast.c', 'scalpel/fx/_svf.c']
 
-if not os.path.exists('scalpel/fast/fast.c'):
-    import Cython.Compiler.Main
-    Cython.Compiler.Main.compile('scalpel/fast/fast.pyx')
+for path in c_files:
+    if not os.path.exists(path):
+        import Cython.Compiler.Main
+        Cython.Compiler.Main.compile(path[:-2] + '.pyx')
 
 
 setup(name = 'scalpel',
@@ -32,9 +34,9 @@ setup(name = 'scalpel',
       long_description = "\n".join(doclines[2:]),
       classifiers = filter(None, classifiers.split("\n")),
       packages = ['scalpel', 'scalpel.fx'],
-      ext_modules = [Extension('scalpel.fast',
-                               ['scalpel/fast/fast.c'],
-                               libraries=['cairo'])],
+      ext_modules = [Extension('scalpel.fast', ['scalpel/fast/fast.c'],
+                               libraries=['cairo']),
+                     Extension('scalpel.fx._svf', ['scalpel/fx/_svf.c'])],
       scripts = ['scripts/scalpel'],
       requires = ['PyGTK', 'numpy', 'pyalsaaudio (==0.4)'],
       install_requires = ['pyalsaaudio==0.4']
