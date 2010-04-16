@@ -9,12 +9,13 @@ class VolumeDialog(gtk.Dialog):
 
     volume = 100
 
-    def __init__(self):
+    def __init__(self, parent):
         gtk.Dialog.__init__(self, title="Volume",
                    flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                             gtk.STOCK_APPLY, gtk.RESPONSE_ACCEPT))
         self.set_default_response(gtk.RESPONSE_ACCEPT)
+        self.set_transient_for(parent)
 
         self.adjustment = gtk.Adjustment(self.__class__.volume, 0, 200, 1)
         scale = gtk.HScale(self.adjustment)
@@ -39,11 +40,24 @@ class VolumeDialog(gtk.Dialog):
         return self.__class__.volume
 
 
-def volume(x):
-    dialog = VolumeDialog()
-    gain = dialog.get_volume() / 100.
-    y = x * gain
-    return y
+def volume(sound, start, end):
+
+    def process(volume):
+        gain = volume / 100.
+        x = sound.frames[start:end]
+        y = x * gain
+        sound.paste(start, end, y)
+        
+    def ui(parent):
+        dialog = VolumeDialog(parent)
+        try:
+            volume = dialog.get_volume()
+        except AbortException:
+            return
+        else:
+            process(volume)
+    
+    return ui
 
 
-effect.effects['Volume'] = effect.mkfx_overwrite_selection(volume)
+effect.effects['Volume'] = volume

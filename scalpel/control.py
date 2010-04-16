@@ -180,7 +180,7 @@ class Controller(object):
             start = 0
             end = len(self._sound.frames)
         fx = effect.effects[name]
-        fx(self._sound, start, end)
+        return fx(self._sound, start, end)
 
     def filename(self):
         return self._sound.filename

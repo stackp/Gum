@@ -322,7 +322,9 @@ class EditorWindow(gtk.Window):
     
     @busy
     def effect(self, widget, *args):
-        self.ctrl.effect(*args)
+        dialog = self.ctrl.effect(*args)
+        if dialog:
+            dialog(self)
 
     def about(self, *args):
         d = gtk.AboutDialog()
