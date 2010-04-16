@@ -261,10 +261,10 @@ class Graph(object):
         self.update()
 
     def scroll_left(self):
-        self._scroll(-0.20)
+        self._scroll(-0.1)
             
     def scroll_right(self):
-        self._scroll(0.20)
+        self._scroll(0.1)
 
     def channels(self):
         "Return the graph values."
