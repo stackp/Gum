@@ -1,4 +1,4 @@
-import effect
+from scalpel.effect import effects
 import numpy
 import gtk
 import functools
@@ -110,6 +110,6 @@ def svf_fx(type, sound, start, end):
     return ui
 
 
-effect.effects['Filter: High Pass'] = functools.partial(svf_fx, "High Pass")
-effect.effects['Filter: Band Pass'] = functools.partial(svf_fx, "Band Pass")
-effect.effects['Filter: Low Pass'] = functools.partial(svf_fx, "Low Pass")
+effects['Filter: High Pass'] = functools.partial(svf_fx, "High Pass")
+effects['Filter: Band Pass'] = functools.partial(svf_fx, "Band Pass")
+effects['Filter: Low Pass'] = functools.partial(svf_fx, "Low Pass")
