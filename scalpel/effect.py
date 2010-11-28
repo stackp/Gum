@@ -1,4 +1,4 @@
-import numpy 
+import numpy
 from copy import copy
 
 effects = {}
@@ -33,13 +33,12 @@ def fade(x, type='in'):
 def fade_out(x):
     return fade(x, 'out')
 
-
 def mkfx_overwrite_selection(function):
-    def apply(sound, start, end):
+    def process(sound, start, end):
         x = sound.frames[start:end]
         y = function(x)
         sound.paste(start, end, y)
-    return apply
+    return process
 
 # Register effects
 effects['Reverse'] = mkfx_overwrite_selection(reverse)
