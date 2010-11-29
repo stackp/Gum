@@ -31,7 +31,9 @@ def on_new_sound_loaded(controller, graph, sel, curs):
     EditorWindow(controller, graph, sel, curs)
 
 def display_error(title, text, parent=None):
-    d = gtk.MessageDialog(parent, buttons=gtk.BUTTONS_CLOSE)
+    d = gtk.MessageDialog(parent, type=gtk.MESSAGE_ERROR,
+                          buttons=gtk.BUTTONS_CLOSE)
+    d.set_icon(d.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
     d.set_title(title)
     d.set_markup(text)
     d.run()
