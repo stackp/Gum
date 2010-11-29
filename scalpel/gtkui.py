@@ -324,7 +324,8 @@ class EditorWindow(gtk.Window):
     def effect(self, widget, *args):
         dialog = self.ctrl.effect(*args)
         if dialog:
-            dialog(self)
+            dialog.set_transient_for(self)
+            dialog.proceed()
 
     def about(self, *args):
         d = gtk.AboutDialog()

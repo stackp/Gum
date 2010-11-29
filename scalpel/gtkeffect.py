@@ -1,8 +1,5 @@
 import gtk
 
-class AbortException(Exception):
-    pass
-
 class Dialog(gtk.Dialog):
     def __init__(self, title=""):
         gtk.Dialog.__init__(self, title,
@@ -40,22 +37,25 @@ class Dialog(gtk.Dialog):
         self.table.attach(scale, 1, 2, vposition, vposition + 1,
                           xoptions=gtk.EXPAND|gtk.FILL)
 
-
-    def get_parameters(self):
+    def proceed(self):
         self.show_all()
         response = self.run()
         self.hide()
         if response != gtk.RESPONSE_ACCEPT:
-            raise AbortException
+            return
         values = {}
         for name in self.parameters:
             adj = self.parameters[name]
             values[name] = adj.get_value()
-        return values
+        self.callback(values)
+
+    def callback(self, parameters):
+        """Reaffect this attribute with a method that will apply the effect."""
+        print parameters
 
 
 if __name__ == '__main__':
     d = Dialog('Effect')
     d.add_slider("Delay", 500, 0, 5000)
     d.add_slider("Feedback", 50, 0, 99)
-    print d.get_parameters()
+    d.proceed()

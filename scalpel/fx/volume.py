@@ -10,22 +10,17 @@ def volume(sound, start, end):
         x = sound.frames[start:end]
         y = x * gain
         sound.paste(start, end, y)
-        
-    def ui(parent):
+
+    def callback(parameters):
         global volume_last
-        name_param = 'Volume'
-        d = gtkeffect.Dialog('Volume')
-        d.set_transient_for(parent)
-        d.add_slider(name_param, volume_last, 0, 200)
-        try:
-            parameters = d.get_parameters()
-        except:
-            return
-        volume = parameters[name_param]
+        volume = parameters['Volume']
         volume_last = volume
         process(volume)
 
-    return ui
-
+    global volume_last
+    d = gtkeffect.Dialog('Volume')
+    d.add_slider('Volume', volume_last, 0, 200, 0)
+    d.callback = callback
+    return d
 
 effect.effects['Volume'] = volume
