@@ -11,6 +11,11 @@ import cursor
 import control
 import effect
 import os.path
+import glob
+import imp
+import sys
+
+PLUGINS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fx')
 
 # This signal is emitted when a new sound has been loaded. User
 # interface should connect to it. Values passed are: Controller,
@@ -33,3 +38,20 @@ def list_effects():
 
 def list_extensions():
     return edit.list_extensions()
+
+def load_all_plugins():
+    plugins = glob.glob(os.path.join(PLUGINS_DIR, '*.py'))
+
+    # The plugin may do a relative import
+    sys.path.append(PLUGINS_DIR)
+
+    for filename in plugins:
+        try:
+            execfile(filename, globals())
+        except Exception, e:
+            print "Error while loading plugin: '%s'" % filename
+            print e
+
+    sys.path.remove(PLUGINS_DIR)
+
+load_all_plugins()

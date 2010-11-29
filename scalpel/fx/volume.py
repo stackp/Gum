@@ -1,4 +1,4 @@
-from scalpel.effect import effects
+import effect
 import gtk
 
 class AbortException(Exception):
@@ -60,4 +60,4 @@ def volume(sound, start, end):
     return ui
 
 
-effects['Volume'] = volume
+effect.effects['Volume'] = volume

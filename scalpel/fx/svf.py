@@ -1,4 +1,4 @@
-from scalpel.effect import effects
+from effect import effects
 import numpy
 import gtk
 import functools
