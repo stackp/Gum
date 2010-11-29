@@ -847,8 +847,8 @@ out of luck, because its implementation of POSIX open is broken)"""
         elif dtype == N.int16:
             res         = _SND.sf_readf_short(self.hdl, y, c_nframes)
         else:
-            RuntimeError("Sorry, only float, double, int and short read " + \
-                    "supported for now")
+            raise RuntimeError("Sorry, only float, double, int and short "
+                               "read supported for now")
 
         if not(res == nframes):
             msg = "Read %d frames, expected to read %d" % (res, nframes)
