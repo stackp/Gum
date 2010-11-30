@@ -38,6 +38,6 @@ setup(name = 'scalpel',
                                libraries=['cairo']),
                      Extension('scalpel.fx._svf', ['scalpel/fx/_svf.c'])],
       scripts = ['scripts/scalpel'],
-      requires = ['PyGTK', 'numpy', 'pyalsaaudio (==0.4)'],
-      install_requires = ['pyalsaaudio==0.4']
+      requires = ['PyGTK', 'numpy', 'pyalsaaudio (>=0.6)'],
+      install_requires = ['pyalsaaudio>=0.6']
       )
