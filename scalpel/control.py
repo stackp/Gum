@@ -31,11 +31,13 @@ class Controller(object):
 
         """
         def wrapper(self, *args, **kwargs):
+            result = None
             try:
-                method(self, *args, **kwargs)
+                result = method(self, *args, **kwargs)
             except Exception, e:
                 self.error("Error", str(e))
                 traceback.print_exc()
+            return result
 
         wrapper.__name__ = method.__name__
         wrapper.__doc__ = method.__doc__
@@ -173,6 +175,7 @@ class Controller(object):
         else:
             self._graph.zoom_out_full()
 
+    @_report_exception
     def effect(self, name):
         if self._selection.selected():
             start, end = self._selection.get()
