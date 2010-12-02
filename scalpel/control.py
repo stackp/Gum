@@ -188,7 +188,7 @@ class Controller(object):
     def filename(self):
         return self._sound.filename
 
-class FileNotSaved: pass
+class FileNotSaved(Exception): pass
 
 def test_Controller():
     from mock import Fake
