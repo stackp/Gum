@@ -1,0 +1,7 @@
+#!/bin/sh
+
+DIRECTORY=`dirname $0`
+cd $DIRECTORY/scalpel
+for file in *.py; do
+    python $file
+done
