@@ -174,7 +174,7 @@ class Graph(object):
         self.update()
 
     def center_on(self, frame):
-        self.move_to(frame - (self._width - 1) * self.density)
+        self.move_to(frame - (self._width - 1) * self.density * 0.5)
 
     def frmtopxl(self, f):
         "Converts a frame index to a pixel index."
