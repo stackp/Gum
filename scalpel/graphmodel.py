@@ -416,7 +416,7 @@ def test_zoom_in():
     g.set_width(2)
     g.zoom_in()
     o = g.channels()
-    assert o == [[(1, 1), (2, 2)]]
+    assert o == [[(2, 2), (3, 3)]]
 
     g.zoom_out()
     g.set_width(4)
@@ -434,15 +434,15 @@ def test_zoom_in_on():
     g.set_width(2)
 
     g.zoom_in_on(0)
-    assert g.channels() == [[(1, 1), (2, 2)]]
+    assert g.channels() == [[(1, 2), (3, 3)]]
 
     g.zoom_out()
     g.zoom_in_on(1)
-    assert g.channels() == [[(2, 2), (3, 3)]]
+    assert g.channels() == [[(1, 2), (3, 3)]]
 
     g.zoom_out()
     g.zoom_in_on(2)
-    assert g.channels() == [[(3, 3), (4, 4)]]
+    assert g.channels() == [[(1, 2), (3, 3)]]
 
 def test_scroll():
     import numpy
