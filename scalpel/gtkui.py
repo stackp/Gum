@@ -336,7 +336,7 @@ class EditorWindow(gtk.Window):
         d.set_version(constants.__version__)
         d.set_website(constants.__url__)
         d.set_copyright("(c) Pierre Duquesne <stackp@online.fr>")
-        d.set_comments("A sound editor")
+        d.set_comments("An audio editor")
         d.run()
         d.destroy()
 
