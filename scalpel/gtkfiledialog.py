@@ -64,6 +64,15 @@ class OpenFileDialog(FileDialog):
     buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                gtk.STOCK_OPEN, gtk.RESPONSE_OK)
 
+    def get_filenames(self):
+        self.chooser.set_select_multiple(True)
+        response = self.chooser.run()
+        filenames = self.chooser.get_filenames()
+        self.hide_dialog()
+        if response == gtk.RESPONSE_OK:
+            return filenames
+        else:
+            return []
 
 class SaveFileDialog(FileDialog):
 

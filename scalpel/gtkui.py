@@ -341,8 +341,8 @@ class EditorWindow(gtk.Window):
     def open(self, *args):
         dialog = OpenFileDialog(app.list_extensions(), parent=self,
                                 filename=self.ctrl.filename())
-        filename = dialog.get_filename()
-        if filename != None:
+        filenames = dialog.get_filenames()
+        for filename in filenames:
             self._do_open(filename)
 
     def save_as(self, *args):
