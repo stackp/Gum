@@ -1,4 +1,5 @@
 import gtk
+import os.path
 
 class FileDialog(object):
     """Handle a pair of file dialogs (open and save)."""
@@ -13,7 +14,11 @@ class FileDialog(object):
     def __init__(self, extensions=[], parent=None, filename=None):
         self.filename = filename
         self.extensions = extensions
-        self.chooser = gtk.FileChooserDialog(parent=parent,
+        self.parent = parent
+        self.create_dialog()
+
+    def create_dialog(self):
+        self.chooser = gtk.FileChooserDialog(parent=self.parent,
                                              action=self.action,
                                              buttons=self.buttons)
         self.chooser.set_title(self.title)
@@ -74,6 +79,7 @@ class OpenFileDialog(FileDialog):
         else:
             return []
 
+
 class SaveFileDialog(FileDialog):
 
     title = 'Save as:'
@@ -81,6 +87,27 @@ class SaveFileDialog(FileDialog):
     action = gtk.FILE_CHOOSER_ACTION_SAVE
     buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                gtk.STOCK_SAVE, gtk.RESPONSE_OK)
+
+    def get_filename(self):
+        must_return = False
+        while not must_return:
+            must_return = True
+            filename = FileDialog.get_filename(self)
+            if filename is not None and os.path.exists(filename):
+                must_return = self.ask_overwrite(os.path.basename(filename))
+                if not must_return:
+                    self.create_dialog()
+        return filename
+
+    def ask_overwrite(self, filename):
+        d = gtk.MessageDialog(self.parent, type=gtk.MESSAGE_QUESTION,
+                              buttons=(gtk.BUTTONS_YES_NO))
+        d.set_icon(d.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
+        d.set_markup("<b>%s already exists. Overwrite?</b>" % filename)
+        response = d.run()
+        d.destroy()
+        overwrite = response == gtk.RESPONSE_YES
+        return overwrite
 
 
 class SaveSelectionFileDialog(SaveFileDialog):
