@@ -12,7 +12,7 @@ sys.argv[0] = constants.__appname__
 import app
 import control
 from gtkwaveform import GraphView, GraphScrollbar
-from gtkfiledialog import FileDialog
+from gtkfiledialog import OpenFileDialog, SaveFileDialog
 import copy
 import os.path
 import urllib
@@ -72,7 +72,6 @@ class EditorWindow(gtk.Window):
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
-        self.filedialog = FileDialog(app.list_extensions(), self)
 
         self.vbox = gtk.VBox()
         self.vbox.pack_start(self.menubar, expand=False, fill=False)
@@ -257,7 +256,6 @@ class EditorWindow(gtk.Window):
     def _filename_update(self):
         filename = self.ctrl.filename()
         self._update_title(filename)
-        self.filedialog.filename = filename
 
     def _update_title(self, filename=None):
         title = constants.__appname__
@@ -341,12 +339,16 @@ class EditorWindow(gtk.Window):
         d.destroy()
 
     def open(self, *args):
-        filename = self.filedialog.get_filename(action='open')
+        dialog = OpenFileDialog(app.list_extensions(), parent=self,
+                                filename=self.ctrl.filename())
+        filename = dialog.get_filename()
         if filename != None:
             self._do_open(filename)
 
     def save_as(self, *args):
-        filename = self.filedialog.get_filename(action='save')
+        dialog = SaveFileDialog(app.list_extensions(), parent=self,
+                                filename=self.ctrl.filename())
+        filename = dialog.get_filename()
         saved = False
         if filename != None:
             self.ctrl.save_as(filename)
@@ -355,7 +357,9 @@ class EditorWindow(gtk.Window):
 
     def save_selection_as(self, *args):
         # FIXME: title
-        filename = self.filedialog.get_filename(action='save')
+        dialog = SaveFileDialog(app.list_extensions(), parent=self,
+                                filename=self.ctrl.filename())
+        filename = dialog.get_filename()
         if filename != None:
             self.ctrl.save_selection_as(filename)
 

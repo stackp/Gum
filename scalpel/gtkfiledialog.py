@@ -3,67 +3,50 @@ import gtk
 class FileDialog(object):
     """Handle a pair of file dialogs (open and save)."""
 
-    def __init__(self, extensions=[], parent=None):
-        self.filename = None
+    title = ""
+    icon = None
+    title = 'Open file:'
+    stock = gtk.STOCK_OPEN
+    action = gtk.FILE_CHOOSER_ACTION_OPEN
+    buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+
+    def __init__(self, extensions=[], parent=None, filename=None):
+        self.filename = filename
         self.extensions = extensions
-        self.parent = parent
-
-    def get_filename(self, action='open'):
-        """Run a dialog and return a filename or None.
-
-        Valid actions are 'open' and 'save'.
-
-        """
-        # I used to create the dialogs only once (on object
-        # initialization), and hide and show them, but I can not
-        # manage to pre-select a filename after a dialog have been
-        # used once. I guess file chooser dialogs are just throwaway
-        # objects. Thus, recreate them every time.
-        if action == 'open':
-            chooser = gtk.FileChooserDialog(
-                                action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                         gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-            title = 'Open file:'
-            stock = gtk.STOCK_OPEN
-
-        elif action == 'save':
-            chooser = gtk.FileChooserDialog(
-                                action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                                buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                                         gtk.STOCK_SAVE, gtk.RESPONSE_OK))
-            title = 'Save as:'
-            stock = gtk.STOCK_SAVE
-
-        else:
-            raise Exception("action must be 'open' or 'save' (got '%s')"
-                            % action)
+        self.chooser = gtk.FileChooserDialog(parent=parent,
+                                             action=self.action,
+                                             buttons=self.buttons)
+        self.chooser.set_title(self.title)
+        icon = self.chooser.render_icon(self.stock, gtk.ICON_SIZE_MENU)
+        self.chooser.set_icon(icon)
+        if self.filename:
+            self.chooser.select_filename(self.filename)
 
         # Supported files filter
         filter = gtk.FileFilter()
         filter.set_name("Supported files")
         for ext in self.extensions:
             filter.add_pattern("*." + ext)
-        chooser.add_filter(filter)
-        chooser.set_filter(filter)
+        self.chooser.add_filter(filter)
+        self.chooser.set_filter(filter)
 
         # All files filter
         filter = gtk.FileFilter()
         filter.set_name("All files")
         filter.add_pattern("*")
-        chooser.add_filter(filter)
+        self.chooser.add_filter(filter)
 
-        chooser.set_title(title)
-        icon = chooser.render_icon(stock, gtk.ICON_SIZE_MENU)
-        chooser.set_icon(icon)
-        chooser.set_transient_for(self.parent)
+    def get_filename(self):
+        response = self.chooser.run()
+        filename = self.chooser.get_filename()
+        self.hide_dialog()
+        if response == gtk.RESPONSE_OK:
+            return filename
+        else:
+            return None
 
-        if self.filename:
-            chooser.select_filename(self.filename)
-        response = chooser.run()
-        filename = chooser.get_filename()
-        chooser.destroy()
-
+    def hide_dialog(self):
+        self.chooser.destroy()
         # By default, the GTK loop waits until the process is idle to
         # process events. Now, it is very probable that file I/O will
         # be performed right after this method was called and that
@@ -72,22 +55,34 @@ class FileDialog(object):
         while gtk.events_pending():
             gtk.main_iteration(False)
 
-        if response == gtk.RESPONSE_OK:
-            return filename
-        else:
-            return None
+
+class OpenFileDialog(FileDialog):
+
+    title = 'Open file:'
+    stock = gtk.STOCK_OPEN
+    action = gtk.FILE_CHOOSER_ACTION_OPEN
+    buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+               gtk.STOCK_OPEN, gtk.RESPONSE_OK)
+
+
+class SaveFileDialog(FileDialog):
+
+    title = 'Save as:'
+    stock = gtk.STOCK_SAVE
+    action = gtk.FILE_CHOOSER_ACTION_SAVE
+    buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+               gtk.STOCK_SAVE, gtk.RESPONSE_OK)
 
 
 def test():
     d = FileDialog()
-    print d.get_filename(action='open')
-    print d.get_filename(action='save')
-    try:
-        d.get_filename(action='nonsense')
-    except Exception, e:
-        print e
-    else:
-        assert False
+    print d.get_filename()
+
+    d = OpenFileDialog()
+    print d.get_filename()
+
+    d = SaveFileDialog()
+    print d.get_filename()
 
 if __name__ == '__main__':
     test()
