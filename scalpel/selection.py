@@ -48,6 +48,16 @@ class Selection(object):
         self._cursor.set_frame(min(self.start, self.end))
         self.changed()
 
+    def move_start_to_pixel(self, pixel):
+        start, end = self.get()
+        self.set(end, end)
+        self.extend(pixel)
+
+    def move_end_to_pixel(self, pixel):
+        start, end = self.get()
+        self.set(start, start)
+        self.extend(pixel)
+
     def pixels(self):
         """Returns pixel position for selection: `(start, end)`.
 
