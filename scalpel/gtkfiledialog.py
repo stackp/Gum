@@ -83,6 +83,11 @@ class SaveFileDialog(FileDialog):
                gtk.STOCK_SAVE, gtk.RESPONSE_OK)
 
 
+class SaveSelectionFileDialog(SaveFileDialog):
+
+    title = 'Save selection as:'
+
+
 def test():
     d = FileDialog()
     print d.get_filename()

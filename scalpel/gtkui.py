@@ -12,7 +12,8 @@ sys.argv[0] = constants.__appname__
 import app
 import control
 from gtkwaveform import GraphView, GraphScrollbar
-from gtkfiledialog import OpenFileDialog, SaveFileDialog
+from gtkfiledialog import OpenFileDialog, SaveFileDialog, \
+                                                        SaveSelectionFileDialog
 import copy
 import os.path
 import urllib
@@ -356,9 +357,8 @@ class EditorWindow(gtk.Window):
         return saved
 
     def save_selection_as(self, *args):
-        # FIXME: title
-        dialog = SaveFileDialog(app.list_extensions(), parent=self,
-                                filename=self.ctrl.filename())
+        dialog = SaveSelectionFileDialog(app.list_extensions(), parent=self,
+                                         filename=self.ctrl.filename())
         filename = dialog.get_filename()
         if filename != None:
             self.ctrl.save_selection_as(filename)
