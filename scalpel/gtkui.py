@@ -374,7 +374,8 @@ class EditorNotebook(gtk.Notebook):
 
     def add_page(self, page):
         page.show_all()
-        i = self.append_page(page, page.tab)
+        i = self.append_page_menu(page, tab_label=page.tab,
+                                  menu_label=page.menu_title)
         self.set_tab_reorderable(page, True)
         self.set_current_page(i)
         page.connect("filename-changed", self.on_filename_changed)
@@ -474,6 +475,9 @@ class EditorPage(gtk.VBox):
         button.modify_style(style)
         button.connect("clicked", self.must_close)
 
+        # Popup menu page title
+        self.menu_title = gtk.Label()
+
         # Tab title
         title = gtk.Label()
 
@@ -511,6 +515,7 @@ class EditorPage(gtk.VBox):
         else:
             name = "Unsaved"
         self.title.set_text(name)
+        self.menu_title.set_text(name)
         self.emit('filename-changed', filename)
 
     def __getattr__(self, name):
