@@ -475,20 +475,17 @@ class EditorPage(gtk.VBox):
         button.modify_style(style)
         button.connect("clicked", self.must_close)
 
+        # Tab title
+        self.title = gtk.Label()
+        self.tab = gtk.HBox()
+        self.tab.modify_style(style)
+        self.tab.pack_start(self.title, True, True)
+        self.tab.pack_end(button, False, False)
+        self.tab.show_all()
+
         # Popup menu page title
         self.menu_title = gtk.Label()
 
-        # Tab title
-        title = gtk.Label()
-
-        tab = gtk.HBox()
-        tab.modify_style(style)
-        tab.pack_start(title, True, True)
-        tab.pack_end(button, False, False)
-        tab.show_all()
-
-        self.tab = tab
-        self.title = title
         self.waveform = GraphView(graph, selection, cursor)
         self.scrollbar = GraphScrollbar(graph)
         self.statusbar = gtk.Statusbar()
