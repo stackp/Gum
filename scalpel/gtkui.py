@@ -317,7 +317,7 @@ class EditorWindow(gtk.Window):
 
     def save_selection_as(self, *args):
         dialog = SaveSelectionFileDialog(app.list_extensions(), parent=self,
-                                         filename=self.filename())
+                                         filename=self.notebook.filename())
         filename = dialog.get_filename()
         if filename != None:
             self.notebook.save_selection_as(filename)
