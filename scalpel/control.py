@@ -188,6 +188,12 @@ class Controller(object):
     def filename(self):
         return self._sound.filename
 
+    def on_selection_changed(self, widget):
+        if self._player.is_playing():
+            self.stop()
+            self.play()
+
+
 class FileNotSaved(Exception): pass
 
 def test_Controller():

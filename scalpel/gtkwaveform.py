@@ -3,6 +3,7 @@
 # Licensed under the Revised BSD License.
 
 import gtk
+import gobject
 import cairo
 try:
     import fast
@@ -92,6 +93,11 @@ class GraphView(LayeredGraphView):
     * Mouse event listeners act on models (scroll, selection, middle-click).
 
     """
+
+    __gsignals__ = {'selection-changed': (gobject.SIGNAL_RUN_LAST,
+                                          gobject.TYPE_NONE,
+                                          ())}
+
     def __init__(self, graph, selection, cursor):
         super(GraphView, self).__init__(graph)
         self.layers.append(BackgroundLayer(self, selection))
@@ -342,6 +348,7 @@ class MouseSelection(object):
     def button_release(self, widget, event):
         if event.button == 1:
             self.pressed = False
+            self.widget.emit("selection-changed")
 
     def motion_notify(self, widget, event):
         if self.pressed:

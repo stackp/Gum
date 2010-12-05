@@ -492,6 +492,8 @@ class EditorPage(gtk.VBox):
         self.pack_start(self.waveform, expand=True, fill=True)
         self.pack_start(self.scrollbar, expand=False, fill=False)
         self.pack_end(self.statusbar, expand=False, fill=False)
+        self.waveform.connect("selection-changed",
+                                              self.on_selection_changed)
         self.ctrl.filename_changed.connect(self._update_filename)
         self.ctrl.error.connect(self.emit_error)
         self._update_filename()
@@ -521,7 +523,7 @@ class EditorPage(gtk.VBox):
                     "cut", "copy", "paste", "mix", "undo", "redo",
                     "zoom_in", "zoom_out", "zoom_fit", "effect",
                     "open", "save_as", "save_selection_as",
-                    "filename"]:
+                    "filename", "on_selection_changed"]:
             method = getattr(self.ctrl, name)
             def forward(*args):
                 return method(*args)
