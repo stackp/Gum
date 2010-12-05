@@ -96,7 +96,7 @@ class Controller(object):
         self._player.stop()
 
     def toggle_play(self):
-        if self._player._playing:
+        if self._player.is_playing():
             self.stop()
         else:
             self.play()

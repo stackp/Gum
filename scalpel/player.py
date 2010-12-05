@@ -85,6 +85,9 @@ class Player(object):
     def stop(self):
         self._playing = False
 
+    def is_playing(self):
+        return self._playing
+
 
 # test
 def testPlayer():
