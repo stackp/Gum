@@ -12,7 +12,7 @@ for better performance.
 
 Scalpel still has some rough edges but is quite usable. Try it now and
 be sure to send your feedback. Installing is as easy as (see
-http://scalpelsound.online.fr/?p=102 for more details)::
+http://scalpelsound.online.fr/?page_id=457 for more details)::
 
     pip install scalpel
 
