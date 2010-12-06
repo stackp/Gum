@@ -34,6 +34,14 @@ class Selection(object):
     def select_all(self):
         self.set(0, self._graph.numframes())
 
+    def select_till_start(self):
+        start, end = self.get()
+        self.set(0, end)
+
+    def select_till_end(self):
+        start, end = self.get()
+        self.set(start, self._graph.numframes())
+
     def selected(self):
         return self.start != self.end
 

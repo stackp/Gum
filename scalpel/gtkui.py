@@ -85,8 +85,11 @@ class EditorWindow(gtk.Window):
 
         # Keyboard shortcuts
         kval = gtk.gdk.keyval_from_name
-        self.handlers = {kval('space'): self.toggle_play,
-                         kval('ISO_Level3_Shift'): self.play}
+        self.handlers = {'space': self.toggle_play,
+                         'ISO_Level3_Shift': self.play,
+                         '<Shift>Home': self.select_till_start,
+                         '<Shift>End': self.select_till_end}
+
         self.connect('key_press_event', self.on_key_press_event)
 
         self.connect("delete-event", self.quit)
@@ -266,7 +269,8 @@ class EditorWindow(gtk.Window):
         if name in ["new", "save", "play", "toggle_play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
-                    "zoom_in", "zoom_out", "zoom_fit"]:
+                    "zoom_in", "zoom_out", "zoom_fit",
+                    "select_till_start", "select_till_end"]:
             method = getattr(self.notebook, name)
             def forward(*args):
                 method(*args[1:])
@@ -275,8 +279,11 @@ class EditorWindow(gtk.Window):
             raise AttributeError(name)
 
     def on_key_press_event(self, widget, event):
-        if event.keyval in self.handlers:
-            handler = self.handlers[event.keyval]
+        key = gtk.gdk.keyval_name(event.keyval)
+        if event.state is gtk.gdk.SHIFT_MASK:
+            key = '<Shift>' + key
+        if key in self.handlers:
+            handler = self.handlers[key]
             handler()
 
     @busy
@@ -437,8 +444,9 @@ class EditorNotebook(gtk.Notebook):
         if name in ["new", "save", "play", "toggle_play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
-                    "zoom_in", "zoom_out", "zoom_fit", "effect",
-                    "open", "save_as", "save_selection_as",
+                    "zoom_in", "zoom_out", "zoom_fit",
+                    "select_till_start", "select_till_end",
+                    "effect", "open", "save_as", "save_selection_as",
                     "filename"]:
             def forward(*args):
                 page = self.get_nth_page(self.get_current_page())
@@ -521,8 +529,9 @@ class EditorPage(gtk.VBox):
         if name in ["new", "save", "play", "toggle_play", "stop",
                     "goto_start", "goto_end", "select_all",
                     "cut", "copy", "paste", "mix", "undo", "redo",
-                    "zoom_in", "zoom_out", "zoom_fit", "effect",
-                    "open", "save_as", "save_selection_as",
+                    "zoom_in", "zoom_out", "zoom_fit",
+                    "select_till_start", "select_till_end",
+                    "effect", "open", "save_as", "save_selection_as",
                     "filename", "on_selection_changed"]:
             method = getattr(self.ctrl, name)
             def forward(*args):

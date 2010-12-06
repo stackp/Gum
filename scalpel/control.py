@@ -162,6 +162,12 @@ class Controller(object):
     def select_all(self):
         self._selection.select_all()
 
+    def select_till_start(self):
+        self._selection.select_till_start()
+
+    def select_till_end(self):
+        self._selection.select_till_end()
+
     def zoom_out(self):
         self._graph.zoom_out()
 
