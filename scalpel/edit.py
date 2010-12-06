@@ -4,6 +4,7 @@
 
 from event import Signal
 from copy import copy
+import os.path
 import pysndfile
 import numpy
 
@@ -93,6 +94,7 @@ class Sound(object):
             self._saved_revision = None
             self._format = pysndfile.formatinfo()
         else:
+            filename = os.path.expanduser(filename)
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self.frames = f.read_frames(nframes)
@@ -628,7 +630,17 @@ def testSound():
         print "OK"
     else:
         assert False
-        
+
+    # expand user symbol
+    import mock
+    def fake_sndfile(filename):
+        assert '~' not in filename
+        return mock.Fake()
+    sndfile = pysndfile.sndfile
+    pysndfile.sndfile = fake_sndfile
+    Sound("~/sound.wav")
+    pysndfile.sndfile = sndfile
+
 if __name__ == '__main__':
     testAction()
     testSound()
