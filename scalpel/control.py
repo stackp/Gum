@@ -108,6 +108,7 @@ class Controller(object):
     def goto_end(self):
         end = len(self._sound.frames)
         self._selection.set(end, end)
+        self._graph.move_to(end)
 
     def cut(self):
         start, end = self._selection.get()
