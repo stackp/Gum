@@ -91,25 +91,27 @@ class Sound(object):
             self.frames = numpy.array([])
             self.samplerate = 44100
             self._saved_revision = None
+            self._format = pysndfile.formatinfo()
         else:
             f = pysndfile.sndfile(filename)
             nframes = f.get_nframes()
             self.frames = f.read_frames(nframes)
             self.samplerate = f.get_samplerate()
+            self._format = f._format
             f.close()
             self._saved_revision = self.history.revision()
 
     def numchan(self):
         return self.frames.ndim
 
-    def save(self, format=pysndfile.formatinfo()):
-        self.save_as(self.filename, format)
+    def save(self):
+        self.save_as(self.filename)
 
-    def save_as(self, filename, format=pysndfile.formatinfo()):
+    def save_as(self, filename):
         if filename is None:
             raise Exception("No filename")
         f = pysndfile.sndfile(filename, mode='write',
-                              format=format,
+                              format=self._format,
                               channels=self.numchan(),
                               samplerate=self.samplerate)
         f.write_frames(self.frames)
@@ -436,6 +438,18 @@ def testSound():
     assert snd.frames.size == snd2.frames.size
     assert abs((snd.frames - snd2.frames).flatten().max()) == 0
     os.remove(outfile)
+
+    # Preserve file format when saving
+    snd = Sound("../sounds/test3.wav")
+    outfile = "/tmp/test3.wav"
+    snd.save_as(outfile)
+    snd2 = Sound(outfile)
+    assert snd2._format.type == 'wavex'
+    assert snd2._format.encoding == 'pcm24'
+    assert snd2._format.endianness == 'file'
+    assert snd.samplerate == 48000
+    os.remove(outfile)
+    
 
     # test mix_channels
     #
