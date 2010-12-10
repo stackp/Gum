@@ -15,9 +15,9 @@ class AlsaBackend(object):
         self._pcm.setchannels(2)
         self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT_LE)
         self.set_samplerate(rate)
-        # alsaaudio.PCM.setperiodsize() does not work but it
-        # returns the actual period size.
-        self.periodsize = self._pcm.setperiodsize(128)
+        # alsaaudio.PCM.setperiodsize() attempts to change the
+        # periodsize and returns the actual period size.
+        self.periodsize = self._pcm.setperiodsize(1024)
 
     def set_samplerate(self, rate):
         self._pcm.setrate(rate)
