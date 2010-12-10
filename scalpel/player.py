@@ -13,7 +13,7 @@ class AlsaBackend(object):
                             mode=alsaaudio.PCM_NORMAL,
                             card='default')
         self._pcm.setchannels(2)
-        self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT64_LE)
+        self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT_LE)
         self.set_samplerate(rate)
         # alsaaudio.PCM.setperiodsize() does not work but it
         # returns the actual period size.
@@ -26,13 +26,13 @@ class AlsaBackend(object):
         if buf.ndim == 1:
             # converting mono to stereo
             buf = numpy.array([buf, buf]).transpose()
-        if 0 < len(buf) < self.periodsize: # FIXME: wrong
+        if 0 < len(buf) < self.periodsize:
             # zero padding to flush the ALSA buffer
             padlen = self.periodsize - len(buf)
             padding = numpy.zeros((padlen, buf.ndim))
             buf = numpy.concatenate((buf, padding))
-        buf = buf.tostring()
-        self._pcm.write(buf)
+        bytes = buf.astype(numpy.float32).tostring()
+        self._pcm.write(bytes)
         
 
 class Player(object):
