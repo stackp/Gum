@@ -160,21 +160,6 @@ class Controller(object):
             end = n
             self._selection.set(start, end)
 
-    def select_all(self):
-        self._selection.select_all()
-
-    def select_till_start(self):
-        self._selection.select_till_start()
-
-    def select_till_end(self):
-        self._selection.select_till_end()
-
-    def zoom_out(self):
-        self._graph.zoom_out()
-
-    def zoom_in(self):
-        self._graph.zoom_in()
-
     def zoom_fit(self):
         if self._selection.selected():
             start, end = self._selection.get()
@@ -199,6 +184,15 @@ class Controller(object):
         if self._player.is_playing():
             self.stop()
             self.play()
+
+    def __getattr__(self, name):
+        if name in ["select_all", "select_till_start", "select_till_end"]:
+            method = getattr(self._selection, name)
+        elif name in ["zoom_in", "zoom_out"]:
+            method = getattr(self._graph, name)
+        else:
+            raise AttributeError(name)
+        return method
 
 
 class FileNotSaved(Exception): pass
