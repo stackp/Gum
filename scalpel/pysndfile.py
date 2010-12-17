@@ -851,10 +851,7 @@ out of luck, because its implementation of POSIX open is broken)"""
                                "read supported for now")
 
         if not(res == nframes):
-            msg = "Read %d frames, expected to read %d" % (res, nframes)
-            msg += ", libsndfile last msg is \n\t%s" \
-                    % _SND.sf_strerror(self.hdl)
-            raise IOError(msg)
+            y = y[0:res]
 
         return y
 
