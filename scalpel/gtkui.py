@@ -405,7 +405,9 @@ class EditorNotebook(gtk.Notebook):
         try:
             self._close_page(numpage, force=False)
         except control.FileNotSaved:
-            proceed = self._show_dialog_close()
+            page = self.get_nth_page(numpage)
+            name = page.filename() or "sound"
+            proceed = self._show_dialog_close(name)
             if not proceed:
                 return False
             else:
@@ -419,10 +421,9 @@ class EditorNotebook(gtk.Notebook):
         page.destroy()
         return True
 
-    def _show_dialog_close(self):
+    def _show_dialog_close(self, name):
         dialog = gtk.MessageDialog(parent=self.root_window,
                                    type=gtk.MESSAGE_WARNING)
-        name = self.filename() or "sound"
         name = os.path.basename(name)
         name = name.replace('&', '&amp;')
         dialog.set_markup("<b>Save %s before closing?</b>" % name)
