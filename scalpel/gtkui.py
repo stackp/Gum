@@ -505,6 +505,7 @@ class EditorPage(gtk.VBox):
                                               self.on_selection_changed)
         self.ctrl.filename_changed.connect(self._update_filename)
         self.ctrl.error.connect(self.emit_error)
+        self.connect("destroy", self.on_destroy)
         self._update_filename()
 
     def must_close(self, *args):
@@ -512,6 +513,11 @@ class EditorPage(gtk.VBox):
 
     def close(self, force=False):
         self.ctrl.close(force)
+
+    def on_destroy(self, widget):
+        # For some reason, the "tab" widget has to be destroyed
+        # explicitely. Otherwise, it does not get garbage-collected.
+        self.tab.destroy()
 
     def emit_error(self, title, text):
         self.emit('error', title, text)
