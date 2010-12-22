@@ -108,6 +108,15 @@ class GraphView(LayeredGraphView):
         MouseScroll(self, graph)
         MouseMiddleClick(self, graph)
         PointerStyle(self, selection)
+        self.connect("destroy", self.on_destroy)
+
+    def on_destroy(self, widget):
+        # Lose the references to Layers objects, otherwise they do not
+        # get garbage-collected. I suspect a strange interaction
+        # between the gobject and the Python reference counting
+        # systems.
+        self.layers = []
+
 
 
 # -- Layers that can be added to LayeredGraphview.

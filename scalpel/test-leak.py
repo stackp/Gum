@@ -1,7 +1,9 @@
 import gc
 import sys
 import run
+import numpy
 import gtkui
+import gtkwaveform
 
 def seek_objects(classes=[]):
     gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_INSTANCES
@@ -20,4 +22,10 @@ if __name__ == "__main__":
     run.run()
 
     l = seek_objects([gtkui.EditorPage])
+    assert len(l) == 0, "uncollected garbage found : " + str(l)
+
+    l = seek_objects([gtkwaveform.GraphView])
+    assert len(l) == 0, "uncollected garbage found : " + str(l)
+
+    l = seek_objects([numpy.memmap])
     assert len(l) == 0, "uncollected garbage found : " + str(l)
