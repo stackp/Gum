@@ -1,4 +1,4 @@
 #!/bin/sh
 
 DIRECTORY=`dirname $0`
-python $DIRECTORY/scalpel/run.py $*
+python $DIRECTORY/scalpel/run.py "$@"
