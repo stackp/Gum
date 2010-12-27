@@ -52,7 +52,10 @@ class Player(object):
         self._sound = sound
         self.start = 0
         self.end = len(sound.frames)
-        self._backend.set_samplerate(self._sound.samplerate)
+        self.set_samplerate(self._sound.samplerate)
+
+    def set_samplerate(self, rate):
+        self._backend.set_samplerate(rate)
 
     def play(self):
         self.position = self.start
