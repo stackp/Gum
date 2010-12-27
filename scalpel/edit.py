@@ -7,6 +7,7 @@ from copy import copy
 import os.path
 import pysndfile
 import numpy
+from scikits import samplerate
 
 def list_extensions():
     extensions = pysndfile.supported_format()
@@ -199,6 +200,11 @@ class Sound(object):
 
     def is_saved(self):
         return self._saved_revision == self.history.revision()
+
+
+def resample(frames, ratio):
+    new = samplerate.resample(frames, ratio, 'sinc_best')
+    return numpy.array(new, dtype='float64')
 
 
 def mix_channels(frames, gain_lists):

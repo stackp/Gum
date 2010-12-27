@@ -119,13 +119,19 @@ class Controller(object):
     def copy(self):
         start, end = self._selection.get()
         clipboard.clip = self._sound.copy(start, end)
+        clipboard.samplerate = self._sound.samplerate
         
     @_report_exception
     def paste(self):
         start, end = self._selection.get()
         was_zoomed_out_full = self._graph.is_zoomed_out_full()
-        self._sound.paste(start, end, clipboard.clip)
-        self._selection.set(start, start + len(clipboard.clip))
+        if self._sound.is_fresh():
+            self._sound.samplerate = clipboard.samplerate
+            self._player.set_samplerate(self._sound.samplerate)
+        rate_ratio = float(self._sound.samplerate) / clipboard.samplerate
+        clip = edit.resample(clipboard.clip, rate_ratio)
+        self._sound.paste(start, end, clip)
+        self._selection.set(start, start + len(clip))
         if was_zoomed_out_full:
             self._graph.zoom_out_full()
 
