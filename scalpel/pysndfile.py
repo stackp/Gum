@@ -59,7 +59,7 @@ if CTYPES_MAJOR < 1 or (CTYPES_MINOR == 0 and CTYPES_MICRO < 1):
             % (ctypes.__version__, '1.0.1'))
 import numpy as N
 
-_SND = cdll.LoadLibrary('/usr/lib/libsndfile.so.1')
+_SND = cdll.LoadLibrary('libsndfile.so.1')
 
 #=========================
 # Definition of constants
