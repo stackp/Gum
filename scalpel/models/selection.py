@@ -2,7 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from event import Signal
+from scalpel.lib.event import Signal
 
 class Selection(object):
     """Represents a selection on a Graph object.
@@ -92,7 +92,7 @@ class Selection(object):
 
 def test_selection():
     from graphmodel import Graph
-    from mock import Fake
+    from scalpel.lib.mock import Fake
 
     class FakeGraph():
         density = 10

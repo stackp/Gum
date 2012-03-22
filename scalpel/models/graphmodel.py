@@ -2,7 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from event import Signal
+from scalpel.lib.event import Signal
 try:
     import fast
 except ImportError:
@@ -290,7 +290,7 @@ def test_overview():
     assert len(_condense(b, 0, l, l/100)) == 100
 
 def test_middle():
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     import numpy
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
@@ -310,7 +310,7 @@ def test_intersection():
     assert intersection((5, 9), (1, 4)) == None
 
 def test_Graph():
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     import numpy
     
     sound = Mock({"numchan": 1})
@@ -342,7 +342,7 @@ def test_Graph():
     
 
 def test_zoom():
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     import numpy
 
     sound = Mock({"numchan": 1})
@@ -405,7 +405,7 @@ def test_zoom():
 
 def test_zoom_in():
     import numpy 
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
 
@@ -425,7 +425,7 @@ def test_zoom_in():
 
 def test_zoom_in_on():
     import numpy
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
     data = numpy.array([1, 2, 3, 4], DTYPE)
@@ -446,7 +446,7 @@ def test_zoom_in_on():
 
 def test_scroll():
     import numpy
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
 
     sound = Mock({})
     data = numpy.array([1, 2, 3, 4])
@@ -465,7 +465,7 @@ def test_scroll():
 
 def test_density():
     import edit
-    g = Graph(edit.Sound("../sounds/test1.wav"))
+    g = Graph(edit.Sound("../../sounds/test1.wav"))
     g.set_width(700)
     g.zoom_in()
     g.channels()
@@ -484,7 +484,7 @@ def test_density():
 
 def test_channels():
     import numpy
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
     sound = Mock({"numchan": 1})
     sound.changed = Fake()
     sound.frames = numpy.array(range(1000000), DTYPE)

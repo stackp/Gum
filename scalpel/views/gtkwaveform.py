@@ -6,7 +6,7 @@ import gtk
 import gobject
 import cairo
 try:
-    import fast
+    from scalpel import fast
 except ImportError:
     HAVE_FAST = False
 else:
@@ -508,7 +508,7 @@ class GraphScrollbar(gtk.HScrollbar):
 # -- Tests
 
 if __name__ == '__main__':
-    from mock import Mock, Fake
+    from scalpel.lib.mock import Mock, Fake
 
     def test_layered():
 

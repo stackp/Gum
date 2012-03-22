@@ -2,14 +2,9 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import event
-import edit
-import player
-import graphmodel
-import selection
-import cursor
-import control
-import effect
+from scalpel.lib import event
+from scalpel.models import graphmodel, cursor, edit, selection
+from scalpel.controllers import control, player, effect
 import os.path
 import glob
 import imp

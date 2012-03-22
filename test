@@ -1,7 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 DIRECTORY=`dirname $0`
-cd $DIRECTORY/scalpel
-for file in *.py; do
-    python $file
+export PYTHONPATH=$DIRECTORY:$PYTHONPATH
+
+if test -z $@; then
+    files=`find scalpel -name '*.py'`;
+else
+    files=$@
+fi
+
+for f in $files; do
+    echo ""
+    echo -e '\E[37;44m'"\033[1mpython $f\033[0m"
+    python $f
+    if [[ ! $? == 0 ]]; then
+	echo -e '\E[31;40m'"\033[1mFailed \033[0m"
+    fi
 done

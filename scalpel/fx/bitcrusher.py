@@ -1,6 +1,6 @@
-import effect
+from scalpel.controllers import effect
+from scalpel.views.gtkeffect import Dialog
 import numpy
-from gtkeffect import Dialog
 
 nbits_last = 8
 

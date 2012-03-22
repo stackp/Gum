@@ -2,7 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from event import Signal
+from scalpel.lib.event import Signal
 from threading import Thread, Event, Lock
 
 # Cursor position can be set by a Selection object. When Player is
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     def test():
         import time
-        from mock import Fake
+        from scalpel.lib.mock import Fake
 
         class Empty: pass
 

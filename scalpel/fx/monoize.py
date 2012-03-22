@@ -1,5 +1,5 @@
-import effect
-import edit
+from scalpel.controllers import effect
+from scalpel.models import edit
 
 def replace_frames(sound, y):
     sound.frames = y

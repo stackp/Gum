@@ -2,17 +2,17 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import constants
+from scalpel import constants
 
 # pygtk gets program name from sys.argv[0]. This name appears in
 # taskbars when windows are grouped together.
 import sys
 sys.argv[0] = constants.__appname__
 
-import app
-import control
-from gtkwaveform import GraphView, GraphScrollbar
-from gtkfiledialog import OpenFileDialog, SaveFileDialog, \
+from scalpel import app
+from scalpel.controllers import control
+from scalpel.views.gtkwaveform import GraphView, GraphScrollbar
+from scalpel.views.gtkfiledialog import OpenFileDialog, SaveFileDialog, \
                                                         SaveSelectionFileDialog
 import copy
 import os.path
@@ -552,7 +552,7 @@ class EditorPage(gtk.VBox):
 # -- Tests
            
 def test():
-    from mock import Fake, Mock
+    from scalpel.lib.mock import Fake, Mock
     graph = Mock({"frames_info":(0, 0, [], []),
                   "channels": [[(0, 0.5)]],
                   "set_width": None,

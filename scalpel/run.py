@@ -4,8 +4,8 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import app
-import gtkui
+from scalpel import app
+from scalpel.views import gtkui
 import sys
 
 def run():

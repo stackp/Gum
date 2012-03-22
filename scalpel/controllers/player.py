@@ -4,7 +4,7 @@
 
 import alsaaudio
 import threading
-from  event import Signal
+from  scalpel.lib.event import Signal
 import numpy
 
 class AlsaBackend(object):
@@ -94,7 +94,7 @@ class Player(object):
 
 # test
 def testPlayer():
-    from mock import Mock
+    from scalpel.lib.mock import Mock
     from math import sin
     SR = 44100
     f0 = 440
@@ -107,8 +107,8 @@ def testPlayer():
     player = Player(sound)
     player.thread_play().join()
 
-    import pysndfile
-    f = pysndfile.sndfile('../sounds/test1.wav')
+    from scalpel.lib import pysndfile
+    f = pysndfile.sndfile('../../sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
     sound.frames = data
     player.set_sound(sound)
@@ -148,7 +148,7 @@ def testPlayer():
     player.stop()
 
     # Testing stereo
-    f = pysndfile.sndfile('../sounds/test2.wav')
+    f = pysndfile.sndfile('../../sounds/test2.wav')
     data = f.read_frames(f.get_nframes())
     sound = Mock({"numchan": 2})
     sound.samplerate = 44100

@@ -292,7 +292,7 @@ def get_libsndfile_version():
 MAJOR, MINOR, MICRO, PRERELEASE = get_libsndfile_version()
 if not(MAJOR == 1):
     raise Exception("audiolab expects major version %d of libsndfile" % 1)
-if MICRO > 21:
+if MICRO > 25:
     if PRERELEASE == 0: 
         prestr  = "No"
     else:

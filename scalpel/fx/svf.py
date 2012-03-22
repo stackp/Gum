@@ -1,6 +1,6 @@
-from effect import effects
+from scalpel.controllers.effect import effects
+from scalpel.views.gtkeffect import Dialog
 import numpy
-from gtkeffect import Dialog
 import functools
 
 svf_index = {"High Pass": 0, "Band Pass": 1, "Low Pass": 2}

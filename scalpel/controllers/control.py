@@ -2,12 +2,12 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-import edit
-import clipboard
-from player import Player
-from event import Signal
-import effect
-import app
+from scalpel.models import edit
+from scalpel.models import clipboard
+from scalpel.controllers.player import Player
+from scalpel.lib.event import Signal
+from scalpel.controllers import effect
+import scalpel.app
 import traceback
 
 class Controller(object):
@@ -21,7 +21,7 @@ class Controller(object):
         self.error = Signal()
 
     def new(self):
-        app.open_()
+        scalpel.app.open_()
 
     def _report_exception(method):
         """Method decorator.
@@ -48,7 +48,7 @@ class Controller(object):
         if self._sound.is_fresh():
             self.load_sound(filename)
         else:
-            app.open_(filename)
+            scalpel.app.open_(filename)
 
     @_report_exception
     def load_sound(self, filename):
@@ -204,16 +204,16 @@ class Controller(object):
 class FileNotSaved(Exception): pass
 
 def test_Controller():
-    from mock import Fake
+    from scalpel.lib.mock import Fake
     
     # Test opening a file
     ctrl = Controller(Fake(), Fake(), Fake(), Fake())
-    ctrl.open('../sounds/test1.wav')
+    ctrl.open('../../sounds/test1.wav')
     assert ctrl._sound != None
 
 def test_fix_selection():
-    from mock import Fake, Mock
-    from selection import Selection
+    from scalpel.lib.mock import Fake, Mock
+    from scalpel.models.selection import Selection
     import numpy
 
     # Undo
