@@ -3,7 +3,7 @@
 # Licensed under the Revised BSD License.
 
 from gum.lib import event
-from gum.models import graphmodel, cursor, edit, selection
+from gum.models import Graph, Cursor, Sound, Selection
 from gum.controllers import control, player, effect
 import os.path
 import glob
@@ -18,11 +18,11 @@ PLUGINS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fx')
 new_sound_loaded = event.Signal()
 
 def open_(filename=None):
-    sound = edit.Sound(filename)
+    sound = Sound(filename)
     p = player.Player(sound)
-    graph = graphmodel.Graph(sound)
-    curs = cursor.Cursor(graph, p)
-    sel = selection.Selection(graph, curs)
+    graph = Graph(sound)
+    curs = Cursor(graph, p)
+    sel = Selection(graph, curs)
     controller = control.Controller(sound, p, graph, sel)
     new_sound_loaded(controller, graph, sel, curs)
 

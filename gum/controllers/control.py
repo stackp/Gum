@@ -2,8 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from gum.models import edit
-from gum.models import clipboard
+from gum.models import Sound, clipboard, edit
 from gum.controllers.player import Player
 from gum.lib.event import Signal
 from gum.controllers import effect
@@ -53,7 +52,7 @@ class Controller(object):
     @_report_exception
     def load_sound(self, filename):
         self._player.stop()
-        self._sound = edit.Sound(filename)
+        self._sound = Sound(filename)
         self._graph.set_sound(self._sound)
         self._player.set_sound(self._sound)
         self._selection.unselect()
@@ -70,7 +69,7 @@ class Controller(object):
 
     @_report_exception
     def save_selection_as(self, filename):
-        sound = edit.Sound()
+        sound = Sound()
         if not self._selection.selected():
             raise Exception("There is no selection.")
         start, end = self._selection.get()
@@ -213,14 +212,14 @@ def test_Controller():
 
 def test_fix_selection():
     from gum.lib.mock import Fake, Mock
-    from gum.models.selection import Selection
+    from gum.models import Selection
     import numpy
 
     # Undo
     graph = Mock({})
     graph.changed = Fake()
     selection = Selection(graph, Fake())
-    sound = edit.Sound()
+    sound = Sound()
     sound.frames = numpy.array(range(1000))
     ctrl = Controller(sound, Fake(), Fake(), selection)
     frames = sound.frames
@@ -237,7 +236,7 @@ def test_fix_selection():
     graph = Mock({})
     graph.changed = Fake()
     selection = Selection(graph, Fake())
-    sound = edit.Sound()
+    sound = Sound()
     sound.frames = numpy.array(range(1000))
     ctrl = Controller(sound, Fake(), Fake(), selection)
     frames = sound.frames

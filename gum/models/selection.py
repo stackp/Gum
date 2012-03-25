@@ -91,7 +91,7 @@ class Selection(object):
 
 
 def test_selection():
-    from graphmodel import Graph
+    from graph import Graph
     from gum.lib.mock import Fake
 
     class FakeGraph():
