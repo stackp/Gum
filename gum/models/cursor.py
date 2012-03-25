@@ -1,8 +1,8 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel.lib.event import Signal
+from gum.lib.event import Signal
 from threading import Thread, Event, Lock
 
 # Cursor position can be set by a Selection object. When Player is
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     def test():
         import time
-        from scalpel.lib.mock import Fake
+        from gum.lib.mock import Fake
 
         class Empty: pass
 

@@ -1,5 +1,5 @@
-from scalpel.controllers import effect
-from scalpel.views.gtkeffect import Dialog
+from gum.controllers import effect
+from gum.views.gtkeffect import Dialog
 import numpy
 
 nbits_last = 8

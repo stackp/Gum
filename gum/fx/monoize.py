@@ -1,5 +1,5 @@
-from scalpel.controllers import effect
-from scalpel.models import edit
+from gum.controllers import effect
+from gum.models import edit
 
 def replace_frames(sound, y):
     sound.frames = y

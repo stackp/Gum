@@ -1,5 +1,5 @@
-from scalpel.controllers.effect import effects
-from scalpel.views.gtkeffect import Dialog
+from gum.controllers.effect import effects
+from gum.views.gtkeffect import Dialog
 import numpy
 import functools
 

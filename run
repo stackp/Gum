@@ -1,4 +1,4 @@
 #!/bin/sh
 
 DIRECTORY=`dirname $0`
-PYTHONPATH=$DIRECTORY python $DIRECTORY/scalpel/run.py "$@"
+PYTHONPATH=$DIRECTORY python $DIRECTORY/gum/run.py "$@"

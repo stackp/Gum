@@ -1,13 +1,13 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel.models import edit
-from scalpel.models import clipboard
-from scalpel.controllers.player import Player
-from scalpel.lib.event import Signal
-from scalpel.controllers import effect
-import scalpel.app
+from gum.models import edit
+from gum.models import clipboard
+from gum.controllers.player import Player
+from gum.lib.event import Signal
+from gum.controllers import effect
+import gum.app
 import traceback
 
 class Controller(object):
@@ -21,7 +21,7 @@ class Controller(object):
         self.error = Signal()
 
     def new(self):
-        scalpel.app.open_()
+        gum.app.open_()
 
     def _report_exception(method):
         """Method decorator.
@@ -48,7 +48,7 @@ class Controller(object):
         if self._sound.is_fresh():
             self.load_sound(filename)
         else:
-            scalpel.app.open_(filename)
+            gum.app.open_(filename)
 
     @_report_exception
     def load_sound(self, filename):
@@ -204,7 +204,7 @@ class Controller(object):
 class FileNotSaved(Exception): pass
 
 def test_Controller():
-    from scalpel.lib.mock import Fake
+    from gum.lib.mock import Fake
     
     # Test opening a file
     ctrl = Controller(Fake(), Fake(), Fake(), Fake())
@@ -212,8 +212,8 @@ def test_Controller():
     assert ctrl._sound != None
 
 def test_fix_selection():
-    from scalpel.lib.mock import Fake, Mock
-    from scalpel.models.selection import Selection
+    from gum.lib.mock import Fake, Mock
+    from gum.models.selection import Selection
     import numpy
 
     # Undo

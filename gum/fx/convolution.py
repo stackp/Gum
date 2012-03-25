@@ -1,5 +1,5 @@
-from scalpel.controllers import effect
-from scalpel.models import clipboard, edit
+from gum.controllers import effect
+from gum.models import clipboard, edit
 import numpy
 
 def nextpow2(n):

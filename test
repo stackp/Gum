@@ -4,7 +4,7 @@ DIRECTORY=`dirname $0`
 export PYTHONPATH=$DIRECTORY:$PYTHONPATH
 
 if test -z $@; then
-    files=`find scalpel -name '*.py'`;
+    files=`find gum -name '*.py'`;
 else
     files=$@
 fi

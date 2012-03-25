@@ -1,9 +1,9 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel.lib.event import Signal
-from scalpel.lib import pysndfile
+from gum.lib.event import Signal
+from gum.lib import pysndfile
 from scikits import samplerate
 from copy import copy
 import os.path
@@ -638,7 +638,7 @@ def testSound():
         assert False
 
     # expand user symbol
-    from scalpel.lib import mock
+    from gum.lib import mock
     def fake_sndfile(filename):
         assert '~' not in filename
         return mock.Fake()

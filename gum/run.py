@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel import app
-from scalpel.views import gtkui
+from gum import app
+from gum.views import gtkui
 import sys
 
 def run():

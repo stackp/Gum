@@ -1,10 +1,10 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
 import alsaaudio
 import threading
-from  scalpel.lib.event import Signal
+from  gum.lib.event import Signal
 import numpy
 
 class AlsaBackend(object):
@@ -94,7 +94,7 @@ class Player(object):
 
 # test
 def testPlayer():
-    from scalpel.lib.mock import Mock
+    from gum.lib.mock import Mock
     from math import sin
     SR = 44100
     f0 = 440
@@ -107,7 +107,7 @@ def testPlayer():
     player = Player(sound)
     player.thread_play().join()
 
-    from scalpel.lib import pysndfile
+    from gum.lib import pysndfile
     f = pysndfile.sndfile('../../sounds/test1.wav')
     data = f.read_frames(f.get_nframes())
     sound.frames = data

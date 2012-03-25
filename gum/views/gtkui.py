@@ -1,18 +1,18 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel import constants
+from gum import constants
 
 # pygtk gets program name from sys.argv[0]. This name appears in
 # taskbars when windows are grouped together.
 import sys
 sys.argv[0] = constants.__appname__
 
-from scalpel import app
-from scalpel.controllers import control
-from scalpel.views.gtkwaveform import GraphView, GraphScrollbar
-from scalpel.views.gtkfiledialog import OpenFileDialog, SaveFileDialog, \
+from gum import app
+from gum.controllers import control
+from gum.views.gtkwaveform import GraphView, GraphScrollbar
+from gum.views.gtkfiledialog import OpenFileDialog, SaveFileDialog, \
                                                         SaveSelectionFileDialog
 import copy
 import os.path
@@ -128,7 +128,7 @@ class EditorWindow(gtk.Window):
               </menu>
               <menu action="Effects">
               </menu>                
-              <menu action="Scalpel">
+              <menu action="Gum">
                 <menuitem action="About"/>
               </menu>
             </menubar>
@@ -171,7 +171,7 @@ class EditorWindow(gtk.Window):
                    ('Edit', None, '_Edit'),
                    ('View', None, '_View'),
                    ('Effects', None, 'Effe_cts'),
-                   ('Scalpel', None, '_Scalpel'),
+                   ('Gum', None, '_Gum'),
                    ('New', gtk.STOCK_NEW, None, None, '', self.new),
                    ('Open', gtk.STOCK_OPEN, None, None, '', self.open),
                    ('Save', gtk.STOCK_SAVE, None, None, '', self.save),
@@ -552,7 +552,7 @@ class EditorPage(gtk.VBox):
 # -- Tests
            
 def test():
-    from scalpel.lib.mock import Fake, Mock
+    from gum.lib.mock import Fake, Mock
     graph = Mock({"frames_info":(0, 0, [], []),
                   "channels": [[(0, 0.5)]],
                   "set_width": None,

@@ -1,4 +1,4 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
@@ -6,7 +6,7 @@ import gtk
 import gobject
 import cairo
 try:
-    from scalpel import fast
+    from gum import fast
 except ImportError:
     HAVE_FAST = False
 else:
@@ -508,7 +508,7 @@ class GraphScrollbar(gtk.HScrollbar):
 # -- Tests
 
 if __name__ == '__main__':
-    from scalpel.lib.mock import Mock, Fake
+    from gum.lib.mock import Mock, Fake
 
     def test_layered():
 

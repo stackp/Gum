@@ -1,5 +1,5 @@
-from scalpel.controllers import effect
-from scalpel.views import gtkeffect
+from gum.controllers import effect
+from gum.views import gtkeffect
 
 volume_last = 100
 

@@ -1,10 +1,10 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel.lib import event
-from scalpel.models import graphmodel, cursor, edit, selection
-from scalpel.controllers import control, player, effect
+from gum.lib import event
+from gum.models import graphmodel, cursor, edit, selection
+from gum.controllers import control, player, effect
 import os.path
 import glob
 import imp

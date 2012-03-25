@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 from setuptools import setup, Extension
-import scalpel
+import gum
 import os
 
-doclines = scalpel.__doc__.split("\n")
+doclines = gum.__doc__.split("\n")
 classifiers = """\
 Development Status :: 3 - Alpha
 Environment :: X11 Applications :: GTK
@@ -16,7 +16,7 @@ Programming Language :: Python
 Topic :: Multimedia :: Sound/Audio :: Editors
 """
 
-c_files = ['scalpel/fast/fast.c', 'scalpel/fx/_svf.c']
+c_files = ['gum/fast/fast.c', 'gum/fx/_svf.c']
 
 for path in c_files:
     if not os.path.exists(path):
@@ -24,20 +24,20 @@ for path in c_files:
         Cython.Compiler.Main.compile(path[:-2] + '.pyx')
 
 
-setup(name = 'scalpel',
-      version = scalpel.__version__,
+setup(name = 'gum-audio',
+      version = gum.__version__,
       description = doclines[0],
       author = 'Pierre',
       author_email = 'stackp@online.fr',
-      url = 'http://scalpelsound.online.fr',
+      url = 'http://gumsound.online.fr',
       license = "BSD License",
       long_description = "\n".join(doclines[2:]),
       classifiers = filter(None, classifiers.split("\n")),
-      packages = ['scalpel', 'scalpel.fx'],
-      ext_modules = [Extension('scalpel.fast', ['scalpel/fast/fast.c'],
+      packages = ['gum', 'gum.fx'],
+      ext_modules = [Extension('gum.fast', ['gum/fast/fast.c'],
                                libraries=['cairo']),
-                     Extension('scalpel.fx._svf', ['scalpel/fx/_svf.c'])],
-      scripts = ['scripts/scalpel'],
+                     Extension('gum.fx._svf', ['gum/fx/_svf.c'])],
+      scripts = ['scripts/gum'],
       requires = ['PyGTK', 'numpy', 'pyalsaaudio (>=0.6)',
                   'scikits.samplerate'],
       install_requires = ['pyalsaaudio>=0.6', 'scikits.samplerate']

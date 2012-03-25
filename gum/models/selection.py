@@ -1,8 +1,8 @@
-# Scalpel sound editor (http://scalpelsound.online.fr)
+# Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from scalpel.lib.event import Signal
+from gum.lib.event import Signal
 
 class Selection(object):
     """Represents a selection on a Graph object.
@@ -92,7 +92,7 @@ class Selection(object):
 
 def test_selection():
     from graphmodel import Graph
-    from scalpel.lib.mock import Fake
+    from gum.lib.mock import Fake
 
     class FakeGraph():
         density = 10

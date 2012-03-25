@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Scalpel
+Name=Gum
 GenericName=Audio Editor
 Comment=An audio editor
-Exec=scalpel %f
+Exec=gum %f
 Terminal=false
 Type=Application
 Icon=editcut
