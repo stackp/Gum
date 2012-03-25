@@ -1,5 +1,5 @@
 from gum.controllers import effect
-from gum.views import gtkeffect
+from gum.views import EffectDialog
 
 volume_last = 100
 
@@ -18,7 +18,7 @@ def volume(sound, start, end):
         process(volume)
 
     global volume_last
-    d = gtkeffect.Dialog('Volume')
+    d = EffectDialog('Volume')
     d.add_slider('Volume', volume_last, 0, 200, 0)
     d.callback = callback
     return d

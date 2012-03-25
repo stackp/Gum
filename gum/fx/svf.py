@@ -1,5 +1,5 @@
 from gum.controllers.effect import effects
-from gum.views.gtkeffect import Dialog
+from gum.views import EffectDialog
 import numpy
 import functools
 
@@ -56,7 +56,7 @@ def svf_fx(type, sound, start, end):
         damp = parameters['Damping']
         process(freq, damp)
 
-    d = Dialog(type + ' State Variable Filter')
+    d = EffectDialog(type + ' State Variable Filter')
     d.add_slider('Frequency', 500, 0, 5000)
     d.add_slider('Damping', 0.5, 0.01, 3, 1)
     d.callback = callback

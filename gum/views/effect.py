@@ -1,6 +1,6 @@
 import gtk
 
-class Dialog(gtk.Dialog):
+class EffectDialog(gtk.Dialog):
     def __init__(self, title=""):
         gtk.Dialog.__init__(self, title,
                    flags=gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

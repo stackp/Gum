@@ -11,9 +11,8 @@ sys.argv[0] = constants.__appname__
 
 from gum import app
 from gum.controllers import control
-from gum.views.gtkwaveform import GraphView, GraphScrollbar
-from gum.views.gtkfiledialog import OpenFileDialog, SaveFileDialog, \
-                                                        SaveSelectionFileDialog
+from waveform import GraphView, GraphScrollbar
+from filedialog import OpenFileDialog, SaveFileDialog, SaveSelectionFileDialog
 import copy
 import os.path
 import urllib

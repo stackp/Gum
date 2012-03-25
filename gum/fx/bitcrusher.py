@@ -1,5 +1,5 @@
 from gum.controllers import effect
-from gum.views.gtkeffect import Dialog
+from gum.views import EffectDialog
 import numpy
 
 nbits_last = 8
@@ -22,7 +22,7 @@ def bitcrusher(sound, start, end):
         nbits_last = nbits
         process(nbits)
 
-    d = Dialog('BitCrusher')
+    d = EffectDialog('BitCrusher')
     global nbits_last
     d.add_slider('Bit Width', nbits_last, 2, 12)
     d.callback = callback

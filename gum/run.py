@@ -5,7 +5,7 @@
 # Licensed under the Revised BSD License.
 
 from gum import app
-from gum.views import gtkui
+from gum.views import ui
 import sys
 
 def run():
@@ -17,13 +17,13 @@ def run():
             app.open_(filename)
             opened = True
         except Exception, e:
-            gtkui.display_error("Error", str(e))
+            ui.display_error("Error", str(e))
 
     # Load an empty sound if no file was open.
     if not opened:
         app.open_()
 
-    gtkui.main_loop()
+    ui.main_loop()
 
 if __name__ == "__main__":
     run()
