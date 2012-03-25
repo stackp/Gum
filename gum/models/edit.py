@@ -3,7 +3,7 @@
 # Licensed under the Revised BSD License.
 
 from gum.lib.event import Signal
-from gum.lib import pysndfile
+from gum.lib import pysndfile, history
 from scikits import samplerate
 from copy import copy
 import os.path
@@ -15,78 +15,13 @@ def list_extensions():
     return extensions
 
 
-class Action(object):
-    """Describes an action, and a way to revert that action"""
-     
-    def __init__(self, do, undo):
-        """do and undo are tuples in the form (fun, args) where fun is a
-        function and args contains the arguments"""
-        self._do = do
-        self._undo = undo
-
-    def do(self):
-        fun, args = self._do
-        return fun(*args)
-
-    def undo(self):
-        fun, args = self._undo
-        return fun(*args)
-
-
-class History(object):
-    "A list of actions, that can be undone and redone."
-
-    def __init__(self):
-        self._actions = []
-        self._last = -1
-        self._counter = 0
-
-    def _push(self, action):
-        if self._last < len(self._actions) - 1:
-            # erase previously undone actions
-            del self._actions[self._last + 1:]
-        self._actions.append(action)
-        self._last = self._last + 1
-        self._counter += 1
-        action.number = self._counter
-        
-    def undo(self):
-        if self._last < 0:
-            return None
-        else:
-            action = self._actions[self._last]
-            self._last = self._last - 1
-            return action.undo()
-            
-    def redo(self):
-        if self._last == len(self._actions) - 1:
-            return None
-        else:
-            self._last = self._last + 1
-            action = self._actions[self._last]
-            return action.do()
-
-    def add(self, do, undo):
-        "Does an action and adds it to history."
-        action = Action(do, undo)
-        self._push(action)
-        return action.do()
-
-    def revision(self):
-        if self._last < 0:
-            return 0
-        else:
-            action = self._actions[self._last]
-            return action.number
-
-
 class Sound(object):
 
     # frames is a numpy.ndarray, as returned by pysndfile
     
     def __init__(self, filename=None):
         self.filename = filename
-        self.history = History()
+        self.history = history.History()
         self.changed = Signal()
         if filename == None:
             # empty sound
@@ -196,7 +131,7 @@ class Sound(object):
 
     def is_fresh(self):
         """True if sound is empty and has never been edited."""
-        return self.is_empty() and not self.history._actions
+        return self.is_empty() and self.history.is_empty()
 
     def is_saved(self):
         return self._saved_revision == self.history.revision()
