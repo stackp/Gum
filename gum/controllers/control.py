@@ -3,9 +3,9 @@
 # Licensed under the Revised BSD License.
 
 from gum.models import Sound, clipboard, edit
-from gum.controllers.player import Player
+from player import Player
+import effect
 from gum.lib.event import Signal
-from gum.controllers import effect
 import gum.app
 import traceback
 

@@ -4,7 +4,7 @@
 
 from gum.lib import event
 from gum.models import Graph, Cursor, Sound, Selection
-from gum.controllers import control, player, effect
+from gum.controllers import Controller, Player, effect
 import os.path
 import glob
 import imp
@@ -19,11 +19,11 @@ new_sound_loaded = event.Signal()
 
 def open_(filename=None):
     sound = Sound(filename)
-    p = player.Player(sound)
     graph = Graph(sound)
+    p = Player(sound)
     curs = Cursor(graph, p)
     sel = Selection(graph, curs)
-    controller = control.Controller(sound, p, graph, sel)
+    controller = Controller(sound, p, graph, sel)
     new_sound_loaded(controller, graph, sel, curs)
 
 def list_effects():
