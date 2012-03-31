@@ -466,7 +466,7 @@ def test_scroll():
 def test_density():
     from gum.models import Sound
     import gum
-    g = Graph(Sound(gum.basedir + "/../sounds/test1.wav"))
+    g = Graph(Sound(gum.basedir + "/data/test/test1.wav"))
     g.set_width(700)
     g.zoom_in()
     g.channels()

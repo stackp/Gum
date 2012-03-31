@@ -209,7 +209,7 @@ def test_Editor():
     
     # Test opening a file
     editor = Editor(Fake(), Fake(), Fake(), Fake())
-    editor.open(gum.basedir + '/../sounds/test1.wav')
+    editor.open(gum.basedir + '/data/test/test1.wav')
     assert editor._sound != None
 
 def test_fix_selection():
