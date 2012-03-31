@@ -6,7 +6,7 @@ import os
 
 doclines = gum.__doc__.split("\n")
 classifiers = """\
-Development Status :: 3 - Beta
+Development Status :: 4 - Beta
 Environment :: X11 Applications :: GTK
 Intended Audience :: End Users/Desktop
 License :: OSI Approved :: BSD License
