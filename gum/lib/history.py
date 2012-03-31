@@ -64,3 +64,64 @@ class History(object):
 
     def is_empty(self):
         return len(self._actions) == 0
+
+    
+if __name__ == '__main__':
+    def testAction():
+        f = lambda x: x
+        do = (f, (1,))
+        undo = (f, (2,))
+        a = Action(do, undo)
+        assert a.do() == 1
+        assert a.undo() == 2
+    
+        g = lambda : 1
+        do = (g, ())
+        undo = (g, ())
+        a = Action(do, undo)
+        assert a.do() == 1
+        assert a.undo() == 1
+    
+    def testHistory():    
+        history = History()
+        f = lambda x: x
+        do = (f, (1,))
+        undo = (f, (2,))
+        assert history.add(do, undo) == 1
+        assert history.undo() == 2
+        assert history.undo() == None
+        assert history.redo() == 1
+        assert history.redo() == None
+        assert history.undo() == 2
+        assert history.add(do, undo) ==  1
+        assert history.add(do, undo) == 1
+        assert history.undo() == 2
+        assert history.undo() == 2
+        assert history.redo() == 1
+        assert history.redo() == 1
+        assert history.redo() == None
+    
+        # Test Revisions
+        history = History()
+        assert history.revision() == 0
+        history.add(do, undo)
+        assert history.revision() == 1
+        history.add(do, undo)
+        assert history.revision() == 2
+        history.undo()
+        assert history.revision() == 1
+        history.redo()
+        assert history.revision() == 2
+        history.add(do, undo)
+        assert history.revision() == 3
+        history.undo()
+        assert history.revision() == 2
+        history.add(do, undo)
+        assert history.revision() == 4
+        history.undo()
+        assert history.revision() == 2
+        history.redo()
+        assert history.revision() == 4
+
+    testAction()
+    testHistory()

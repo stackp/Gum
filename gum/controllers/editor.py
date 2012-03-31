@@ -6,7 +6,6 @@ from gum.models import Sound, clipboard, sound
 from player import Player
 import effect
 from gum.lib.event import Signal
-import gum.app
 import traceback
 
 class Editor(object):
@@ -20,6 +19,7 @@ class Editor(object):
         self.error = Signal()
 
     def new(self):
+        import gum.app
         gum.app.open_()
 
     def _report_exception(method):
@@ -47,6 +47,7 @@ class Editor(object):
         if self._sound.is_fresh():
             self.load_sound(filename)
         else:
+            import gum.app
             gum.app.open_(filename)
 
     @_report_exception
@@ -203,12 +204,13 @@ class Editor(object):
 class FileNotSaved(Exception): pass
 
 def test_Editor():
+    import gum
     from gum.lib.mock import Fake
     
     # Test opening a file
-    ctrl = Editor(Fake(), Fake(), Fake(), Fake())
-    ctrl.open('../../sounds/test1.wav')
-    assert ctrl._sound != None
+    editor = Editor(Fake(), Fake(), Fake(), Fake())
+    editor.open(gum.basedir + '/../sounds/test1.wav')
+    assert editor._sound != None
 
 def test_fix_selection():
     from gum.lib.mock import Fake, Mock
@@ -221,15 +223,15 @@ def test_fix_selection():
     selection = Selection(graph, Fake())
     sound = Sound()
     sound.frames = numpy.array(range(1000))
-    ctrl = Editor(sound, Fake(), Fake(), selection)
+    editor = Editor(sound, Fake(), Fake(), selection)
     frames = sound.frames
     selection.set(0, 999)
-    ctrl.copy()
-    ctrl.paste()
+    editor.copy()
+    editor.paste()
     selection.set(1500, 1500)
-    ctrl.undo()
-    ctrl.paste()
-    ctrl.undo()
+    editor.undo()
+    editor.paste()
+    editor.undo()
     assert sound.frames.tolist() == frames.tolist()
 
     # Redo
@@ -238,16 +240,16 @@ def test_fix_selection():
     selection = Selection(graph, Fake())
     sound = Sound()
     sound.frames = numpy.array(range(1000))
-    ctrl = Editor(sound, Fake(), Fake(), selection)
+    editor = Editor(sound, Fake(), Fake(), selection)
     frames = sound.frames
     selection.set(10, 999)
-    ctrl.cut()
-    ctrl.undo()
+    editor.cut()
+    editor.undo()
     selection.set(900, 900)
-    ctrl.redo()
+    editor.redo()
     frames = sound.frames 
-    ctrl.paste()
-    ctrl.undo()
+    editor.paste()
+    editor.undo()
     assert sound.frames.tolist() == frames.tolist()
     
 

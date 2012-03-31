@@ -4,7 +4,7 @@
 
 from gum.lib.event import Signal
 try:
-    import fast
+    from gum import fast
 except ImportError:
     HAVE_FAST = False
     print "Warning: 'fast' module not found. You won't have fast display!"
@@ -464,8 +464,9 @@ def test_scroll():
     assert end == 4
 
 def test_density():
-    import sound
-    g = Graph(soundSound("../../sounds/test1.wav"))
+    from gum.models import Sound
+    import gum
+    g = Graph(Sound(gum.basedir + "/../sounds/test1.wav"))
     g.set_width(700)
     g.zoom_in()
     g.channels()

@@ -55,7 +55,7 @@ class EffectDialog(gtk.Dialog):
 
 
 if __name__ == '__main__':
-    d = Dialog('Effect')
+    d = EffectDialog('Effect')
     d.add_slider("Delay", 500, 0, 5000)
     d.add_slider("Feedback", 50, 0, 99)
     d.proceed()

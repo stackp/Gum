@@ -225,64 +225,10 @@ def mix_channels_auto(frames, n):
 
 # -- Tests
 
-def testAction():
-    f = lambda x: x
-    do = (f, (1,))
-    undo = (f, (2,))
-    a = Action(do, undo)
-    assert a.do() == 1
-    assert a.undo() == 2
-
-    g = lambda : 1
-    do = (g, ())
-    undo = (g, ())
-    a = Action(do, undo)
-    assert a.do() == 1
-    assert a.undo() == 1
-
-def testHistory():    
-    history = History()
-    f = lambda x: x
-    do = (f, (1,))
-    undo = (f, (2,))
-    assert history.add(do, undo) == 1
-    assert history.undo() == 2
-    assert history.undo() == None
-    assert history.redo() == 1
-    assert history.redo() == None
-    assert history.undo() == 2
-    assert history.add(do, undo) ==  1
-    assert history.add(do, undo) == 1
-    assert history.undo() == 2
-    assert history.undo() == 2
-    assert history.redo() == 1
-    assert history.redo() == 1
-    assert history.redo() == None
-
-    # Test Revisions
-    history = History()
-    assert history.revision() == 0
-    history.add(do, undo)
-    assert history.revision() == 1
-    history.add(do, undo)
-    assert history.revision() == 2
-    history.undo()
-    assert history.revision() == 1
-    history.redo()
-    assert history.revision() == 2
-    history.add(do, undo)
-    assert history.revision() == 3
-    history.undo()
-    assert history.revision() == 2
-    history.add(do, undo)
-    assert history.revision() == 4
-    history.undo()
-    assert history.revision() == 2
-    history.redo()
-    assert history.revision() == 4
-    
 def testSound():
     from copy import copy
+    import gum
+    testdir = gum.basedir + '/..'
     snd = Sound()
 
     # synthesize a sine wave
@@ -314,7 +260,7 @@ def testSound():
     assert snd.frames.tolist() == sine2[start:end] + sine2
 
     # test with a mono file
-    snd = Sound("../../sounds/test1.wav")
+    snd = Sound(testdir + "/sounds/test1.wav")
     assert snd.frames != []
     start = 4444
     end = 55555
@@ -338,7 +284,7 @@ def testSound():
     assert snd.frames.tolist() == data2[start:end] + data2
 
     # test with a stereo file
-    snd = Sound("../../sounds/test2.wav")
+    snd = Sound(testdir + "/sounds/test2.wav")
     assert snd.frames.tolist() != []
     start = 4444
     end = 55555
@@ -363,7 +309,7 @@ def testSound():
 
     # test save_as()
     import os
-    snd = Sound("../../sounds/test1.wav")
+    snd = Sound(testdir + "/sounds/test1.wav")
     outfile = "/tmp/test.wav"
     snd.save_as(outfile)
     assert os.path.exists(outfile)
@@ -372,7 +318,7 @@ def testSound():
     assert abs((snd.frames - snd2.frames).max()) < 0.0001 # quantization errors!
     os.remove(outfile)
 
-    snd = Sound("../../sounds/test2.wav")
+    snd = Sound(testdir + "/sounds/test2.wav")
     outfile = "/tmp/test2.wav"
     snd.save_as(outfile)
     assert os.path.exists(outfile)
@@ -383,7 +329,7 @@ def testSound():
     os.remove(outfile)
 
     # Preserve file format when saving
-    snd = Sound("../../sounds/test3.wav")
+    snd = Sound(testdir + "/sounds/test3.wav")
     outfile = "/tmp/test3.wav"
     snd.save_as(outfile)
     snd2 = Sound(outfile)
@@ -583,6 +529,4 @@ def testSound():
     pysndfile.sndfile = sndfile
 
 if __name__ == '__main__':
-    testAction()
     testSound()
-    testHistory()
