@@ -37,7 +37,7 @@ setup(name = 'gum-audio',
       ext_modules = [Extension('gum.fast', ['gum/fast/fast.c'],
                                libraries=['cairo']),
                      Extension('gum.fx._svf', ['gum/fx/_svf.c'])],
-      scripts = ['scripts/gum'],
+      scripts = ['gum/scripts/gum'],
       requires = ['PyGTK', 'numpy', 'pyalsaaudio (>=0.6)',
                   'scikits.samplerate'],
       install_requires = ['pyalsaaudio>=0.6', 'scikits.samplerate']
