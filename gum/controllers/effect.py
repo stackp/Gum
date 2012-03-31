@@ -49,7 +49,7 @@ effects['Fade Out'] = mkfx_overwrite_selection(fade_out)
 
 # Tests
 if __name__ == '__main__':
-    from edit import Sound
+    from gum.models import Sound
     import numpy
 
     # test reverse()

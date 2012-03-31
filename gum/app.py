@@ -3,7 +3,7 @@
 # Licensed under the Revised BSD License.
 
 from gum.lib import event
-from gum.models import Graph, Cursor, Sound, Selection
+from gum.models import Graph, Cursor, Sound, Selection, sound
 from gum.controllers import Controller, Player, effect
 import os.path
 import glob
@@ -32,7 +32,7 @@ def list_effects():
     return l
 
 def list_extensions():
-    return edit.list_extensions()
+    return sound.list_extensions()
 
 def load_all_plugins():
     plugins = glob.glob(os.path.join(PLUGINS_DIR, '*.py'))

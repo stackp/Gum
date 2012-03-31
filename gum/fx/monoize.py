@@ -1,12 +1,12 @@
 from gum.controllers import effect
-from gum.models import edit
+from gum.models import sound
 
 def replace_frames(sound, y):
     sound.frames = y
 
 def monoize(sound, start, end):
     x = sound.frames
-    y = edit.mix_channels_auto(sound.frames, 1)
+    y = sound.mix_channels_auto(sound.frames, 1)
     do = (replace_frames, [sound, y])
     undo = (replace_frames, [sound, x])
     sound.history.add(do, undo)

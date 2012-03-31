@@ -2,7 +2,7 @@
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
 
-from gum.models import Sound, clipboard, edit
+from gum.models import Sound, clipboard, sound
 from player import Player
 import effect
 from gum.lib.event import Signal
@@ -128,7 +128,7 @@ class Controller(object):
             self._sound.samplerate = clipboard.samplerate
             self._player.set_samplerate(self._sound.samplerate)
         rate_ratio = float(self._sound.samplerate) / clipboard.samplerate
-        clip = edit.resample(clipboard.clip, rate_ratio)
+        clip = sound.resample(clipboard.clip, rate_ratio)
         self._sound.paste(start, end, clip)
         self._selection.set(start, start + len(clip))
         if was_zoomed_out_full:

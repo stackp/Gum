@@ -464,8 +464,8 @@ def test_scroll():
     assert end == 4
 
 def test_density():
-    import edit
-    g = Graph(edit.Sound("../../sounds/test1.wav"))
+    import sound
+    g = Graph(soundSound("../../sounds/test1.wav"))
     g.set_width(700)
     g.zoom_in()
     g.channels()
