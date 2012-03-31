@@ -10,7 +10,7 @@ import sys
 sys.argv[0] = constants.__appname__
 
 from gum import app
-from gum.controllers import control
+from gum.controllers import Editor, editor
 from waveform import GraphView, GraphScrollbar
 from filedialog import OpenFileDialog, SaveFileDialog, SaveSelectionFileDialog
 import copy
@@ -209,8 +209,8 @@ class EditorWindow(gtk.Window):
 
         return uimanager
 
-    def on_new_sound_loaded(self, controller, graph, sel, curs):
-        page = EditorPage(controller, graph, sel, curs)
+    def on_new_sound_loaded(self, editor, graph, sel, curs):
+        page = EditorPage(editor, graph, sel, curs)
         self.notebook.add_page(page)
 
     def _on_filename_changed(self, notebook, filename):
@@ -403,7 +403,7 @@ class EditorNotebook(gtk.Notebook):
             numpage = self.get_current_page()
         try:
             self._close_page(numpage, force=False)
-        except control.FileNotSaved:
+        except editor.FileNotSaved:
             page = self.get_nth_page(numpage)
             name = page.filename() or "sound"
             proceed = self._show_dialog_close(name)
@@ -467,9 +467,9 @@ class EditorPage(gtk.VBox):
                     'error': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_PYOBJECT,gobject.TYPE_PYOBJECT))}
 
-    def __init__(self, controller, graph, selection, cursor):
+    def __init__(self, editor, graph, selection, cursor):
         gtk.VBox.__init__(self)
-        self.ctrl = controller
+        self.ctrl = editor
 
         # Close button
         image = gtk.image_new_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_MENU)
@@ -565,14 +565,14 @@ def test():
     selection.changed = Fake()
     cursor = Mock({'pixel': 20})
     cursor.changed = Fake()
-    class FakeController(Fake):
+    class FakeEditor(Fake):
         def __init__(self):
             self.filename_changed = Fake()
             self.error = Fake()
 
     notebook = EditorNotebook()
     win = EditorWindow(notebook)
-    page = EditorPage(FakeController(), graph, selection, cursor)
+    page = EditorPage(FakeEditor(), graph, selection, cursor)
     notebook.add_page(page)
     win.resize(700, 500)
     win.show_all()

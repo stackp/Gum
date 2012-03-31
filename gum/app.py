@@ -4,7 +4,7 @@
 
 from gum.lib import event
 from gum.models import Graph, Cursor, Sound, Selection, sound
-from gum.controllers import Controller, Player, effect
+from gum.controllers import Editor, Player, effect
 import os.path
 import glob
 import imp
@@ -13,7 +13,7 @@ import sys
 PLUGINS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fx')
 
 # This signal is emitted when a new sound has been loaded. User
-# interface should connect to it. Values passed are: Controller,
+# interface should connect to it. Values passed are: Editor,
 # Graph, Selection and Cursor instances.
 new_sound_loaded = event.Signal()
 
@@ -23,8 +23,8 @@ def open_(filename=None):
     p = Player(sound)
     curs = Cursor(graph, p)
     sel = Selection(graph, curs)
-    controller = Controller(sound, p, graph, sel)
-    new_sound_loaded(controller, graph, sel, curs)
+    editor = Editor(sound, p, graph, sel)
+    new_sound_loaded(editor, graph, sel, curs)
 
 def list_effects():
     l = effect.effects.keys()

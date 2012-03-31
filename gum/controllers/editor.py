@@ -9,7 +9,7 @@ from gum.lib.event import Signal
 import gum.app
 import traceback
 
-class Controller(object):
+class Editor(object):
 
     def __init__(self, sound, player, graph, selection):
         self._player = player
@@ -202,11 +202,11 @@ class Controller(object):
 
 class FileNotSaved(Exception): pass
 
-def test_Controller():
+def test_Editor():
     from gum.lib.mock import Fake
     
     # Test opening a file
-    ctrl = Controller(Fake(), Fake(), Fake(), Fake())
+    ctrl = Editor(Fake(), Fake(), Fake(), Fake())
     ctrl.open('../../sounds/test1.wav')
     assert ctrl._sound != None
 
@@ -221,7 +221,7 @@ def test_fix_selection():
     selection = Selection(graph, Fake())
     sound = Sound()
     sound.frames = numpy.array(range(1000))
-    ctrl = Controller(sound, Fake(), Fake(), selection)
+    ctrl = Editor(sound, Fake(), Fake(), selection)
     frames = sound.frames
     selection.set(0, 999)
     ctrl.copy()
@@ -238,7 +238,7 @@ def test_fix_selection():
     selection = Selection(graph, Fake())
     sound = Sound()
     sound.frames = numpy.array(range(1000))
-    ctrl = Controller(sound, Fake(), Fake(), selection)
+    ctrl = Editor(sound, Fake(), Fake(), selection)
     frames = sound.frames
     selection.set(10, 999)
     ctrl.cut()
@@ -252,5 +252,5 @@ def test_fix_selection():
     
 
 if __name__ == "__main__":
-    test_Controller()
+    test_Editor()
     test_fix_selection()
