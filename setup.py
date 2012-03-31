@@ -42,5 +42,5 @@ setup(name = 'gum-audio',
       scripts = ['gum/scripts/gum'],
       requires = ['PyGTK', 'numpy', 'pyalsaaudio (>=0.6)',
                   'scikits.samplerate'],
-      install_requires = ['pyalsaaudio>=0.6', 'scikits.samplerate']
+      install_requires = ['pyalsaaudio>=0.6', 'scikits.samplerate', 'numpy']
       )
