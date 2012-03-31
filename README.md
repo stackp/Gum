@@ -24,7 +24,7 @@ If you’d rather install Gum in your home directory, you should use pip with vi
     cd $HOME
     virtualenv gummy
     source gummy/bin/activate
-    pip install gum
+    pip install gum-audio
     gum
 
 You can uninstall Gum removing the $HOME/gummy directory.
