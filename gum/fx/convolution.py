@@ -1,3 +1,4 @@
+from gum.lib import edit
 from gum.controllers import effect
 from gum.models import clipboard, sound
 import numpy
@@ -39,9 +40,9 @@ def convolution(sound, start, end):
         y = []
         if h.ndim == 1:
             #! H will be computed two times !
-            h = sound.mix_channels_auto(h, 2)
+            h = edit.mix_channels_auto(h, 2)
         if x.ndim == 1:
-            x = sound.mix_channels_auto(x, 2)
+            x = edit.mix_channels_auto(x, 2)
         h = h.transpose()
         x = x.transpose()
         for nchan in range(2):

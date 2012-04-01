@@ -6,6 +6,7 @@ from gum.models import Sound, clipboard, sound
 from player import Player
 import effect
 from gum.lib.event import Signal
+from gum.lib import edit
 import traceback
 
 class Editor(object):
@@ -129,7 +130,7 @@ class Editor(object):
             self._sound.samplerate = clipboard.samplerate
             self._player.set_samplerate(self._sound.samplerate)
         rate_ratio = float(self._sound.samplerate) / clipboard.samplerate
-        clip = sound.resample(clipboard.clip, rate_ratio)
+        clip = edit.resample(clipboard.clip, rate_ratio)
         self._sound.paste(start, end, clip)
         self._selection.set(start, start + len(clip))
         if was_zoomed_out_full:
