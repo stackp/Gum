@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Gum sound editor (https://github.com/stackp/Gum)
 # Copyright 2009 (C) Pierre Duquesne <stackp@online.fr>
 # Licensed under the Revised BSD License.
@@ -9,6 +11,7 @@ from gum import constants
 import sys
 sys.argv[0] = constants.__appname__
 
+import gum
 from gum import app
 from gum.controllers import Editor, editor
 from waveform import GraphView, GraphScrollbar
@@ -33,7 +36,7 @@ def main_loop():
 def display_error(title, text, parent=None):
     d = gtk.MessageDialog(parent, type=gtk.MESSAGE_ERROR,
                           buttons=gtk.BUTTONS_CLOSE)
-    d.set_icon(d.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
+    d.set_icon_from_file(gum.logofile)
     d.set_title(title)
     d.set_markup(text)
     d.run()
@@ -92,7 +95,7 @@ class EditorWindow(gtk.Window):
         self.connect('key_press_event', self.on_key_press_event)
 
         self.connect("delete-event", self.quit)
-        self.set_icon(self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
+        self.set_icon_from_file(gum.logofile)
         self.resize(700, 500)
         self.show_all()
 
@@ -296,11 +299,15 @@ class EditorWindow(gtk.Window):
         d = gtk.AboutDialog()
         d.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
         d.set_transient_for(self)
+        d.set_logo(gtk.gdk.pixbuf_new_from_file(gum.logofile))
         d.set_program_name(constants.__appname__)
         d.set_version(constants.__version__)
         d.set_website(constants.__url__)
         d.set_copyright("(c) Pierre Duquesne <stackp@online.fr>")
         d.set_comments("An audio editor")
+        d.set_authors(["Pierre Duquesne <stackp@online.fr>"])
+        d.set_artists(
+            ["Logo by Martina Šmejkalová http://www.sireasgallery.com"])
         d.run()
         d.destroy()
 

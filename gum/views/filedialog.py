@@ -1,5 +1,6 @@
 import gtk
 import os.path
+from gum import logofile
 
 class FileDialog(object):
     """Handle a pair of file dialogs (open and save)."""
@@ -102,7 +103,7 @@ class SaveFileDialog(FileDialog):
     def ask_overwrite(self, filename):
         d = gtk.MessageDialog(self.parent, type=gtk.MESSAGE_QUESTION,
                               buttons=(gtk.BUTTONS_YES_NO))
-        d.set_icon(d.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
+        d.set_icon_from_file(logofile)
         d.set_markup("<b>%s already exists. Overwrite?</b>" % filename)
         response = d.run()
         d.destroy()

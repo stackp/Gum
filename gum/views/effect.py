@@ -1,3 +1,4 @@
+from gum import logofile
 import gtk
 
 class EffectDialog(gtk.Dialog):
@@ -10,7 +11,7 @@ class EffectDialog(gtk.Dialog):
         self.parameters = {}
         self.set_decorated(False)
         self.resize(400, 1)
-        self.set_icon(self.render_icon(gtk.STOCK_CUT, gtk.ICON_SIZE_DIALOG))
+        self.set_icon_from_file(logofile)
         self.table = gtk.Table(3, 2)
         self.table.set_col_spacings(10)
         self.table.set_row_spacings(10)
