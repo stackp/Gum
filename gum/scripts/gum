@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import gum
 from gum.run import run
 
 if __name__ == '__main__':
