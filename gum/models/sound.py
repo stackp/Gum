@@ -104,7 +104,8 @@ class Sound(object):
             clip = edit.mix_channels_auto(clip, self.numchan())
             if start != end:
                 length = min(end - start, len(clip))
-                self.frames[start:start + length] += clip[:length]
+                chunk = clip[:length].astype(self.frames.dtype) # FIXME
+                self.frames[start:start + length] += chunk
             else:
                 a = self.frames
                 b = clip

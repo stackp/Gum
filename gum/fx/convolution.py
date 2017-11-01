@@ -16,7 +16,7 @@ def ola_fftconvolve(x, h):
     Nfft = 2 ** nextpow2(len(h))
     H = numpy.fft.fft(h, Nfft)
     lslice = Nfft - len(h) + 1 # because lslice + len(h) - 1 == Nfft
-    numslices = numpy.ceil(float(len(x)) / lslice)
+    numslices = int(numpy.ceil(float(len(x)) / lslice))
     y = numpy.zeros(numslices * lslice + len(h) - 1)
     start = 0
     while start < len(x):

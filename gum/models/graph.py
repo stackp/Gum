@@ -183,7 +183,7 @@ class Graph(object):
     def pxltofrm(self, p):
         "Converts a pixel index to a frame index."
         f = cell2frame(self._view_start + p, self.density)
-        return self._gauge(f, 0, self.numframes())
+        return int(self._gauge(f, 0, self.numframes()))
     
     def _gauge(self, value, mini, maxi):
         "Calibrate value between mini and maxi."
