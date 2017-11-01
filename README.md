@@ -27,7 +27,7 @@ If you’d rather install Gum in your home directory, you should use pip with vi
     pip install gum-audio
     gum
 
-You can uninstall Gum removing the $HOME/gummy directory.
+To uninstall Gum, just remove the $HOME/gummy directory.
 
 ## Method 3: Manual installation of the development version
 
@@ -37,6 +37,4 @@ You’ll need git, cython and make (`apt-get install git cython make`). Type in 
     cd Gum
     ./build.sh
     ./run
-
-To uninstall Gum, just remove the $HOME/gummy directory.
 
