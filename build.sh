@@ -20,7 +20,7 @@ pushd gum/fast
 make clean && make
 popd
 
-log "\n→ Building fast waveform display..."
+log "\n→ Building audio effects..."
 pushd gum/fx
 make clean && make
 popd
