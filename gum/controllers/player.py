@@ -10,8 +10,7 @@ import numpy
 class AlsaBackend(object):
     def __init__(self, rate=44100):
         self._pcm = alsaaudio.PCM(type=alsaaudio.PCM_PLAYBACK,
-                            mode=alsaaudio.PCM_NORMAL,
-                            card='default')
+                            mode=alsaaudio.PCM_NORMAL)
         self._pcm.setchannels(2)
         self._pcm.setformat(alsaaudio.PCM_FORMAT_FLOAT_LE)
         self.set_samplerate(rate)

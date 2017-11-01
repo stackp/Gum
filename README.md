@@ -10,12 +10,12 @@ There are (at least) 3 methods to install Gum. But first, you must install the f
 
 Install pip (on Debian/Ubuntu: `apt-get install python-pip`). Then, type in a terminal:
 
-    su -c "pip install gum-audio"
+    sudo pip install gum-audio
     gum
 
 To uninstall Gum:
 
-    su -c "pip uninstall gum-audio"
+    sudo pip uninstall gum-audio
 
 ## Method 2: Local install with pip and virtualenv
 
@@ -33,29 +33,9 @@ You can uninstall Gum removing the $HOME/gummy directory.
 
 You’ll need git, cython and make (`apt-get install git cython make`). Type in a terminal (not as root):
 
-    cd $HOME
-    mkdir gummy
-    cd gummy
     git clone https://github.com/stackp/Gum.git
-    wget http://downloads.sourceforge.net/pyalsaaudio/pyalsaaudio-0.6.tar.gz
-    tar xvzf pyalsaaudio-0.6.tar.gz
-    cd pyalsaaudio-0.6/
-    python setup.py build
-    cp build/lib.linux-i686-2.*/alsaaudio.so ../Gum/gum/
-    cd ../
-    wget http://pypi.python.org/packages/source/s/scikits.samplerate/scikits.samplerate-0.3.3.tar.gz
-    tar xvzf scikits.samplerate-0.3.3.tar.gz
-    cd scikits.samplerate-0.3.3/scikits/samplerate/
-    cython _samplerate.pyx
-    gcc -shared -pthread -fPIC -fwrapv -O2 -Wall -fno-strict-aliasing             -I/usr/include/python2.5 -I/usr/include/python2.6 -I /usr/include/samplerate            -lsamplerate -o _samplerate.so _samplerate.c
-    cd ../../..
-    mv scikits.samplerate-0.3.3/scikits/ Gum/gum
-    rm -rf scikits.samplerate-0.3.3*
-    cd Gum/gum/fast
-    make
-    cd ../fx
-    make
-    cd ../..
+    cd Gum
+    ./build.sh
     ./run
 
 To uninstall Gum, just remove the $HOME/gummy directory.

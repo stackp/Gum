@@ -2,3 +2,6 @@
 *.pyo
 \#*\#
 *~
+*.c
+*so
+pyalsaaudio*
