@@ -1,3 +1,6 @@
+numpy
 samplerate
+pysndfile
 pyalsaaudio
-flufl.enum  # enum is not included in python2
+# enum is not included in python2 but required by pyalsaaudio
+flufl.enum

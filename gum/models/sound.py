@@ -3,13 +3,14 @@
 # Licensed under the Revised BSD License.
 
 from gum.lib.event import Signal
-from gum.lib import pysndfile, history, edit
+from gum.lib import history, edit
+import pysndfile
 from copy import copy
 import os.path
 import numpy
 
 def list_extensions():
-    extensions = pysndfile.supported_format()
+    extensions = pysndfile.get_sndfile_formats()
     extensions.append('aif')
     return extensions
 
@@ -27,15 +28,14 @@ class Sound(object):
             self.frames = numpy.array([])
             self.samplerate = 44100
             self._saved_revision = None
-            self._format = pysndfile.formatinfo()
+            self._format = pysndfile.construct_format('wavex', 'pcm24')
         else:
             filename = os.path.expanduser(filename)
-            f = pysndfile.sndfile(filename)
-            nframes = f.get_nframes()
+            f = pysndfile.PySndfile(filename)
+            nframes = f.frames()
             self.frames = f.read_frames(nframes)
-            self.samplerate = f.get_samplerate()
-            self._format = f._format
-            f.close()
+            self.samplerate = f.samplerate()
+            self._format = f.format()
             self._saved_revision = self.history.revision()
 
     def numchan(self):
@@ -47,12 +47,12 @@ class Sound(object):
     def save_as(self, filename):
         if filename is None:
             raise Exception("No filename")
-        f = pysndfile.sndfile(filename, mode='write',
-                              format=self._format,
-                              channels=self.numchan(),
-                              samplerate=self.samplerate)
+        f = pysndfile.PySndfile(filename,
+                                mode='w',
+                                format=self._format,
+                                channels=self.numchan(),
+                                samplerate=self.samplerate)
         f.write_frames(self.frames)
-        f.close()
         self.filename = filename
         self._saved_revision = self.history.revision()
 
@@ -247,9 +247,7 @@ def testSound():
     outfile = "/tmp/test3.wav"
     snd.save_as(outfile)
     snd2 = Sound(outfile)
-    assert snd2._format.type == 'wavex'
-    assert snd2._format.encoding == 'pcm24'
-    assert snd2._format.endianness == 'file'
+    assert snd2._format == pysndfile.construct_format('wavex', 'pcm24')
     assert snd.samplerate == 48000
     os.remove(outfile)
     
@@ -395,10 +393,10 @@ def testSound():
     def fake_sndfile(filename):
         assert '~' not in filename
         return mock.Fake()
-    sndfile = pysndfile.sndfile
-    pysndfile.sndfile = fake_sndfile
+    orig = pysndfile.PySndfile
+    pysndfile.PySndfile = fake_sndfile
     Sound("~/sound.wav")
-    pysndfile.sndfile = sndfile
+    pysndfile.PySndfile = orig
 
 if __name__ == '__main__':
     testSound()

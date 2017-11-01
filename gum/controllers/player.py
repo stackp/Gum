@@ -106,10 +106,10 @@ def testPlayer():
     player = Player(sound)
     player.thread_play().join()
 
-    from gum.lib import pysndfile
+    import pysndfile
     import gum
-    f = pysndfile.sndfile(gum.basedir + '/data/test/test1.wav')
-    data = f.read_frames(f.get_nframes())
+    f = pysndfile.PySndfile(gum.basedir + '/data/test/test1.wav')
+    data = f.read_frames(f.frames())
     sound.frames = data
     player.set_sound(sound)
     player.thread_play().join()
@@ -148,8 +148,8 @@ def testPlayer():
     player.stop()
 
     # Testing stereo
-    f = pysndfile.sndfile(gum.basedir + '/data/test/test2.wav')
-    data = f.read_frames(f.get_nframes())
+    f = pysndfile.PySndfile(gum.basedir + '/data/test/test2.wav')
+    data = f.read_frames(f.frames())
     sound = Mock({"numchan": 2})
     sound.samplerate = 44100
     sound.frames = data
