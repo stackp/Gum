@@ -40,8 +40,8 @@ def _condense(data, start, width, density):
     start = int(start)
     width = int(width)
     for i in range(start, start + width):
-        a = cell2frame(i, density)
-        b = cell2frame(i + 1, density)
+        a = int(round(cell2frame(i, density)))
+        b = int(round(cell2frame(i + 1, density)))
         d = data[a:b]
         if len(d) == 0:
             break
@@ -183,7 +183,7 @@ class Graph(object):
     def pxltofrm(self, p):
         "Converts a pixel index to a frame index."
         f = cell2frame(self._view_start + p, self.density)
-        return int(self._gauge(f, 0, self.numframes()))
+        return int(round(self._gauge(f, 0, self.numframes())))
     
     def _gauge(self, value, mini, maxi):
         "Calibrate value between mini and maxi."
