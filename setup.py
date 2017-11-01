@@ -41,7 +41,7 @@ setup(name = 'gum-audio',
                      Extension('gum.fx._svf', ['gum/fx/_svf.c'])],
       scripts = ['gum/scripts/gum'],
       requires = ['PyGTK', 'numpy', 'pyalsaaudio (>=0.6)',
-                  'samplerate', 'pysndfile', 'flufl.enum'],
+                  'samplerate', 'pysndfile', 'enum34'],
       install_requires = ['numpy', 'pyalsaaudio>=0.6',
-                          'samplerate', 'pysndfile', 'flufl.enum']
-      )
+                          'samplerate', 'pysndfile', 'enum34']
+)
