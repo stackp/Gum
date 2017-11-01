@@ -5,3 +5,4 @@
 *.c
 *so
 pyalsaaudio*
+venv/

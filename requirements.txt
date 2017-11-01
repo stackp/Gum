@@ -1,0 +1,3 @@
+samplerate
+pyalsaaudio
+flufl.enum  # enum is not included in python2

@@ -6,33 +6,23 @@ log () {
     echo -e "${ORANGE}${*}${NC}"
 }
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
 
-if [ ! -d pyalsaaudio-0.8.4/ ]; then
-    log "\n→ Downloading pyalsaaudio..."
-    wget https://pypi.python.org/packages/52/b6/44871791929d9d7e11325af0b7be711388dfeeab17147988f044a41a6d83/pyalsaaudio-0.8.4.tar.gz#md5=b46f69561bc85fc52e698b2440ca251e
-    tar xzf pyalsaaudio-0.8.4.tar.gz
-fi
-
-log "\n→ Building pyalsaaudio..."
-pushd pyalsaaudio-0.8.4/
-python2 setup.py build
-cp build/lib.*/*.so ../gum/alsaaudio.so
-rm -rf pyalsaaudio*
-popd
-
-log "\n→ Building scikits.samplerate..."
-pushd gum/scikits/samplerate
-make
-popd
+log "\n→ Creating virtualenv..."
+rm -rf venv
+virtualenv -p python2 --system-site-packages venv
+source venv/bin/activate
+pip install -r requirements.txt
 
 log "\n→ Building fast waveform display..."
 pushd gum/fast
-make
+make clean && make
 popd
 
 log "\n→ Building fast waveform display..."
 pushd gum/fx
-make
+make clean && make
 popd
 
 log "\n✓ Build completed with success"

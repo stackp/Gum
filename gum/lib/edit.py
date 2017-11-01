@@ -1,5 +1,5 @@
 import numpy
-from scikits import samplerate
+import samplerate
 
 
 def resample(frames, ratio):

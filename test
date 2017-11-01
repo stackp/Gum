@@ -3,6 +3,10 @@
 DIRECTORY=`dirname $0`
 export PYTHONPATH=$DIRECTORY:$DIRECTORY/gum:$PYTHONPATH
 
+if [ -d "$DIRECTORY/venv" ]; then
+    source venv/bin/activate
+fi;
+
 if test -z $@; then
     files=`find gum -name '*.py'`;
 else
