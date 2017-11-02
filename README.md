@@ -22,7 +22,7 @@ To uninstall Gum:
 If you’d rather install Gum in your home directory, you should use pip with virtualenv (`apt-get install python-pip python-virtualenv`). Type (not as root):
 
     cd $HOME
-    virtualenv gummy
+    virtualenv -p python2 --system-site-packages gummy
     source gummy/bin/activate
     pip install gum-audio
     gum
